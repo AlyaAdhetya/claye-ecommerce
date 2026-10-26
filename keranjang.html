@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Keranjang Belanja — Clayé Ceramic</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    .cart-layout { display: grid; grid-template-columns: 1fr 380px; gap: 2rem; align-items: start; }
+    .cart-item { display: grid; grid-template-columns: 100px 1fr auto; gap: 1.25rem; align-items: center; padding: 1.5rem; border-bottom: 1px solid var(--color-border-light); transition: background var(--transition-base); }
+    .cart-item:last-child { border-bottom: none; }
+    .cart-item:hover { background: var(--color-bg); }
+    .cart-item-img { width: 100px; height: 100px; border-radius: var(--radius-md); overflow: hidden; flex-shrink: 0; }
+    .cart-item-img img { width: 100%; height: 100%; object-fit: cover; }
+    .cart-item-name { font-family: var(--font-heading); font-size: 1rem; font-weight: 600; color: var(--color-dark); margin-bottom: 0.3rem; }
+    .cart-item-cat { font-size: 0.75rem; color: var(--color-text-muted); margin-bottom: 0.5rem; }
+    .cart-item-price { font-weight: 700; color: var(--color-primary); font-family: var(--font-heading); }
+    .cart-item-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 0.75rem; }
+    .cart-item-total { font-weight: 700; font-size: 1.1rem; color: var(--color-dark); font-family: var(--font-heading); }
+    .cart-remove-btn { font-size: 0.78rem; color: var(--color-text-muted); background: none; border: none; cursor: pointer; transition: color var(--transition-base); }
+    .cart-remove-btn:hover { color: var(--color-error); }
+    .order-summary { background: white; border-radius: var(--radius-lg); box-shadow: var(--shadow-card); border: 1px solid var(--color-border-light); padding: 1.75rem; position: sticky; top: calc(var(--navbar-height) + 1.5rem); }
+    .order-summary h3 { margin-bottom: 1.5rem; font-size: 1.2rem; }
+    .summary-row { display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 0; font-size: 0.9rem; }
+    .summary-row.total { font-weight: 700; font-size: 1.1rem; color: var(--color-dark); border-top: 2px solid var(--color-border); margin-top: 0.5rem; padding-top: 1rem; font-family: var(--font-heading); }
+    .summary-row .label { color: var(--color-text-light); }
+    .summary-row .value { font-weight: 600; color: var(--color-dark); }
+    .summary-row .value.green { color: var(--color-accent); }
+    .promo-input-wrap { display: flex; gap: 0.5rem; margin: 1rem 0; }
+    .promo-input { flex: 1; padding: 0.7rem 1rem; border: 1.5px solid var(--color-border); border-radius: var(--radius-full); font-size: 0.85rem; outline: none; }
+    .promo-input:focus { border-color: var(--color-primary); }
+    .promo-btn { padding: 0.7rem 1.25rem; background: var(--color-dark); color: white; border: none; border-radius: var(--radius-full); font-size: 0.82rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .trust-badges { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--color-border-light); }
+    .trust-badge-item { display: flex; align-items: center; gap: 0.6rem; font-size: 0.78rem; color: var(--color-text-muted); }
+    @media(max-width: 900px) { .cart-layout { grid-template-columns: 1fr; } .order-summary { position: static; } }
+    @media(max-width: 640px) { .cart-item { grid-template-columns: 80px 1fr; } .cart-item-actions { grid-column: 1/-1; flex-direction: row; justify-content: space-between; } }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="container navbar-inner">
+    <a href="index.html" class="navbar-logo"><span class="logo-name">Clayé</span><span class="logo-tagline">Ceramic Studio</span></a>
+    <div class="navbar-nav">
+      <a href="index.html">Beranda</a><a href="katalog.html">Katalog</a><a href="index.html#tentang">Tentang</a>
+    </div>
+    <div class="navbar-actions">
+      <button class="navbar-icon-btn" id="navbar-user-btn">👤</button>
+      <a href="keranjang.html" class="navbar-icon-btn">🛒<span class="cart-badge" style="display:none">0</span></a>
+      <button class="hamburger"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<div class="mobile-menu"><div class="mobile-menu-overlay"></div><div class="mobile-menu-panel"><div class="mobile-menu-header"><a href="index.html" class="navbar-logo"><span class="logo-name">Clayé</span></a><button class="mobile-menu-close">✕</button></div><nav class="mobile-nav"><a href="index.html">🏠 Beranda</a><a href="katalog.html">🏺 Katalog</a><a href="login.html">👤 Login</a></nav></div></div>
+
+<div class="page-header">
+  <div class="container">
+    <nav class="breadcrumb"><a href="index.html">Beranda</a><span class="separator">›</span><span class="current">Keranjang Belanja</span></nav>
+    <h1>Keranjang Belanja</h1>
+  </div>
+</div>
+
+<section class="section-sm">
+  <div class="container">
+    <div id="empty-cart" style="display:none">
+      <div class="empty-state">
+        <div class="empty-state-icon">🛒</div>
+        <h3>Keranjang Anda Masih Kosong</h3>
+        <p>Temukan keramik artisan impian Anda dan tambahkan ke keranjang!</p>
+        <a href="katalog.html" class="btn btn-primary btn-lg">Mulai Belanja</a>
+      </div>
+    </div>
+
+    <div id="cart-content" class="cart-layout">
+      <!-- Cart Items -->
+      <div class="card" style="overflow:hidden">
+        <div class="card-header flex-between">
+          <h3 style="margin:0;font-size:1.1rem">Item dalam Keranjang <span id="cart-item-count" style="color:var(--color-text-muted);font-weight:400;font-size:0.9rem"></span></h3>
+          <button class="btn btn-ghost btn-sm" onclick="clearCart()">🗑 Hapus Semua</button>
+        </div>
+        <div id="cart-items-list"></div>
+        <div class="card-footer flex-between">
+          <a href="katalog.html" class="btn btn-ghost btn-sm">← Lanjut Belanja</a>
+          <span style="font-size:0.82rem;color:var(--color-text-muted)">Produk akan disimpan selama 24 jam</span>
+        </div>
+      </div>
+
+      <!-- Order Summary -->
+      <div class="order-summary">
+        <h3>Ringkasan Pesanan</h3>
+        <div class="summary-row"><span class="label">Subtotal</span><span class="value" id="summary-subtotal">Rp 0</span></div>
+        <div class="summary-row"><span class="label">Ongkos Kirim</span><span class="value" id="summary-shipping">Rp 15.000</span></div>
+        <div class="summary-row"><span class="label">Diskon Promo</span><span class="value green" id="summary-discount">- Rp 0</span></div>
+        <div class="summary-row total"><span>Total</span><span id="summary-total">Rp 0</span></div>
+
+        <div class="promo-input-wrap">
+          <input type="text" class="promo-input" placeholder="Kode promo" id="promo-code">
+          <button class="promo-btn" onclick="applyPromo()">Gunakan</button>
+        </div>
+        <div id="promo-msg" style="font-size:0.78rem;color:var(--color-accent);margin-bottom:0.5rem;display:none">✓ Promo berhasil diterapkan!</div>
+
+        <a href="checkout.html" class="btn btn-primary btn-full btn-lg" style="margin-top:0.5rem">
+          Lanjut ke Checkout →
+        </a>
+
+        <div class="trust-badges">
+          <div class="trust-badge-item">🔒 Pembayaran aman & terenkripsi</div>
+          <div class="trust-badge-item">🚚 Pengiriman ke seluruh Indonesia</div>
+          <div class="trust-badge-item">↩️ Garansi retur 30 hari</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recommended Products -->
+    <div style="margin-top:4rem">
+      <div class="section-header" style="text-align:left;margin-bottom:2rem"><h3>Mungkin Anda Juga Suka</h3></div>
+      <div class="products-grid" id="recommended-products" style="grid-template-columns:repeat(4,1fr)"></div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-bottom"><p>© 2024 Clayé Ceramic Studio.</p></div>
+  </div>
+</footer>
+
+<script src="assets/js/main.js"></script>
+<script>
+  let promoApplied = false;
+  const PROMO_CODES = { 'CLAYE10': 10, 'WELCOME15': 15, 'KERAMIK20': 20 };
+
+  function renderCartItems() {
+    const cart = getCart();
+    const container = document.getElementById('cart-items-list');
+    const emptyEl = document.getElementById('empty-cart');
+    const contentEl = document.getElementById('cart-content');
+
+    if (cart.length === 0) {
+      emptyEl.style.display = 'block';
+      contentEl.style.display = 'none';
+      return;
+    }
+    emptyEl.style.display = 'none';
+    contentEl.style.display = 'grid';
+    document.getElementById('cart-item-count').textContent = `(${cart.length} item)`;
+
+    container.innerHTML = cart.map(item => `
+      <div class="cart-item" id="cart-item-${item.id}">
+        <div class="cart-item-img"><img src="${item.image}" alt="${item.name}"></div>
+        <div>
+          <div class="cart-item-cat">${item.category}</div>
+          <div class="cart-item-name"><a href="detail-produk.html?id=${item.id}" style="color:inherit">${item.name}</a></div>
+          <div class="cart-item-price">${formatRupiah(item.price)}</div>
+        </div>
+        <div class="cart-item-actions">
+          <div class="cart-item-total">${formatRupiah(item.price * item.quantity)}</div>
+          <div class="qty-control">
+            <button class="qty-btn" onclick="updateQty(${item.id},-1)">−</button>
+            <input type="number" class="qty-num" value="${item.quantity}" min="1" onchange="setQty(${item.id},this.value)">
+            <button class="qty-btn" onclick="updateQty(${item.id},1)">+</button>
+          </div>
+          <button class="cart-remove-btn" onclick="removeItem(${item.id})">🗑 Hapus</button>
+        </div>
+      </div>
+    `).join('');
+    updateSummary();
+    // Recommended
+    const productIds = cart.map(i => i.id);
+    const recommended = PRODUCTS.filter(p => !productIds.includes(p.id)).slice(0, 4);
+    document.getElementById('recommended-products').innerHTML = recommended.map(renderProductCard).join('');
+    initScrollAnimations();
+  }
+
+  function updateSummary() {
+    const subtotal = getCartTotal();
+    const shipping = subtotal >= 300000 ? 0 : 15000;
+    const discountPercent = promoApplied ? (PROMO_CODES[document.getElementById('promo-code').value.toUpperCase()] || 0) : 0;
+    const discount = Math.floor(subtotal * discountPercent / 100);
+    const total = subtotal + shipping - discount;
+    document.getElementById('summary-subtotal').textContent = formatRupiah(subtotal);
+    document.getElementById('summary-shipping').textContent = shipping === 0 ? 'GRATIS 🎉' : formatRupiah(shipping);
+    document.getElementById('summary-discount').textContent = `- ${formatRupiah(discount)}`;
+    document.getElementById('summary-total').textContent = formatRupiah(total);
+  }
+
+  function updateQty(id, delta) {
+    const cart = getCart();
+    const item = cart.find(i => i.id === id);
+    if (item) { item.quantity = Math.max(1, item.quantity + delta); saveCart(cart); }
+    renderCartItems();
+  }
+
+  function setQty(id, val) {
+    const qty = Math.max(1, parseInt(val) || 1);
+    updateCartQty(id, qty);
+    renderCartItems();
+  }
+
+  function removeItem(id) {
+    removeFromCart(id);
+    renderCartItems();
+    showToast('Item dihapus dari keranjang', 'info');
+  }
+
+  function clearCart() {
+    if (confirm('Hapus semua item dari keranjang?')) { saveCart([]); renderCartItems(); }
+  }
+
+  function applyPromo() {
+    const code = document.getElementById('promo-code').value.toUpperCase();
+    const pct = PROMO_CODES[code];
+    if (pct) {
+      promoApplied = true;
+      document.getElementById('promo-msg').style.display = 'block';
+      document.getElementById('promo-msg').textContent = `✓ Promo "${code}" diterapkan! Diskon ${pct}%`;
+      showToast(`Kode promo berhasil! Diskon ${pct}% diterapkan 🎉`, 'success');
+    } else {
+      showToast('Kode promo tidak valid atau sudah kadaluarsa', 'error');
+    }
+    updateSummary();
+  }
+
+  document.addEventListener('DOMContentLoaded', renderCartItems);
+</script>
+</body>
+</html>

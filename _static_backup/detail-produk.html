@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detail Produk — Clayé Ceramic</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    .detail-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }
+    .gallery-wrap { position: sticky; top: calc(var(--navbar-height) + 1.5rem); }
+    .gallery-main { aspect-ratio: 1; border-radius: var(--radius-xl); overflow: hidden; background: var(--color-cream); box-shadow: var(--shadow-lg); margin-bottom: 1rem; }
+    .gallery-main img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; cursor: zoom-in; }
+    .gallery-main img:hover { transform: scale(1.05); }
+    .gallery-thumbs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }
+    .gallery-thumb { aspect-ratio: 1; border-radius: var(--radius-md); overflow: hidden; cursor: pointer; border: 2px solid transparent; transition: all var(--transition-base); }
+    .gallery-thumb:hover, .gallery-thumb.active { border-color: var(--color-primary); }
+    .gallery-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .product-detail-price { font-family: var(--font-heading); font-size: 2rem; font-weight: 700; color: var(--color-primary); }
+    .product-detail-price-old { font-size: 1.1rem; color: var(--color-text-muted); text-decoration: line-through; margin-left: 0.75rem; }
+    .product-detail-price-save { display: inline-block; background: #FEE2E2; color: var(--color-error); font-size: 0.78rem; font-weight: 700; padding: 3px 10px; border-radius: 12px; margin-left: 0.5rem; }
+    .variant-option { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .variant-btn { padding: 0.45rem 1.1rem; border: 1.5px solid var(--color-border); border-radius: var(--radius-full); font-size: 0.82rem; font-weight: 500; cursor: pointer; transition: all var(--transition-base); background: white; }
+    .variant-btn:hover, .variant-btn.active { background: var(--color-primary); border-color: var(--color-primary); color: white; }
+    .color-btn { width: 36px; height: 36px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: all var(--transition-base); }
+    .color-btn.active { border-color: var(--color-primary); transform: scale(1.15); }
+    .product-add-section { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+    .product-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .product-meta-item { display: flex; align-items: flex-start; gap: 0.5rem; padding: 0.85rem; background: var(--color-bg); border-radius: var(--radius-md); font-size: 0.82rem; }
+    .product-meta-item span:first-child { font-size: 1.2rem; }
+    .product-meta-item strong { display: block; font-size: 0.75rem; font-weight: 600; color: var(--color-text); margin-bottom: 2px; }
+    .product-meta-item p { color: var(--color-text-muted); font-size: 0.75rem; margin: 0; }
+    .tabs { display: flex; border-bottom: 2px solid var(--color-border-light); margin-bottom: 1.5rem; gap: 0.25rem; }
+    .tab-btn { padding: 0.75rem 1.5rem; font-size: 0.88rem; font-weight: 600; color: var(--color-text-muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all var(--transition-base); background: none; border-top: none; border-left: none; border-right: none; }
+    .tab-btn.active { color: var(--color-primary); border-bottom-color: var(--color-primary); }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+    .review-item { padding: 1.5rem 0; border-bottom: 1px solid var(--color-border-light); }
+    .review-item:last-child { border-bottom: none; }
+    @media(max-width: 900px) { .detail-layout { grid-template-columns: 1fr; gap: 2rem; } .gallery-wrap { position: static; } }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="container navbar-inner">
+    <a href="index.html" class="navbar-logo">
+      <span class="logo-name">Clayé</span>
+      <span class="logo-tagline">Ceramic Studio</span>
+    </a>
+    <div class="navbar-nav">
+      <a href="index.html">Beranda</a>
+      <a href="katalog.html" class="active">Katalog</a>
+      <a href="index.html#tentang">Tentang</a>
+      <a href="index.html#kontak">Kontak</a>
+    </div>
+    <div class="navbar-actions">
+      <button class="navbar-icon-btn" id="navbar-user-btn">👤</button>
+      <a href="keranjang.html" class="navbar-icon-btn">🛒<span class="cart-badge" style="display:none">0</span></a>
+      <button class="hamburger"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<div class="mobile-menu">
+  <div class="mobile-menu-overlay"></div>
+  <div class="mobile-menu-panel">
+    <div class="mobile-menu-header"><a href="index.html" class="navbar-logo"><span class="logo-name">Clayé</span></a><button class="mobile-menu-close">✕</button></div>
+    <nav class="mobile-nav"><a href="index.html">🏠 Beranda</a><a href="katalog.html">🏺 Katalog</a><a href="keranjang.html">🛒 Keranjang</a><a href="login.html">👤 Login</a></nav>
+  </div>
+</div>
+
+<div class="page-header">
+  <div class="container">
+    <nav class="breadcrumb">
+      <a href="index.html">Beranda</a><span class="separator">›</span>
+      <a href="katalog.html">Katalog</a><span class="separator">›</span>
+      <span class="current" id="breadcrumb-name">Terra Bowl Klasik</span>
+    </nav>
+  </div>
+</div>
+
+<section class="section-sm">
+  <div class="container">
+    <div class="detail-layout">
+      <!-- GALLERY -->
+      <div class="gallery-wrap animate-on-scroll">
+        <div class="gallery-main">
+          <img src="assets/images/product_bowl.jpg" alt="Produk" id="main-img">
+        </div>
+        <div class="gallery-thumbs">
+          <div class="gallery-thumb active" onclick="changeImg('assets/images/product_bowl.jpg',this)"><img src="assets/images/product_bowl.jpg" alt=""></div>
+          <div class="gallery-thumb" onclick="changeImg('assets/images/product_vase.jpg',this)"><img src="assets/images/product_vase.jpg" alt=""></div>
+          <div class="gallery-thumb" onclick="changeImg('assets/images/product_mug.jpg',this)"><img src="assets/images/product_mug.jpg" alt=""></div>
+          <div class="gallery-thumb" onclick="changeImg('assets/images/product_plate.jpg',this)"><img src="assets/images/product_plate.jpg" alt=""></div>
+        </div>
+      </div>
+
+      <!-- PRODUCT INFO -->
+      <div class="animate-on-scroll animate-delay-1">
+        <div class="product-category" style="font-size:0.8rem;margin-bottom:0.5rem" id="prod-cat">Mangkuk</div>
+        <h1 style="font-size:clamp(1.6rem,3vw,2.2rem);margin-bottom:1rem" id="prod-name">Terra Bowl Klasik</h1>
+
+        <div class="product-rating" style="margin-bottom:1.25rem">
+          <span class="stars">★★★★★</span>
+          <span style="font-weight:600;font-size:0.9rem;color:var(--color-dark)">4.8</span>
+          <span class="rating-count">(124 ulasan)</span>
+          <span style="margin-left:0.5rem;font-size:0.78rem;color:var(--color-accent)">✓ 89 terjual bulan ini</span>
+        </div>
+
+        <div style="margin-bottom:1.5rem">
+          <span class="product-detail-price" id="prod-price">Rp 185.000</span>
+          <span class="product-detail-price-old" id="prod-old-price">Rp 220.000</span>
+          <span class="product-detail-price-save">Hemat 16%</span>
+        </div>
+
+        <p style="color:var(--color-text-light);line-height:1.8;margin-bottom:1.5rem">
+          Terra Bowl Klasik hadir dengan keindahan yang autentik — setiap lekukan dan guratan tangan mencerminkan proses pembuatan yang penuh dedikasi. Terbuat dari tanah liat pilihan yang dibakar pada suhu tinggi untuk durabilitas maksimal dan keamanan pangan.
+        </p>
+
+        <!-- Variants -->
+        <div style="margin-bottom:1.5rem">
+          <div style="font-size:0.82rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--color-text-muted);margin-bottom:0.6rem">Ukuran</div>
+          <div class="variant-option" id="size-options">
+            <button class="variant-btn active">S — 14 cm</button>
+            <button class="variant-btn">M — 18 cm</button>
+            <button class="variant-btn">L — 22 cm</button>
+          </div>
+        </div>
+        <div style="margin-bottom:1.75rem">
+          <div style="font-size:0.82rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--color-text-muted);margin-bottom:0.6rem">Warna Glasir</div>
+          <div class="variant-option">
+            <button class="color-btn active" style="background:#C4956A" title="Terrakota Hangat"></button>
+            <button class="color-btn" style="background:#EDE0D4" title="Krem Alami"></button>
+            <button class="color-btn" style="background:#4A7C59" title="Sage Hijau"></button>
+            <button class="color-btn" style="background:#2C1810" title="Espresso Gelap"></button>
+            <button class="color-btn" style="background:#B8A99A" title="Abu Pasir"></button>
+          </div>
+        </div>
+
+        <!-- Add to Cart -->
+        <div class="product-add-section" style="margin-bottom:2rem">
+          <div class="qty-control">
+            <button class="qty-btn" onclick="changeQty(-1)">−</button>
+            <input type="number" class="qty-num" value="1" min="1" max="99" id="qty-input">
+            <button class="qty-btn" onclick="changeQty(1)">+</button>
+          </div>
+          <button class="btn btn-primary btn-lg" onclick="addProductToCart()" style="flex:1">🛒 Tambah ke Keranjang</button>
+          <button class="btn btn-icon btn-secondary" title="Wishlist" id="wishlist-btn" onclick="toggleWishlist()">♡</button>
+        </div>
+        <a href="checkout.html" class="btn btn-dark btn-full btn-lg" style="margin-bottom:1.5rem">⚡ Beli Sekarang</a>
+
+        <!-- Meta -->
+        <div class="product-meta">
+          <div class="product-meta-item"><span>🤲</span><div><strong>100% Handmade</strong><p>Dibuat satu per satu oleh pengrajin</p></div></div>
+          <div class="product-meta-item"><span>🔥</span><div><strong>Kiln-fired</strong><p>Dibakar 1200°C, tahan lama</p></div></div>
+          <div class="product-meta-item"><span>✅</span><div><strong>Food Safe</strong><p>Aman untuk makanan & minuman</p></div></div>
+          <div class="product-meta-item"><span>📦</span><div><strong>Gift Ready</strong><p>Tersedia packaging hadiah</p></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRODUCT TABS -->
+    <div style="margin-top:4rem" class="animate-on-scroll">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('deskripsi',this)">Deskripsi</button>
+        <button class="tab-btn" onclick="switchTab('spesifikasi',this)">Spesifikasi</button>
+        <button class="tab-btn" onclick="switchTab('ulasan',this)">Ulasan (124)</button>
+        <button class="tab-btn" onclick="switchTab('pengiriman',this)">Pengiriman</button>
+      </div>
+
+      <div class="tab-pane active" id="tab-deskripsi">
+        <p><strong>Terra Bowl Klasik</strong> adalah karya unggulan dari koleksi Clayé yang terinspirasi dari tradisi tembikar Jawa kuno. Setiap mangkuk dibentuk di atas roda putar, kemudian digelasiri dengan campuran mineral alami yang menghasilkan tampilan matte yang elegan.</p>
+        <p>Proses pembakaran dalam kiln suhu tinggi memastikan ketahanan jangka panjang sekaligus mengunci keindahan warna glasir. Bentuk organik yang tidak sempurna justru menjadi keistimewaan — karena tidak ada dua buah yang identik.</p>
+        <p>Cocok untuk hidangan sup, salad, buah, atau sekadar pajangan interior yang menawan.</p>
+        <ul style="color:var(--color-text-light);line-height:2;margin-left:1.25rem;list-style:disc">
+          <li>Dibuat dari tanah liat stoneware pilihan</li>
+          <li>Glasir ramah lingkungan, bebas timbal</li>
+          <li>Aman untuk microwave & dishwasher (dengan penanganan hati-hati)</li>
+          <li>Tidak bisa terkena benturan keras</li>
+        </ul>
+      </div>
+
+      <div class="tab-pane" id="tab-spesifikasi">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;max-width:600px">
+          <div style="background:var(--color-bg);padding:1rem;border-radius:var(--radius-md)"><div style="font-size:0.78rem;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:0.08em">Bahan</div><strong>Stoneware Clay</strong></div>
+          <div style="background:var(--color-bg);padding:1rem;border-radius:var(--radius-md)"><div style="font-size:0.78rem;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:0.08em">Glasir</div><strong>Mineral Alami</strong></div>
+          <div style="background:var(--color-bg);padding:1rem;border-radius:var(--radius-md)"><div style="font-size:0.78rem;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:0.08em">Suhu Bakar</div><strong>1200°C</strong></div>
+          <div style="background:var(--color-bg);padding:1rem;border-radius:var(--radius-md)"><div style="font-size:0.78rem;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:0.08em">Dimensi (M)</div><strong>Ø18 × H8 cm</strong></div>
+          <div style="background:var(--color-bg);padding:1rem;border-radius:var(--radius-md)"><div style="font-size:0.78rem;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:0.08em">Berat</div><strong>±320 gram</strong></div>
+          <div style="background:var(--color-bg);padding:1rem;border-radius:var(--radius-md)"><div style="font-size:0.78rem;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:0.08em">Microwave Safe</div><strong>✓ Ya</strong></div>
+        </div>
+      </div>
+
+      <div class="tab-pane" id="tab-ulasan">
+        <div style="display:flex;gap:3rem;align-items:flex-start;margin-bottom:2rem;flex-wrap:wrap">
+          <div style="text-align:center">
+            <div style="font-size:3.5rem;font-family:var(--font-heading);font-weight:700;color:var(--color-primary);line-height:1">4.8</div>
+            <div style="color:#F4A74B;font-size:1.2rem">★★★★★</div>
+            <div style="font-size:0.78rem;color:var(--color-text-muted);margin-top:0.25rem">124 ulasan</div>
+          </div>
+          <div style="flex:1;min-width:200px">
+            <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem"><span style="font-size:0.78rem;color:var(--color-text-muted);width:16px">5★</span><div style="flex:1;height:8px;background:var(--color-border);border-radius:4px"><div style="height:8px;width:78%;background:var(--color-primary);border-radius:4px"></div></div><span style="font-size:0.78rem;color:var(--color-text-muted)">78%</span></div>
+            <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem"><span style="font-size:0.78rem;color:var(--color-text-muted);width:16px">4★</span><div style="flex:1;height:8px;background:var(--color-border);border-radius:4px"><div style="height:8px;width:15%;background:#F4A74B;border-radius:4px"></div></div><span style="font-size:0.78rem;color:var(--color-text-muted)">15%</span></div>
+            <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem"><span style="font-size:0.78rem;color:var(--color-text-muted);width:16px">3★</span><div style="flex:1;height:8px;background:var(--color-border);border-radius:4px"><div style="height:8px;width:5%;background:var(--color-warning);border-radius:4px"></div></div><span style="font-size:0.78rem;color:var(--color-text-muted)">5%</span></div>
+            <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem"><span style="font-size:0.78rem;color:var(--color-text-muted);width:16px">2★</span><div style="flex:1;height:8px;background:var(--color-border);border-radius:4px"><div style="height:8px;width:2%;background:var(--color-error);border-radius:4px"></div></div><span style="font-size:0.78rem;color:var(--color-text-muted)">2%</span></div>
+            <div style="display:flex;align-items:center;gap:0.75rem"><span style="font-size:0.78rem;color:var(--color-text-muted);width:16px">1★</span><div style="flex:1;height:8px;background:var(--color-border);border-radius:4px"><div style="height:8px;width:0%;background:var(--color-error);border-radius:4px"></div></div><span style="font-size:0.78rem;color:var(--color-text-muted)">0%</span></div>
+          </div>
+        </div>
+        <div id="reviews-list">
+          <div class="review-item"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.5rem"><div><strong style="color:var(--color-dark)">Anisa Putri</strong><span style="color:#F4A74B;margin-left:0.5rem">★★★★★</span></div><span style="font-size:0.78rem;color:var(--color-text-muted)">3 hari lalu</span></div><p style="font-size:0.88rem;color:var(--color-text);margin:0">"Mangkuknya sungguh cantik! Teksturnya terasa hangat dan natural. Kualitas sangat sebanding dengan harganya."</p></div>
+          <div class="review-item"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.5rem"><div><strong style="color:var(--color-dark)">Budi Santoso</strong><span style="color:#F4A74B;margin-left:0.5rem">★★★★★</span></div><span style="font-size:0.78rem;color:var(--color-text-muted)">1 minggu lalu</span></div><p style="font-size:0.88rem;color:var(--color-text);margin:0">"Ini pembelian ketiga saya dari Clayé. Selalu memuaskan! Packaging aman dan pengiriman cepat."</p></div>
+          <div class="review-item"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.5rem"><div><strong style="color:var(--color-dark)">Siti Rahma</strong><span style="color:#F4A74B;margin-left:0.5rem">★★★★☆</span></div><span style="font-size:0.78rem;color:var(--color-text-muted)">2 minggu lalu</span></div><p style="font-size:0.88rem;color:var(--color-text);margin:0">"Cantik sekali, tapi ukurannya sedikit lebih kecil dari yang saya bayangkan. Overall sangat suka!"</p></div>
+        </div>
+      </div>
+
+      <div class="tab-pane" id="tab-pengiriman">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;max-width:700px">
+          <div class="product-meta-item" style="flex-direction:column;align-items:flex-start"><span style="font-size:1.5rem;margin-bottom:0.5rem">🚚</span><strong style="color:var(--color-dark)">Pengiriman Standar</strong><p>2–5 hari kerja · Rp 15.000 – Rp 25.000</p></div>
+          <div class="product-meta-item" style="flex-direction:column;align-items:flex-start"><span style="font-size:1.5rem;margin-bottom:0.5rem">⚡</span><strong style="color:var(--color-dark)">Pengiriman Ekspres</strong><p>1–2 hari kerja · Rp 35.000 – Rp 50.000</p></div>
+          <div class="product-meta-item" style="flex-direction:column;align-items:flex-start"><span style="font-size:1.5rem;margin-bottom:0.5rem">🆓</span><strong style="color:var(--color-dark)">Gratis Ongkir</strong><p>Pembelian ≥ Rp 300.000</p></div>
+          <div class="product-meta-item" style="flex-direction:column;align-items:flex-start"><span style="font-size:1.5rem;margin-bottom:0.5rem">↩️</span><strong style="color:var(--color-dark)">Retur 30 Hari</strong><p>Kondisi asli, gratis ongkir retur</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RELATED PRODUCTS -->
+    <div style="margin-top:4rem" class="animate-on-scroll">
+      <div class="section-header" style="text-align:left;margin-bottom:2rem"><h3>Produk Terkait</h3></div>
+      <div class="products-grid" id="related-products" style="grid-template-columns:repeat(4,1fr)"></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand"><div class="logo-name">Clayé</div><p>Studio keramik artisan premium dari Yogyakarta.</p></div>
+      <div class="footer-col"><h4>Belanja</h4><ul><li><a href="katalog.html">Semua Produk</a></li><li><a href="keranjang.html">Keranjang</a></li></ul></div>
+      <div class="footer-col"><h4>Akun</h4><ul><li><a href="login.html">Login</a></li><li><a href="dashboard-pelanggan.html">Dashboard</a></li></ul></div>
+      <div class="footer-col"><h4>Bantuan</h4><ul><li><a href="#">FAQ</a></li><li><a href="#">Kontak</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><p>© 2024 Clayé Ceramic Studio. Semua hak dilindungi.</p></div>
+  </div>
+</footer>
+
+<script src="assets/js/main.js"></script>
+<script>
+  // Load product from URL param
+  const urlParams = new URLSearchParams(window.location.search);
+  const prodId = parseInt(urlParams.get('id')) || 1;
+  const product = PRODUCTS.find(p => p.id === prodId) || PRODUCTS[0];
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('prod-name').textContent = product.name;
+    document.getElementById('prod-cat').textContent = product.category;
+    document.getElementById('prod-price').textContent = formatRupiah(product.price);
+    document.getElementById('breadcrumb-name').textContent = product.name;
+    if (product.oldPrice) {
+      document.getElementById('prod-old-price').textContent = formatRupiah(product.oldPrice);
+    } else {
+      document.getElementById('prod-old-price').style.display = 'none';
+    }
+    document.getElementById('main-img').src = product.image;
+    // Related
+    const related = PRODUCTS.filter(p => p.id !== product.id).slice(0, 4);
+    document.getElementById('related-products').innerHTML = related.map(renderProductCard).join('');
+    initScrollAnimations();
+  });
+
+  function changeImg(src, el) {
+    document.getElementById('main-img').src = src;
+    document.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function changeQty(delta) {
+    const input = document.getElementById('qty-input');
+    const newVal = Math.max(1, parseInt(input.value) + delta);
+    input.value = newVal;
+  }
+
+  function addProductToCart() {
+    const qty = parseInt(document.getElementById('qty-input').value);
+    addToCart(product.id, qty);
+  }
+
+  function toggleWishlist() {
+    const btn = document.getElementById('wishlist-btn');
+    const isWished = btn.textContent === '♥';
+    btn.textContent = isWished ? '♡' : '♥';
+    btn.style.color = isWished ? '' : '#C44A3A';
+    showToast(isWished ? 'Dihapus dari wishlist' : 'Ditambahkan ke wishlist ❤️', isWished ? 'info' : 'success');
+  }
+
+  // Variant toggle
+  document.querySelectorAll('#size-options .variant-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#size-options .variant-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+  document.querySelectorAll('.color-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  function switchTab(id, btn) {
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    btn.classList.add('active');
+  }
+</script>
+</body>
+</html>

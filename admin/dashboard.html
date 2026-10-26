@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — Clayé Ceramic</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <style>
+    :root { --admin-sidebar: 260px; }
+    body { background: #F0EBE6; }
+    .admin-layout { display: flex; min-height: 100vh; }
+    .admin-sidebar { width: var(--admin-sidebar); background: var(--color-dark); position: fixed; top: 0; left: 0; bottom: 0; z-index: 200; overflow-y: auto; display: flex; flex-direction: column; transition: transform var(--transition-slow); }
+    .admin-sidebar-logo { padding: 1.75rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .admin-sidebar-logo .logo-name { font-family: var(--font-heading); font-size: 1.5rem; font-weight: 700; color: var(--color-secondary); }
+    .admin-sidebar-logo .logo-sub { font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.3); }
+    .admin-nav { flex: 1; padding: 1.25rem 0; }
+    .admin-nav-section { padding: 0 1.25rem; margin-bottom: 0.25rem; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.25); margin-top: 1.25rem; }
+    .admin-nav-item { display: flex; align-items: center; gap: 0.85rem; padding: 0.8rem 1.5rem; color: rgba(255,255,255,0.55); font-size: 0.88rem; font-weight: 500; cursor: pointer; transition: all var(--transition-base); position: relative; border-left: 3px solid transparent; }
+    .admin-nav-item:hover { background: rgba(255,255,255,0.05); color: white; border-left-color: rgba(255,255,255,0.2); }
+    .admin-nav-item.active { background: rgba(139,94,60,0.2); color: white; border-left-color: var(--color-primary-light); }
+    .admin-nav-item .nav-icon { font-size: 1.05rem; width: 20px; text-align: center; flex-shrink: 0; }
+    .admin-nav-badge { margin-left: auto; background: var(--color-primary); color: white; font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: var(--radius-full); }
+    .admin-sidebar-footer { padding: 1.25rem; border-top: 1px solid rgba(255,255,255,0.08); }
+    .admin-user-mini { display: flex; align-items: center; gap: 0.75rem; }
+    .admin-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--color-primary); display: flex; align-items: center; justify-content: center; font-weight: 700; color: white; font-size: 0.9rem; flex-shrink: 0; }
+    .admin-user-mini .admin-name { font-size: 0.85rem; font-weight: 600; color: white; }
+    .admin-user-mini .admin-role { font-size: 0.7rem; color: rgba(255,255,255,0.4); }
+    .admin-main { margin-left: var(--admin-sidebar); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+    .admin-topbar { background: white; border-bottom: 1px solid var(--color-border-light); height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 1.75rem; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-sm); gap: 1rem; }
+    .admin-topbar-left { display: flex; align-items: center; gap: 1rem; }
+    .admin-page-title { font-family: var(--font-heading); font-size: 1.2rem; font-weight: 600; color: var(--color-dark); }
+    .admin-search { display: flex; align-items: center; gap: 0.5rem; background: var(--color-bg); border: 1.5px solid var(--color-border); border-radius: var(--radius-full); padding: 0.45rem 1rem; }
+    .admin-search input { border: none; background: transparent; outline: none; font-size: 0.85rem; color: var(--color-text); width: 200px; }
+    .admin-topbar-right { display: flex; align-items: center; gap: 0.5rem; }
+    .admin-content { padding: 1.75rem; flex: 1; }
+    .admin-panel { display: none; }
+    .admin-panel.active { display: block; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; margin-bottom: 1.75rem; }
+    .kpi-card { background: white; border-radius: var(--radius-lg); padding: 1.5rem; box-shadow: var(--shadow-card); border: 1px solid var(--color-border-light); position: relative; overflow: hidden; }
+    .kpi-card::after { content: ''; position: absolute; top: 0; right: 0; width: 80px; height: 80px; border-radius: 0 0 0 80px; opacity: 0.07; }
+    .kpi-card.primary::after { background: var(--color-primary); }
+    .kpi-card.accent::after { background: var(--color-accent); }
+    .kpi-card.warning::after { background: var(--color-warning); }
+    .kpi-card.info::after { background: var(--color-info); }
+    .kpi-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-text-muted); margin-bottom: 0.75rem; }
+    .kpi-value { font-family: var(--font-heading); font-size: 1.9rem; font-weight: 700; color: var(--color-dark); line-height: 1; margin-bottom: 0.5rem; }
+    .kpi-change { font-size: 0.78rem; font-weight: 600; }
+    .kpi-change.up { color: var(--color-accent); }
+    .kpi-change.down { color: var(--color-error); }
+    .kpi-icon { position: absolute; top: 1.25rem; right: 1.25rem; font-size: 1.8rem; opacity: 0.8; }
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th { background: var(--color-bg); padding: 0.85rem 1rem; text-align: left; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-text-muted); border-bottom: 2px solid var(--color-border); white-space: nowrap; }
+    .data-table td { padding: 1rem; font-size: 0.85rem; color: var(--color-text); border-bottom: 1px solid var(--color-border-light); vertical-align: middle; }
+    .data-table tr:hover td { background: rgba(139,94,60,0.02); }
+    .data-table .product-thumb { width: 44px; height: 44px; border-radius: var(--radius-sm); object-fit: cover; }
+    .charts-row { display: grid; grid-template-columns: 2fr 1fr; gap: 1.25rem; margin-bottom: 1.75rem; }
+    .chart-card { background: white; border-radius: var(--radius-lg); box-shadow: var(--shadow-card); border: 1px solid var(--color-border-light); overflow: hidden; }
+    .chart-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--color-border-light); display: flex; justify-content: space-between; align-items: center; }
+    .chart-body { padding: 1.5rem; }
+    .bar-chart { display: flex; align-items: flex-end; gap: 0.5rem; height: 140px; }
+    .bar-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.3rem; }
+    .bar-fill { width: 100%; border-radius: 4px 4px 0 0; background: linear-gradient(to top, var(--color-primary-dark), var(--color-primary-light)); transition: height 0.8s cubic-bezier(0.34,1.56,0.64,1); }
+    .bar-label { font-size: 0.68rem; color: var(--color-text-muted); text-align: center; }
+    .bar-val { font-size: 0.7rem; font-weight: 700; color: var(--color-primary); }
+    .donut-wrap { position: relative; display: flex; align-items: center; justify-content: center; }
+    .donut-svg { transform: rotate(-90deg); }
+    .donut-center { position: absolute; text-align: center; }
+    .donut-center strong { font-family: var(--font-heading); font-size: 1.4rem; font-weight: 700; color: var(--color-dark); display: block; }
+    .donut-center span { font-size: 0.72rem; color: var(--color-text-muted); }
+    .legend-item { display: flex; align-items: center; gap: 0.6rem; font-size: 0.8rem; color: var(--color-text-light); }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .product-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+    .top-product-item { display: flex; align-items: center; gap: 1rem; padding: 0.85rem 0; border-bottom: 1px solid var(--color-border-light); }
+    .top-product-item:last-child { border-bottom: none; }
+    .top-product-rank { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; flex-shrink: 0; }
+    .rank-1 { background: #FEF3C7; color: #92400E; }
+    .rank-2 { background: #F3F4F6; color: #6B7280; }
+    .rank-3 { background: #FEE2E2; color: #991B1B; }
+    .rank-other { background: var(--color-bg); color: var(--color-text-muted); }
+    .action-menu { position: relative; }
+    .action-dropdown { position: absolute; right: 0; top: 100%; background: white; border-radius: var(--radius-md); box-shadow: var(--shadow-lg); border: 1px solid var(--color-border); min-width: 160px; z-index: 50; display: none; }
+    .action-dropdown.open { display: block; }
+    .action-dropdown a { display: block; padding: 0.65rem 1rem; font-size: 0.82rem; color: var(--color-text); transition: background var(--transition-base); }
+    .action-dropdown a:hover { background: var(--color-bg); color: var(--color-primary); }
+    @media(max-width: 1100px) { .kpi-grid { grid-template-columns: repeat(2,1fr); } .charts-row { grid-template-columns: 1fr; } }
+    @media(max-width: 900px) { .admin-sidebar { transform: translateX(-100%); } .admin-sidebar.mobile-open { transform: translateX(0); } .admin-main { margin-left: 0; } }
+  </style>
+</head>
+<body>
+
+<div class="admin-layout">
+  <!-- SIDEBAR -->
+  <aside class="admin-sidebar" id="admin-sidebar">
+    <div class="admin-sidebar-logo">
+      <a href="../index.html">
+        <div class="logo-name">Clayé</div>
+        <div class="logo-sub">Admin Panel</div>
+      </a>
+    </div>
+
+    <nav class="admin-nav">
+      <div class="admin-nav-section">Utama</div>
+      <div class="admin-nav-item active" onclick="adminSwitch('dashboard',this)"><span class="nav-icon">📊</span> Dashboard</div>
+      <div class="admin-nav-item" onclick="adminSwitch('orders',this)"><span class="nav-icon">📦</span> Pesanan <span class="admin-nav-badge" id="order-badge">3</span></div>
+      <div class="admin-nav-item" onclick="adminSwitch('products',this)"><span class="nav-icon">🏺</span> Produk</div>
+      <div class="admin-nav-item" onclick="adminSwitch('customers',this)"><span class="nav-icon">👥</span> Pelanggan</div>
+
+      <div class="admin-nav-section">Konten</div>
+      <div class="admin-nav-item" onclick="adminSwitch('categories',this)"><span class="nav-icon">🗂</span> Kategori</div>
+      <div class="admin-nav-item" onclick="adminSwitch('promo',this)"><span class="nav-icon">🎁</span> Promo & Voucher</div>
+      <div class="admin-nav-item" onclick="showToast('Halaman review segera hadir!','info')"><span class="nav-icon">⭐</span> Ulasan</div>
+
+      <div class="admin-nav-section">Sistem</div>
+      <div class="admin-nav-item" onclick="showToast('Pengaturan segera hadir!','info')"><span class="nav-icon">⚙️</span> Pengaturan</div>
+      <div class="admin-nav-item" onclick="showToast('Laporan segera hadir!','info')"><span class="nav-icon">📈</span> Laporan</div>
+    </nav>
+
+    <div class="admin-sidebar-footer">
+      <div class="admin-user-mini">
+        <div class="admin-avatar">A</div>
+        <div>
+          <div class="admin-name">Admin Clayé</div>
+          <div class="admin-role">Super Administrator</div>
+        </div>
+        <button style="margin-left:auto;background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.4);font-size:1rem" onclick="window.location='../index.html'" title="Ke toko">🏠</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="admin-main">
+    <!-- Topbar -->
+    <div class="admin-topbar">
+      <div class="admin-topbar-left">
+        <button style="display:none;background:none;border:none;cursor:pointer;font-size:1.4rem;color:var(--color-text)" id="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+        <div class="admin-page-title" id="admin-page-title">Dashboard</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:1rem;flex:1;justify-content:center">
+        <div class="admin-search">
+          <span>🔍</span>
+          <input type="text" placeholder="Cari pesanan, produk, pelanggan...">
+        </div>
+      </div>
+      <div class="admin-topbar-right">
+        <button class="navbar-icon-btn" onclick="showToast('3 notifikasi baru','info')" title="Notifikasi" style="position:relative">
+          🔔<span class="cart-badge" style="display:flex">3</span>
+        </button>
+        <a href="../index.html" class="btn btn-ghost btn-sm">🏠 Lihat Toko</a>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="admin-content">
+
+      <!-- ===== DASHBOARD ===== -->
+      <div class="admin-panel active" id="admin-panel-dashboard">
+        <!-- KPI -->
+        <div class="kpi-grid">
+          <div class="kpi-card primary animate-on-scroll">
+            <div class="kpi-icon">💰</div>
+            <div class="kpi-label">Pendapatan Bulan Ini</div>
+            <div class="kpi-value">Rp 24,8 Jt</div>
+            <div class="kpi-change up">↑ 18.4% dari bulan lalu</div>
+          </div>
+          <div class="kpi-card accent animate-on-scroll animate-delay-1">
+            <div class="kpi-icon">📦</div>
+            <div class="kpi-label">Total Pesanan</div>
+            <div class="kpi-value">186</div>
+            <div class="kpi-change up">↑ 12.1% dari bulan lalu</div>
+          </div>
+          <div class="kpi-card warning animate-on-scroll animate-delay-2">
+            <div class="kpi-icon">👥</div>
+            <div class="kpi-label">Pelanggan Baru</div>
+            <div class="kpi-value">94</div>
+            <div class="kpi-change up">↑ 24.7% dari bulan lalu</div>
+          </div>
+          <div class="kpi-card info animate-on-scroll animate-delay-3">
+            <div class="kpi-icon">🏺</div>
+            <div class="kpi-label">Produk Aktif</div>
+            <div class="kpi-value">48</div>
+            <div class="kpi-change down">↓ 2 produk habis stok</div>
+          </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="charts-row">
+          <!-- Sales Bar Chart -->
+          <div class="chart-card animate-on-scroll">
+            <div class="chart-header">
+              <h4 style="margin:0;font-size:1rem">📈 Penjualan 7 Hari Terakhir</h4>
+              <select style="border:1.5px solid var(--color-border);border-radius:var(--radius-full);padding:0.35rem 0.85rem;font-size:0.78rem;outline:none">
+                <option>7 Hari</option><option>30 Hari</option><option>3 Bulan</option>
+              </select>
+            </div>
+            <div class="chart-body">
+              <div class="bar-chart" id="sales-bar-chart">
+                <!-- generated by JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Category Donut -->
+          <div class="chart-card animate-on-scroll animate-delay-1">
+            <div class="chart-header"><h4 style="margin:0;font-size:1rem">🗂 Penjualan per Kategori</h4></div>
+            <div class="chart-body" style="display:flex;flex-direction:column;align-items:center;gap:1.25rem">
+              <div class="donut-wrap">
+                <svg class="donut-svg" width="140" height="140" viewBox="0 0 140 140">
+                  <circle cx="70" cy="70" r="54" fill="none" stroke="#F0EBE6" stroke-width="18"/>
+                  <circle cx="70" cy="70" r="54" fill="none" stroke="#8B5E3C" stroke-width="18" stroke-dasharray="135 204" stroke-dashoffset="0" stroke-linecap="round"/>
+                  <circle cx="70" cy="70" r="54" fill="none" stroke="#4A7C59" stroke-width="18" stroke-dasharray="68 271" stroke-dashoffset="-135" stroke-linecap="round"/>
+                  <circle cx="70" cy="70" r="54" fill="none" stroke="#D4A574" stroke-width="18" stroke-dasharray="51 288" stroke-dashoffset="-203" stroke-linecap="round"/>
+                  <circle cx="70" cy="70" r="54" fill="none" stroke="#B8A99A" stroke-width="18" stroke-dasharray="85 254" stroke-dashoffset="-254" stroke-linecap="round"/>
+                </svg>
+                <div class="donut-center">
+                  <strong>186</strong>
+                  <span>Terjual</span>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:0.5rem;width:100%">
+                <div class="legend-item"><div class="legend-dot" style="background:#8B5E3C"></div><span style="flex:1">Mangkuk</span><strong>40%</strong></div>
+                <div class="legend-item"><div class="legend-dot" style="background:#4A7C59"></div><span style="flex:1">Mug</span><strong>20%</strong></div>
+                <div class="legend-item"><div class="legend-dot" style="background:#D4A574"></div><span style="flex:1">Vas</span><strong>15%</strong></div>
+                <div class="legend-item"><div class="legend-dot" style="background:#B8A99A"></div><span style="flex:1">Lainnya</span><strong>25%</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Row -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem" class="animate-on-scroll">
+          <!-- Recent Orders -->
+          <div class="chart-card">
+            <div class="chart-header flex-between">
+              <h4 style="margin:0;font-size:1rem">📋 Pesanan Terbaru</h4>
+              <button class="btn btn-ghost btn-sm" onclick="adminSwitch('orders',null)">Semua →</button>
+            </div>
+            <div style="overflow-x:auto">
+              <table class="data-table">
+                <thead><tr><th>ID</th><th>Pelanggan</th><th>Total</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr><td style="font-weight:600;color:var(--color-primary)">#CLY-48291</td><td>Anisa P.</td><td>Rp 430.000</td><td><span class="status-badge status-processing">Diproses</span></td></tr>
+                  <tr><td style="font-weight:600;color:var(--color-primary)">#CLY-48290</td><td>Raka D.</td><td>Rp 245.000</td><td><span class="status-badge status-shipped">Dikirim</span></td></tr>
+                  <tr><td style="font-weight:600;color:var(--color-primary)">#CLY-48289</td><td>Dewi R.</td><td>Rp 780.000</td><td><span class="status-badge status-delivered">Selesai</span></td></tr>
+                  <tr><td style="font-weight:600;color:var(--color-primary)">#CLY-48288</td><td>Budi S.</td><td>Rp 185.000</td><td><span class="status-badge status-pending">Menunggu</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Top Products -->
+          <div class="chart-card">
+            <div class="chart-header"><h4 style="margin:0;font-size:1rem">🏆 Produk Terlaris</h4></div>
+            <div style="padding:1rem 1.5rem">
+              <div class="top-product-item"><div class="top-product-rank rank-1">1</div><img src="../assets/images/product_mug.jpg" style="width:44px;height:44px;border-radius:var(--radius-sm);object-fit:cover"><div style="flex:1"><div style="font-weight:600;font-size:0.88rem">Set Mug Artisan Duo</div><div style="font-size:0.75rem;color:var(--color-text-muted)">203 terjual</div></div><div style="font-weight:700;font-size:0.88rem;color:var(--color-primary)">Rp 49 Jt</div></div>
+              <div class="top-product-item"><div class="top-product-rank rank-2">2</div><img src="../assets/images/product_bowl.jpg" style="width:44px;height:44px;border-radius:var(--radius-sm);object-fit:cover"><div style="flex:1"><div style="font-weight:600;font-size:0.88rem">Terra Bowl Klasik</div><div style="font-size:0.75rem;color:var(--color-text-muted)">156 terjual</div></div><div style="font-weight:700;font-size:0.88rem;color:var(--color-primary)">Rp 29 Jt</div></div>
+              <div class="top-product-item"><div class="top-product-rank rank-3">3</div><img src="../assets/images/product_plate.jpg" style="width:44px;height:44px;border-radius:var(--radius-sm);object-fit:cover"><div style="flex:1"><div style="font-weight:600;font-size:0.88rem">Piring Lukis Alam</div><div style="font-size:0.75rem;color:var(--color-text-muted)">124 terjual</div></div><div style="font-weight:700;font-size:0.88rem;color:var(--color-primary)">Rp 24 Jt</div></div>
+              <div class="top-product-item"><div class="top-product-rank rank-other">4</div><img src="../assets/images/product_vase.jpg" style="width:44px;height:44px;border-radius:var(--radius-sm);object-fit:cover"><div style="flex:1"><div style="font-weight:600;font-size:0.88rem">Vase Organik Elegan</div><div style="font-size:0.75rem;color:var(--color-text-muted)">87 terjual</div></div><div style="font-weight:700;font-size:0.88rem;color:var(--color-primary)">Rp 28 Jt</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== ORDERS ===== -->
+      <div class="admin-panel" id="admin-panel-orders">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem">
+          <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+            <button class="tag active" id="order-filter-all" onclick="filterOrders('all',this)">Semua (186)</button>
+            <button class="tag" onclick="filterOrders('pending',this)">Menunggu (12)</button>
+            <button class="tag" onclick="filterOrders('processing',this)">Diproses (23)</button>
+            <button class="tag" onclick="filterOrders('shipped',this)">Dikirim (48)</button>
+            <button class="tag" onclick="filterOrders('done',this)">Selesai (98)</button>
+            <button class="tag" onclick="filterOrders('cancelled',this)">Dibatalkan (5)</button>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="showToast('Ekspor data pesanan sedang disiapkan...','info')">📥 Ekspor CSV</button>
+        </div>
+        <div class="chart-card">
+          <div style="overflow-x:auto">
+            <table class="data-table">
+              <thead><tr><th><input type="checkbox"></th><th>No. Pesanan</th><th>Pelanggan</th><th>Tanggal</th><th>Item</th><th>Total</th><th>Pengiriman</th><th>Status</th><th>Aksi</th></tr></thead>
+              <tbody id="admin-orders-table">
+                <tr><td><input type="checkbox"></td><td style="font-weight:600;color:var(--color-primary)">#CLY-48291</td><td><div style="font-weight:600;font-size:0.85rem">Anisa Putri</div><div style="font-size:0.72rem;color:var(--color-text-muted)">anisa@email.com</div></td><td>25 Okt 2024</td><td>3 item</td><td>Rp 430.000</td><td>JNE REG</td><td><span class="status-badge status-processing">Diproses</span></td><td><div style="display:flex;gap:0.25rem"><button class="btn btn-ghost btn-sm" onclick="showToast('Detail pesanan #CLY-48291','info')">👁</button><button class="btn btn-primary btn-sm" onclick="showToast('Status diperbarui!','success')">✓ Proses</button></div></td></tr>
+                <tr><td><input type="checkbox"></td><td style="font-weight:600;color:var(--color-primary)">#CLY-48290</td><td><div style="font-weight:600;font-size:0.85rem">Raka Darmawan</div><div style="font-size:0.72rem;color:var(--color-text-muted)">raka@email.com</div></td><td>24 Okt 2024</td><td>1 item</td><td>Rp 245.000</td><td>SiCepat</td><td><span class="status-badge status-shipped">Dikirim</span></td><td><div style="display:flex;gap:0.25rem"><button class="btn btn-ghost btn-sm" onclick="showToast('Detail pesanan','info')">👁</button><button class="btn btn-accent btn-sm" onclick="showToast('Dikonfirmasi selesai!','success')">✓ Selesai</button></div></td></tr>
+                <tr><td><input type="checkbox"></td><td style="font-weight:600;color:var(--color-primary)">#CLY-48289</td><td><div style="font-weight:600;font-size:0.85rem">Dewi Rahayu</div><div style="font-size:0.72rem;color:var(--color-text-muted)">dewi@email.com</div></td><td>23 Okt 2024</td><td>4 item</td><td>Rp 780.000</td><td>JNE YES</td><td><span class="status-badge status-delivered">Selesai</span></td><td><button class="btn btn-ghost btn-sm" onclick="showToast('Detail pesanan','info')">👁</button></td></tr>
+                <tr><td><input type="checkbox"></td><td style="font-weight:600;color:var(--color-primary)">#CLY-48288</td><td><div style="font-weight:600;font-size:0.85rem">Budi Santoso</div><div style="font-size:0.72rem;color:var(--color-text-muted)">budi@email.com</div></td><td>22 Okt 2024</td><td>1 item</td><td>Rp 185.000</td><td>Gratis</td><td><span class="status-badge status-pending">Menunggu</span></td><td><div style="display:flex;gap:0.25rem"><button class="btn btn-ghost btn-sm" onclick="showToast('Detail','info')">👁</button><button class="btn btn-primary btn-sm" onclick="showToast('Diproses!','success')">✓ Proses</button></div></td></tr>
+                <tr><td><input type="checkbox"></td><td style="font-weight:600;color:var(--color-primary)">#CLY-48287</td><td><div style="font-weight:600;font-size:0.85rem">Siti Rahma</div><div style="font-size:0.72rem;color:var(--color-text-muted)">siti@email.com</div></td><td>21 Okt 2024</td><td>2 item</td><td>Rp 465.000</td><td>JNE REG</td><td><span class="status-badge status-cancelled">Dibatalkan</span></td><td><button class="btn btn-ghost btn-sm" onclick="showToast('Detail','info')">👁</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card-footer flex-between">
+            <span style="font-size:0.82rem;color:var(--color-text-muted)">Menampilkan 5 dari 186 pesanan</span>
+            <div class="pagination" style="margin:0">
+              <button class="page-item disabled">‹</button>
+              <button class="page-item active">1</button>
+              <button class="page-item">2</button>
+              <button class="page-item">3</button>
+              <button class="page-item">›</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== PRODUCTS ===== -->
+      <div class="admin-panel" id="admin-panel-products">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem">
+          <div class="admin-search" style="flex:0 0 auto"><span>🔍</span><input type="text" placeholder="Cari produk..."></div>
+          <div style="display:flex;gap:0.75rem">
+            <select style="border:1.5px solid var(--color-border);border-radius:var(--radius-full);padding:0.45rem 1.5rem 0.45rem 0.85rem;font-size:0.82rem;outline:none;background:white;cursor:pointer"><option>Semua Kategori</option><option>Mangkuk</option><option>Vas</option><option>Mug</option><option>Piring</option></select>
+            <button class="btn btn-primary" onclick="showAddProductForm()">+ Tambah Produk</button>
+          </div>
+        </div>
+
+        <!-- Add Product Form (hidden by default) -->
+        <div class="chart-card" id="add-product-form" style="display:none;margin-bottom:1.5rem">
+          <div class="chart-header flex-between">
+            <h4 style="margin:0">✏ Tambah Produk Baru</h4>
+            <button class="btn btn-ghost btn-sm" onclick="hideAddProductForm()">✕ Tutup</button>
+          </div>
+          <div style="padding:1.5rem">
+            <div class="product-form-grid">
+              <div class="form-group"><label class="form-label">Nama Produk <span class="required">*</span></label><input type="text" class="form-control" placeholder="Nama produk..."></div>
+              <div class="form-group"><label class="form-label">Kategori <span class="required">*</span></label><select class="form-control form-control-select"><option>Pilih Kategori</option><option>Mangkuk</option><option>Vas</option><option>Mug</option><option>Piring</option><option>Teko</option><option>Pot</option></select></div>
+              <div class="form-group"><label class="form-label">Harga <span class="required">*</span></label><input type="number" class="form-control" placeholder="185000"></div>
+              <div class="form-group"><label class="form-label">Harga Coret</label><input type="number" class="form-control" placeholder="Kosongkan jika tidak ada diskon"></div>
+              <div class="form-group"><label class="form-label">Stok <span class="required">*</span></label><input type="number" class="form-control" placeholder="50"></div>
+              <div class="form-group"><label class="form-label">Badge</label><select class="form-control form-control-select"><option value="">Tidak Ada</option><option value="new">Baru</option><option value="sale">Sale</option><option value="popular">Populer</option><option value="limited">Terbatas</option></select></div>
+              <div class="form-group" style="grid-column:1/-1"><label class="form-label">Deskripsi Produk</label><textarea class="form-control" rows="3" placeholder="Deskripsi produk..."></textarea></div>
+            </div>
+            <div style="margin-top:1rem;border:2px dashed var(--color-border);border-radius:var(--radius-md);padding:2rem;text-align:center;cursor:pointer;transition:all var(--transition-base)" onclick="showToast('Upload gambar segera hadir!','info')" onmouseover="this.style.borderColor='var(--color-primary)'" onmouseout="this.style.borderColor='var(--color-border)'">
+              <div style="font-size:2rem;margin-bottom:0.5rem">📸</div>
+              <div style="font-weight:600;margin-bottom:0.25rem">Upload Foto Produk</div>
+              <div style="font-size:0.78rem;color:var(--color-text-muted)">JPG, PNG, WebP — Max 5MB per file</div>
+            </div>
+            <div style="display:flex;gap:1rem;margin-top:1.5rem">
+              <button class="btn btn-primary" onclick="saveProduct()">💾 Simpan Produk</button>
+              <button class="btn btn-ghost" onclick="hideAddProductForm()">Batal</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div style="overflow-x:auto">
+            <table class="data-table">
+              <thead><tr><th><input type="checkbox"></th><th>Produk</th><th>Kategori</th><th>Harga</th><th>Stok</th><th>Terjual</th><th>Status</th><th>Aksi</th></tr></thead>
+              <tbody id="admin-products-table"></tbody>
+            </table>
+          </div>
+          <div class="card-footer flex-between">
+            <span style="font-size:0.82rem;color:var(--color-text-muted)">Menampilkan 8 dari 48 produk</span>
+            <div class="pagination" style="margin:0">
+              <button class="page-item disabled">‹</button>
+              <button class="page-item active">1</button>
+              <button class="page-item">2</button>
+              <button class="page-item">›</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== CUSTOMERS ===== -->
+      <div class="admin-panel" id="admin-panel-customers">
+        <div class="chart-card">
+          <div style="overflow-x:auto">
+            <table class="data-table">
+              <thead><tr><th>Pelanggan</th><th>Email</th><th>Tanggal Daftar</th><th>Total Pesanan</th><th>Total Belanja</th><th>Status</th><th>Aksi</th></tr></thead>
+              <tbody>
+                <tr><td><div style="display:flex;align-items:center;gap:0.75rem"><div style="width:36px;height:36px;border-radius:50%;background:var(--color-cream-dark);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--color-primary)">A</div><div><div style="font-weight:600;font-size:0.85rem">Anisa Putri</div></div></div></td><td style="font-size:0.82rem;color:var(--color-text-muted)">anisa@email.com</td><td>Jan 2023</td><td>18 pesanan</td><td>Rp 4,2 Jt</td><td><span class="status-badge" style="background:#FEF3C7;color:#92400E">⭐ Gold</span></td><td><button class="btn btn-ghost btn-sm">👁 Detail</button></td></tr>
+                <tr><td><div style="display:flex;align-items:center;gap:0.75rem"><div style="width:36px;height:36px;border-radius:50%;background:var(--color-cream-dark);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--color-primary)">R</div><div><div style="font-weight:600;font-size:0.85rem">Raka Darmawan</div></div></div></td><td style="font-size:0.82rem;color:var(--color-text-muted)">raka@email.com</td><td>Mar 2024</td><td>5 pesanan</td><td>Rp 1,1 Jt</td><td><span class="status-badge status-shipped">Reguler</span></td><td><button class="btn btn-ghost btn-sm">👁 Detail</button></td></tr>
+                <tr><td><div style="display:flex;align-items:center;gap:0.75rem"><div style="width:36px;height:36px;border-radius:50%;background:var(--color-cream-dark);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--color-primary)">D</div><div><div style="font-weight:600;font-size:0.85rem">Dewi Rahayu</div></div></div></td><td style="font-size:0.82rem;color:var(--color-text-muted)">dewi@email.com</td><td>Feb 2022</td><td>34 pesanan</td><td>Rp 8,5 Jt</td><td><span class="status-badge" style="background:#EDE9FE;color:#5B21B6">💎 Platinum</span></td><td><button class="btn btn-ghost btn-sm">👁 Detail</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== CATEGORIES ===== -->
+      <div class="admin-panel" id="admin-panel-categories">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+          <div class="chart-card">
+            <div class="chart-header flex-between"><h4 style="margin:0">🗂 Kategori Produk</h4><button class="btn btn-primary btn-sm" onclick="showToast('Tambah kategori!','info')">+ Tambah</button></div>
+            <div style="padding:1rem">
+              <table class="data-table">
+                <thead><tr><th>Kategori</th><th>Produk</th><th>Terjual</th><th>Aksi</th></tr></thead>
+                <tbody>
+                  <tr><td>🍲 Mangkuk</td><td>12</td><td>312</td><td><button class="btn btn-ghost btn-sm">✏</button></td></tr>
+                  <tr><td>☕ Mug & Cangkir</td><td>15</td><td>267</td><td><button class="btn btn-ghost btn-sm">✏</button></td></tr>
+                  <tr><td>🌸 Vas</td><td>8</td><td>145</td><td><button class="btn btn-ghost btn-sm">✏</button></td></tr>
+                  <tr><td>🍽 Piring</td><td>7</td><td>98</td><td><button class="btn btn-ghost btn-sm">✏</button></td></tr>
+                  <tr><td>🫖 Teko</td><td>4</td><td>52</td><td><button class="btn btn-ghost btn-sm">✏</button></td></tr>
+                  <tr><td>🪴 Pot & Planter</td><td>6</td><td>78</td><td><button class="btn btn-ghost btn-sm">✏</button></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-header"><h4 style="margin:0">✏ Form Kategori</h4></div>
+            <div style="padding:1.5rem">
+              <div class="form-group"><label class="form-label">Nama Kategori <span class="required">*</span></label><input type="text" class="form-control" placeholder="Nama kategori..."></div>
+              <div class="form-group"><label class="form-label">Deskripsi</label><textarea class="form-control" rows="3" placeholder="Deskripsi singkat kategori..."></textarea></div>
+              <button class="btn btn-primary" onclick="showToast('Kategori berhasil disimpan!','success')">Simpan Kategori</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== PROMO ===== -->
+      <div class="admin-panel" id="admin-panel-promo">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+          <div class="chart-card">
+            <div class="chart-header flex-between"><h4 style="margin:0">🎁 Voucher Aktif</h4><button class="btn btn-primary btn-sm" onclick="showToast('Tambah voucher!','info')">+ Buat Voucher</button></div>
+            <div style="padding:1rem">
+              <table class="data-table">
+                <thead><tr><th>Kode</th><th>Diskon</th><th>Min. Belanja</th><th>Digunakan</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr><td style="font-weight:700;font-family:monospace;color:var(--color-primary)">CLAYE10</td><td>10%</td><td>Rp 150.000</td><td>45x</td><td><span class="status-badge status-delivered">Aktif</span></td></tr>
+                  <tr><td style="font-weight:700;font-family:monospace;color:var(--color-primary)">WELCOME15</td><td>15%</td><td>Rp 0</td><td>128x</td><td><span class="status-badge status-delivered">Aktif</span></td></tr>
+                  <tr><td style="font-weight:700;font-family:monospace;color:var(--color-primary)">KERAMIK20</td><td>20%</td><td>Rp 300.000</td><td>18x</td><td><span class="status-badge status-processing">Terbatas</span></td></tr>
+                  <tr><td style="font-weight:700;font-family:monospace;color:var(--color-text-muted)">LEBARAN23</td><td>25%</td><td>Rp 200.000</td><td>312x</td><td><span class="status-badge status-cancelled">Kadaluarsa</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-header"><h4 style="margin:0">✏ Buat Voucher Baru</h4></div>
+            <div style="padding:1.5rem">
+              <div class="form-group"><label class="form-label">Kode Voucher <span class="required">*</span></label><input type="text" class="form-control" placeholder="CLAYE20" style="text-transform:uppercase"></div>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">Tipe Diskon</label><select class="form-control form-control-select"><option>Persen (%)</option><option>Nominal (Rp)</option></select></div>
+                <div class="form-group"><label class="form-label">Nilai Diskon</label><input type="number" class="form-control" placeholder="20"></div>
+              </div>
+              <div class="form-group"><label class="form-label">Min. Belanja</label><input type="number" class="form-control" placeholder="0"></div>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">Tanggal Mulai</label><input type="date" class="form-control"></div>
+                <div class="form-group"><label class="form-label">Tanggal Selesai</label><input type="date" class="form-control"></div>
+              </div>
+              <div class="form-group"><label class="form-label">Batas Penggunaan</label><input type="number" class="form-control" placeholder="100 (kosongkan jika tidak terbatas)"></div>
+              <button class="btn btn-primary" onclick="showToast('Voucher baru berhasil dibuat! 🎁','success')">Buat Voucher</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="../assets/js/main.js"></script>
+<script>
+  // Sales bar chart
+  const salesData = [
+    { day: 'Sen', val: 3200000 },
+    { day: 'Sel', val: 4800000 },
+    { day: 'Rab', val: 2900000 },
+    { day: 'Kam', val: 5600000 },
+    { day: 'Jum', val: 7200000 },
+    { day: 'Sab', val: 8900000 },
+    { day: 'Min', val: 6100000 },
+  ];
+  const max = Math.max(...salesData.map(d => d.val));
+
+  function renderBarChart() {
+    const chart = document.getElementById('sales-bar-chart');
+    if (!chart) return;
+    chart.innerHTML = salesData.map(d => `
+      <div class="bar-item">
+        <div class="bar-val">Rp${(d.val/1000000).toFixed(1)}Jt</div>
+        <div class="bar-fill" style="height:0" data-height="${Math.round((d.val/max)*120)}px"></div>
+        <div class="bar-label">${d.day}</div>
+      </div>
+    `).join('');
+    setTimeout(() => {
+      document.querySelectorAll('.bar-fill').forEach(el => el.style.height = el.dataset.height);
+    }, 200);
+  }
+
+  // Products table
+  function renderAdminProducts() {
+    const tbody = document.getElementById('admin-products-table');
+    if (!tbody) return;
+    const stockColors = { true: '#D1FAE5', false: '#FEE2E2' };
+    const stocks = [48, 23, 15, 0, 67, 31, 0, 44];
+    tbody.innerHTML = PRODUCTS.map((p, i) => {
+      const stock = stocks[i];
+      const inStock = stock > 0;
+      return `<tr>
+        <td><input type="checkbox"></td>
+        <td><div style="display:flex;align-items:center;gap:0.75rem"><img src="../${p.image}" class="data-table-product-thumb" style="width:44px;height:44px;border-radius:var(--radius-sm);object-fit:cover"><div><div style="font-weight:600;font-size:0.85rem">${p.name}</div><div style="font-size:0.72rem;color:var(--color-text-muted)">ID: PRD-00${p.id}</div></div></div></td>
+        <td style="font-size:0.82rem">${p.category}</td>
+        <td style="font-weight:700;color:var(--color-primary)">${formatRupiah(p.price)}</td>
+        <td><span style="background:${inStock ? '#D1FAE5' : '#FEE2E2'};color:${inStock ? '#065F46' : '#991B1B'};padding:3px 10px;border-radius:12px;font-size:0.75rem;font-weight:700">${stock > 0 ? stock + ' unit' : 'Habis'}</span></td>
+        <td>${p.reviews}</td>
+        <td><span class="status-badge ${inStock ? 'status-delivered' : 'status-cancelled'}">${inStock ? 'Aktif' : 'Nonaktif'}</span></td>
+        <td><div style="display:flex;gap:0.25rem">
+          <button class="btn btn-ghost btn-sm" onclick="showToast('Edit ${p.name}','info')">✏</button>
+          <button class="btn btn-ghost btn-sm" style="color:var(--color-error)" onclick="showToast('Hapus produk?','error')">🗑</button>
+        </div></td>
+      </tr>`;
+    }).join('');
+  }
+
+  function adminSwitch(id, el) {
+    document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.admin-nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('admin-panel-' + id).classList.add('active');
+    if (el) el.classList.add('active');
+    const titles = { dashboard: 'Dashboard', orders: 'Manajemen Pesanan', products: 'Manajemen Produk', customers: 'Data Pelanggan', categories: 'Kategori Produk', promo: 'Promo & Voucher' };
+    document.getElementById('admin-page-title').textContent = titles[id] || 'Admin';
+    initScrollAnimations();
+    if (id === 'products') renderAdminProducts();
+  }
+
+  function filterOrders(status, el) {
+    document.querySelectorAll('#admin-panel-orders .tag').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    showToast(`Filter: ${el.textContent.trim()}`, 'info');
+  }
+
+  function showAddProductForm() {
+    document.getElementById('add-product-form').style.display = 'block';
+    document.getElementById('add-product-form').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function hideAddProductForm() {
+    document.getElementById('add-product-form').style.display = 'none';
+  }
+
+  function saveProduct() {
+    showToast('Produk baru berhasil ditambahkan! 🏺', 'success');
+    hideAddProductForm();
+  }
+
+  function toggleSidebar() {
+    document.getElementById('admin-sidebar').classList.toggle('mobile-open');
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    renderBarChart();
+    initScrollAnimations();
+    // Show sidebar toggle on mobile
+    if (window.innerWidth <= 900) {
+      document.getElementById('sidebar-toggle').style.display = 'block';
+    }
+  });
+</script>
+</body>
+</html>

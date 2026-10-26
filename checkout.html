@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout — Clayé Ceramic</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    .checkout-layout { display: grid; grid-template-columns: 1fr 380px; gap: 2rem; align-items: start; }
+    .steps-bar { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 2.5rem; background: white; border-radius: var(--radius-lg); box-shadow: var(--shadow-card); border: 1px solid var(--color-border-light); padding: 1.25rem 2rem; }
+    .step { display: flex; align-items: center; gap: 0.75rem; }
+    .step-num { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; border: 2px solid var(--color-border); color: var(--color-text-muted); background: white; transition: all var(--transition-base); flex-shrink: 0; }
+    .step.active .step-num { background: var(--color-primary); border-color: var(--color-primary); color: white; }
+    .step.done .step-num { background: var(--color-accent); border-color: var(--color-accent); color: white; }
+    .step-label { font-size: 0.85rem; font-weight: 600; color: var(--color-text-muted); }
+    .step.active .step-label { color: var(--color-primary); }
+    .step.done .step-label { color: var(--color-accent); }
+    .step-line { height: 2px; flex: 1; background: var(--color-border); margin: 0 0.75rem; transition: background var(--transition-base); min-width: 40px; }
+    .step-line.done { background: var(--color-accent); }
+    .checkout-step { display: none; }
+    .checkout-step.active { display: block; }
+    .payment-option { border: 2px solid var(--color-border); border-radius: var(--radius-md); padding: 1.1rem 1.25rem; cursor: pointer; transition: all var(--transition-base); display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem; }
+    .payment-option:hover { border-color: var(--color-primary); background: var(--color-bg); }
+    .payment-option.selected { border-color: var(--color-primary); background: rgba(139,94,60,0.04); }
+    .payment-option .pay-icon { font-size: 1.6rem; }
+    .payment-option .pay-name { font-weight: 600; font-size: 0.9rem; color: var(--color-dark); }
+    .payment-option .pay-desc { font-size: 0.78rem; color: var(--color-text-muted); }
+    .shipping-option { border: 2px solid var(--color-border); border-radius: var(--radius-md); padding: 1rem 1.25rem; cursor: pointer; transition: all var(--transition-base); display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
+    .shipping-option:hover { border-color: var(--color-primary); }
+    .shipping-option.selected { border-color: var(--color-primary); background: rgba(139,94,60,0.04); }
+    .order-item { display: flex; align-items: center; gap: 1rem; padding: 0.85rem 0; border-bottom: 1px solid var(--color-border-light); }
+    .order-item:last-child { border-bottom: none; }
+    .order-item img { width: 56px; height: 56px; border-radius: var(--radius-sm); object-fit: cover; }
+    .order-item-name { font-weight: 600; font-size: 0.88rem; color: var(--color-dark); flex: 1; }
+    .order-item-price { font-weight: 700; font-size: 0.9rem; color: var(--color-primary); }
+    .success-screen { text-align: center; padding: 3rem 2rem; }
+    .success-icon { width: 80px; height: 80px; background: linear-gradient(135deg, var(--color-accent), #6FA882); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 0 auto 1.5rem; animation: successPop 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+    @keyframes successPop { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    @media(max-width: 900px) { .checkout-layout { grid-template-columns: 1fr; } .steps-bar { gap: 0; } .step-line { min-width: 20px; } }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="container navbar-inner">
+    <a href="index.html" class="navbar-logo"><span class="logo-name">Clayé</span><span class="logo-tagline">Ceramic Studio</span></a>
+    <div class="navbar-nav">
+      <a href="index.html">Beranda</a><a href="katalog.html">Katalog</a>
+    </div>
+    <div class="navbar-actions">
+      <button class="navbar-icon-btn" id="navbar-user-btn">👤</button>
+      <a href="keranjang.html" class="navbar-icon-btn">🛒<span class="cart-badge" style="display:none">0</span></a>
+      <button class="hamburger"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+<div class="mobile-menu"><div class="mobile-menu-overlay"></div><div class="mobile-menu-panel"><div class="mobile-menu-header"><a href="index.html" class="navbar-logo"><span class="logo-name">Clayé</span></a><button class="mobile-menu-close">✕</button></div><nav class="mobile-nav"><a href="index.html">🏠 Beranda</a><a href="katalog.html">🏺 Katalog</a></nav></div></div>
+
+<div class="page-header">
+  <div class="container">
+    <nav class="breadcrumb"><a href="index.html">Beranda</a><span class="separator">›</span><a href="keranjang.html">Keranjang</a><span class="separator">›</span><span class="current">Checkout</span></nav>
+    <h1>Checkout</h1>
+  </div>
+</div>
+
+<section class="section-sm">
+  <div class="container">
+    <!-- Steps Bar -->
+    <div class="steps-bar" id="steps-bar">
+      <div class="step active" id="step-1"><div class="step-num">1</div><div class="step-label">Alamat</div></div>
+      <div class="step-line" id="line-1"></div>
+      <div class="step" id="step-2"><div class="step-num">2</div><div class="step-label">Pengiriman</div></div>
+      <div class="step-line" id="line-2"></div>
+      <div class="step" id="step-3"><div class="step-num">3</div><div class="step-label">Pembayaran</div></div>
+      <div class="step-line" id="line-3"></div>
+      <div class="step" id="step-4"><div class="step-num">4</div><div class="step-label">Konfirmasi</div></div>
+    </div>
+
+    <div class="checkout-layout">
+      <!-- Left Panel -->
+      <div>
+        <!-- STEP 1: Address -->
+        <div class="checkout-step active" id="checkout-step-1">
+          <div class="card" style="margin-bottom:1.5rem">
+            <div class="card-header"><h3 style="margin:0;font-size:1.1rem">📍 Alamat Pengiriman</h3></div>
+            <div class="card-body">
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">Nama Depan <span class="required">*</span></label><input type="text" class="form-control" id="first-name" placeholder="Andi" required></div>
+                <div class="form-group"><label class="form-label">Nama Belakang <span class="required">*</span></label><input type="text" class="form-control" id="last-name" placeholder="Pratama" required></div>
+              </div>
+              <div class="form-group"><label class="form-label">Email <span class="required">*</span></label><input type="email" class="form-control" id="email" placeholder="andi@email.com" required></div>
+              <div class="form-group"><label class="form-label">Nomor Telepon <span class="required">*</span></label><input type="tel" class="form-control" id="phone" placeholder="0812-3456-7890" required></div>
+              <div class="form-group"><label class="form-label">Alamat Lengkap <span class="required">*</span></label><textarea class="form-control" id="address" rows="3" placeholder="Jl. Malioboro No. 1, Kec. Gedongtengen..." required></textarea></div>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">Kota <span class="required">*</span></label><input type="text" class="form-control" id="city" placeholder="Yogyakarta" required></div>
+                <div class="form-group"><label class="form-label">Kode Pos <span class="required">*</span></label><input type="text" class="form-control" id="postal" placeholder="55271" required></div>
+              </div>
+              <div class="form-group"><label class="form-label">Provinsi <span class="required">*</span></label>
+                <select class="form-control form-control-select" id="province">
+                  <option value="">Pilih Provinsi</option>
+                  <option>DI Yogyakarta</option><option>DKI Jakarta</option><option>Jawa Barat</option><option>Jawa Tengah</option><option>Jawa Timur</option><option>Bali</option><option>Sumatera Utara</option><option>Sulawesi Selatan</option>
+                </select>
+              </div>
+              <label class="form-check"><input type="checkbox" id="save-address"><span class="form-check-label">Simpan alamat ini untuk pembelian berikutnya</span></label>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-full btn-lg" onclick="goToStep(2)">Lanjut ke Pengiriman →</button>
+        </div>
+
+        <!-- STEP 2: Shipping -->
+        <div class="checkout-step" id="checkout-step-2">
+          <div class="card" style="margin-bottom:1.5rem">
+            <div class="card-header"><h3 style="margin:0;font-size:1.1rem">🚚 Metode Pengiriman</h3></div>
+            <div class="card-body">
+              <div class="shipping-option selected" onclick="selectShipping(this,'15000','JNE REG')">
+                <div style="display:flex;gap:1rem;align-items:center"><input type="radio" name="shipping" checked><div><div style="font-weight:600;font-size:0.9rem">JNE Reguler</div><div style="font-size:0.78rem;color:var(--color-text-muted)">2–4 hari kerja</div></div></div>
+                <div style="font-weight:700;color:var(--color-primary)">Rp 15.000</div>
+              </div>
+              <div class="shipping-option" onclick="selectShipping(this,'25000','JNE YES')">
+                <div style="display:flex;gap:1rem;align-items:center"><input type="radio" name="shipping"><div><div style="font-weight:600;font-size:0.9rem">JNE YES (Next Day)</div><div style="font-size:0.78rem;color:var(--color-text-muted)">1 hari kerja</div></div></div>
+                <div style="font-weight:700;color:var(--color-primary)">Rp 25.000</div>
+              </div>
+              <div class="shipping-option" onclick="selectShipping(this,'35000','SiCepat Express')">
+                <div style="display:flex;gap:1rem;align-items:center"><input type="radio" name="shipping"><div><div style="font-weight:600;font-size:0.9rem">SiCepat Express</div><div style="font-size:0.78rem;color:var(--color-text-muted)">1–2 hari kerja</div></div></div>
+                <div style="font-weight:700;color:var(--color-primary)">Rp 35.000</div>
+              </div>
+              <div class="shipping-option" onclick="selectShipping(this,'0','Gratis Ongkir')">
+                <div style="display:flex;gap:1rem;align-items:center"><input type="radio" name="shipping"><div><div style="font-weight:600;font-size:0.9rem">Gratis Ongkir ✨</div><div style="font-size:0.78rem;color:var(--color-text-muted)">Pembelian ≥ Rp 300.000 · 3–5 hari</div></div></div>
+                <div style="font-weight:700;color:var(--color-accent)">GRATIS</div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;gap:1rem">
+            <button class="btn btn-ghost" onclick="goToStep(1)">← Kembali</button>
+            <button class="btn btn-primary" style="flex:1" onclick="goToStep(3)">Lanjut ke Pembayaran →</button>
+          </div>
+        </div>
+
+        <!-- STEP 3: Payment -->
+        <div class="checkout-step" id="checkout-step-3">
+          <div class="card" style="margin-bottom:1.5rem">
+            <div class="card-header"><h3 style="margin:0;font-size:1.1rem">💳 Metode Pembayaran</h3></div>
+            <div class="card-body">
+              <div class="payment-option selected" onclick="selectPayment(this,'transfer')">
+                <div class="pay-icon">🏦</div><div><div class="pay-name">Transfer Bank</div><div class="pay-desc">BCA, BNI, BRI, Mandiri, BSI</div></div>
+                <input type="radio" name="payment" checked style="margin-left:auto">
+              </div>
+              <div class="payment-option" onclick="selectPayment(this,'ewallet')">
+                <div class="pay-icon">📱</div><div><div class="pay-name">E-Wallet</div><div class="pay-desc">GoPay, OVO, DANA, ShopeePay, LinkAja</div></div>
+                <input type="radio" name="payment" style="margin-left:auto">
+              </div>
+              <div class="payment-option" onclick="selectPayment(this,'qris')">
+                <div class="pay-icon">📲</div><div><div class="pay-name">QRIS</div><div class="pay-desc">Scan & bayar dengan semua e-wallet</div></div>
+                <input type="radio" name="payment" style="margin-left:auto">
+              </div>
+              <div class="payment-option" onclick="selectPayment(this,'cod')">
+                <div class="pay-icon">💵</div><div><div class="pay-name">COD (Bayar di Tempat)</div><div class="pay-desc">Tersedia untuk area tertentu</div></div>
+                <input type="radio" name="payment" style="margin-left:auto">
+              </div>
+              <!-- Card detail (shown when transfer selected) -->
+              <div id="bank-detail" style="background:var(--color-bg);border-radius:var(--radius-md);padding:1.25rem;margin-top:1rem">
+                <div style="font-size:0.82rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--color-text-muted);margin-bottom:1rem">Pilih Bank Tujuan</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem">
+                  <label class="form-check" style="border:1.5px solid var(--color-border);border-radius:var(--radius-sm);padding:0.75rem;gap:0.5rem"><input type="radio" name="bank" checked><span class="form-check-label">BCA</span></label>
+                  <label class="form-check" style="border:1.5px solid var(--color-border);border-radius:var(--radius-sm);padding:0.75rem;gap:0.5rem"><input type="radio" name="bank"><span class="form-check-label">BNI</span></label>
+                  <label class="form-check" style="border:1.5px solid var(--color-border);border-radius:var(--radius-sm);padding:0.75rem;gap:0.5rem"><input type="radio" name="bank"><span class="form-check-label">BRI</span></label>
+                  <label class="form-check" style="border:1.5px solid var(--color-border);border-radius:var(--radius-sm);padding:0.75rem;gap:0.5rem"><input type="radio" name="bank"><span class="form-check-label">Mandiri</span></label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;gap:1rem">
+            <button class="btn btn-ghost" onclick="goToStep(2)">← Kembali</button>
+            <button class="btn btn-primary" style="flex:1" onclick="goToStep(4)">Periksa Pesanan →</button>
+          </div>
+        </div>
+
+        <!-- STEP 4: Confirm -->
+        <div class="checkout-step" id="checkout-step-4">
+          <div class="card" style="margin-bottom:1.5rem">
+            <div class="card-header flex-between">
+              <h3 style="margin:0;font-size:1.1rem">📋 Ringkasan Pesanan</h3>
+              <button class="btn btn-ghost btn-sm" onclick="goToStep(1)">✏ Edit</button>
+            </div>
+            <div class="card-body">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem">
+                <div><div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--color-text-muted);margin-bottom:0.5rem">📍 Alamat</div><div id="confirm-address" style="font-size:0.85rem;color:var(--color-text);line-height:1.6"></div></div>
+                <div><div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--color-text-muted);margin-bottom:0.5rem">🚚 Pengiriman</div><div id="confirm-shipping" style="font-size:0.85rem;color:var(--color-text)"></div></div>
+              </div>
+              <div id="confirm-items"></div>
+            </div>
+          </div>
+          <div style="display:flex;gap:1rem">
+            <button class="btn btn-ghost" onclick="goToStep(3)">← Kembali</button>
+            <button class="btn btn-primary btn-lg" style="flex:1" onclick="placeOrder()">✅ Konfirmasi & Bayar</button>
+          </div>
+        </div>
+
+        <!-- SUCCESS -->
+        <div class="checkout-step" id="checkout-step-success">
+          <div class="card">
+            <div class="card-body success-screen">
+              <div class="success-icon">✓</div>
+              <h2 style="margin-bottom:0.5rem">Pesanan Berhasil Dibuat! 🎉</h2>
+              <p>Terima kasih! Pesanan Anda sedang diproses. Kami akan segera mengirimkan konfirmasi ke email Anda.</p>
+              <div style="background:var(--color-bg);border-radius:var(--radius-md);padding:1.25rem;margin:1.5rem 0;font-size:0.9rem">
+                <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem"><span style="color:var(--color-text-muted)">Nomor Pesanan</span><strong id="order-number">#CLY-00001</strong></div>
+                <div style="display:flex;justify-content:space-between"><span style="color:var(--color-text-muted)">Estimasi Tiba</span><strong>3–5 hari kerja</strong></div>
+              </div>
+              <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+                <a href="dashboard-pelanggan.html" class="btn btn-primary">Lacak Pesanan</a>
+                <a href="katalog.html" class="btn btn-secondary">Lanjut Belanja</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Order Summary -->
+      <div class="card" style="position:sticky;top:calc(var(--navbar-height)+1.5rem)">
+        <div class="card-header"><h3 style="margin:0;font-size:1.1rem">Pesanan Anda</h3></div>
+        <div class="card-body" id="checkout-order-items"></div>
+        <div class="card-footer">
+          <div class="summary-row"><span style="color:var(--color-text-light)">Subtotal</span><span id="co-subtotal" style="font-weight:600">Rp 0</span></div>
+          <div class="summary-row"><span style="color:var(--color-text-light)">Ongkos Kirim</span><span id="co-shipping" style="font-weight:600">Rp 15.000</span></div>
+          <div class="summary-row" style="font-weight:700;font-size:1.1rem;border-top:2px solid var(--color-border);margin-top:0.5rem;padding-top:1rem;font-family:var(--font-heading)"><span>Total</span><span id="co-total" style="color:var(--color-primary)">Rp 0</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container"><div class="footer-bottom"><p>© 2024 Clayé Ceramic Studio.</p></div></div>
+</footer>
+
+<script src="assets/js/main.js"></script>
+<script>
+  let currentStep = 1;
+  let selectedShipping = { name: 'JNE REG', cost: 15000 };
+  let selectedPayment = 'transfer';
+
+  function goToStep(n) {
+    if (n === 2) {
+      const fn = document.getElementById('first-name').value;
+      const addr = document.getElementById('address').value;
+      if (!fn || !addr) { showToast('Lengkapi semua field yang wajib diisi!', 'error'); return; }
+    }
+    if (n === 4) {
+      const fn = document.getElementById('first-name').value;
+      const city = document.getElementById('city').value;
+      document.getElementById('confirm-address').innerHTML = `${fn} ${document.getElementById('last-name').value}<br>${document.getElementById('address').value}<br>${city}, ${document.getElementById('postal').value}`;
+      document.getElementById('confirm-shipping').innerHTML = `${selectedShipping.name}<br><strong>${selectedShipping.cost === 0 ? 'GRATIS' : formatRupiah(selectedShipping.cost)}</strong>`;
+      const items = getCart();
+      document.getElementById('confirm-items').innerHTML = items.map(i => `<div class="order-item"><img src="${i.image}" alt="${i.name}"><div class="order-item-name">${i.name} <span style="color:var(--color-text-muted)">×${i.quantity}</span></div><div class="order-item-price">${formatRupiah(i.price*i.quantity)}</div></div>`).join('');
+    }
+    document.querySelectorAll('.checkout-step').forEach(s => s.classList.remove('active'));
+    document.getElementById('checkout-step-' + n).classList.add('active');
+    for (let i = 1; i <= 4; i++) {
+      const stepEl = document.getElementById('step-' + i);
+      stepEl.classList.remove('active','done');
+      if (i < n) stepEl.classList.add('done');
+      else if (i === n) stepEl.classList.add('active');
+      if (i < 4) document.getElementById('line-' + i).classList.toggle('done', i < n);
+    }
+    currentStep = n;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function selectShipping(el, cost, name) {
+    document.querySelectorAll('.shipping-option').forEach(o => { o.classList.remove('selected'); o.querySelector('input').checked = false; });
+    el.classList.add('selected');
+    el.querySelector('input').checked = true;
+    selectedShipping = { name, cost: parseInt(cost) };
+    updateCheckoutSummary();
+  }
+
+  function selectPayment(el, type) {
+    document.querySelectorAll('.payment-option').forEach(o => { o.classList.remove('selected'); o.querySelector('input').checked = false; });
+    el.classList.add('selected');
+    el.querySelector('input').checked = true;
+    selectedPayment = type;
+    document.getElementById('bank-detail').style.display = type === 'transfer' ? 'block' : 'none';
+  }
+
+  function updateCheckoutSummary() {
+    const sub = getCartTotal();
+    const ship = selectedShipping.cost;
+    document.getElementById('co-subtotal').textContent = formatRupiah(sub);
+    document.getElementById('co-shipping').textContent = ship === 0 ? 'GRATIS' : formatRupiah(ship);
+    document.getElementById('co-total').textContent = formatRupiah(sub + ship);
+    const items = getCart();
+    document.getElementById('checkout-order-items').innerHTML = items.map(i => `<div class="order-item"><img src="${i.image}" alt="${i.name}"><div class="order-item-name">${i.name} ×${i.quantity}</div><div class="order-item-price">${formatRupiah(i.price*i.quantity)}</div></div>`).join('');
+  }
+
+  function placeOrder() {
+    const orderNum = '#CLY-' + String(Math.floor(Math.random() * 90000) + 10000);
+    document.getElementById('order-number').textContent = orderNum;
+    // Save order to dashboard
+    const user = getUser();
+    const orders = JSON.parse(localStorage.getItem('claye_orders') || '[]');
+    orders.unshift({
+      id: orderNum,
+      date: new Date().toLocaleDateString('id-ID'),
+      items: getCart(),
+      total: getCartTotal() + selectedShipping.cost,
+      shipping: selectedShipping,
+      status: 'Menunggu Pembayaran'
+    });
+    localStorage.setItem('claye_orders', JSON.stringify(orders));
+    saveCart([]);
+    document.querySelectorAll('.checkout-step').forEach(s => s.classList.remove('active'));
+    document.getElementById('checkout-step-success').classList.add('active');
+    for (let i = 1; i <= 4; i++) {
+      const stepEl = document.getElementById('step-' + i);
+      stepEl.classList.remove('active');
+      stepEl.classList.add('done');
+      if (i < 4) document.getElementById('line-' + i).classList.add('done');
+    }
+    showToast('Pesanan berhasil dibuat! 🎉', 'success', 5000);
+  }
+
+  document.addEventListener('DOMContentLoaded', updateCheckoutSummary);
+</script>
+</body>
+</html>

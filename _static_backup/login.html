@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login & Daftar — Clayé Ceramic</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    .auth-page { min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; }
+    .auth-visual { background: linear-gradient(135deg, rgba(44,24,16,0.85) 0%, rgba(139,94,60,0.6) 100%), url('assets/images/hero_bg.jpg') center/cover; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding: 4rem 3rem; position: relative; overflow: hidden; }
+    .auth-visual::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 30% 70%, rgba(212,165,116,0.2) 0%, transparent 60%); }
+    .auth-visual-content { position: relative; z-index: 1; }
+    .auth-visual h2 { color: white; font-size: clamp(1.8rem,3vw,2.5rem); margin-bottom: 1rem; }
+    .auth-visual p { color: rgba(255,255,255,0.75); font-size: 1.05rem; max-width: 380px; }
+    .auth-benefits { margin-top: 2.5rem; display: flex; flex-direction: column; gap: 1rem; }
+    .auth-benefit { display: flex; align-items: center; gap: 0.85rem; color: rgba(255,255,255,0.85); font-size: 0.9rem; }
+    .auth-benefit span:first-child { width: 36px; height: 36px; background: rgba(255,255,255,0.12); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+    .auth-form-section { display: flex; align-items: center; justify-content: center; background: white; padding: 3rem 2rem; }
+    .auth-form-wrap { width: 100%; max-width: 440px; }
+    .auth-logo { margin-bottom: 2rem; }
+    .auth-logo .logo-name { font-family: var(--font-heading); font-size: 1.8rem; font-weight: 700; color: var(--color-primary); }
+    .auth-logo .logo-tagline { font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--color-text-muted); }
+    .auth-tabs { display: flex; background: var(--color-bg); border-radius: var(--radius-full); padding: 4px; margin-bottom: 2rem; }
+    .auth-tab { flex: 1; text-align: center; padding: 0.65rem; border-radius: var(--radius-full); font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all var(--transition-base); color: var(--color-text-muted); background: transparent; border: none; }
+    .auth-tab.active { background: white; color: var(--color-primary); box-shadow: var(--shadow-sm); }
+    .auth-form { display: none; }
+    .auth-form.active { display: block; }
+    .social-btn { width: 100%; padding: 0.8rem; border: 1.5px solid var(--color-border); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; gap: 0.75rem; font-weight: 600; font-size: 0.88rem; cursor: pointer; transition: all var(--transition-base); background: white; color: var(--color-text); margin-bottom: 0.75rem; }
+    .social-btn:hover { background: var(--color-bg); border-color: var(--color-primary); }
+    .password-field { position: relative; }
+    .password-toggle { position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--color-text-muted); font-size: 1rem; }
+    @media(max-width: 768px) { .auth-page { grid-template-columns: 1fr; } .auth-visual { display: none; } .auth-form-section { min-height: 100vh; } }
+  </style>
+</head>
+<body style="margin:0;padding:0">
+
+<div class="auth-page">
+  <!-- Visual Side -->
+  <div class="auth-visual">
+    <div class="auth-visual-content">
+      <a href="index.html" style="display:inline-block;margin-bottom:2rem">
+        <div style="font-family:var(--font-heading);font-size:2rem;font-weight:700;color:var(--color-secondary)">Clayé</div>
+        <div style="font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.5)">Ceramic Studio</div>
+      </a>
+      <h2>Bergabunglah dengan Komunitas Pecinta Keramik Kami</h2>
+      <p>Dapatkan akses eksklusif ke koleksi terbaru, penawaran anggota, dan inspirasi desain keramik artisan.</p>
+      <div class="auth-benefits">
+        <div class="auth-benefit"><span>🎁</span><span>Diskon 15% untuk pembelian pertama</span></div>
+        <div class="auth-benefit"><span>📦</span><span>Lacak pesanan secara real-time</span></div>
+        <div class="auth-benefit"><span>❤️</span><span>Simpan produk favorit di wishlist</span></div>
+        <div class="auth-benefit"><span>⭐</span><span>Kumpulkan poin untuk reward menarik</span></div>
+        <div class="auth-benefit"><span>🔔</span><span>Notifikasi stok & koleksi eksklusif</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Side -->
+  <div class="auth-form-section">
+    <div class="auth-form-wrap">
+      <div class="auth-logo">
+        <div class="logo-name">Clayé</div>
+        <div class="logo-tagline">Ceramic Studio</div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchAuthTab('login',this)">Masuk</button>
+        <button class="auth-tab" onclick="switchAuthTab('register',this)">Daftar</button>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <div class="auth-form active" id="form-login">
+        <h2 style="margin-bottom:0.5rem;font-size:1.6rem">Selamat Datang Kembali 👋</h2>
+        <p style="margin-bottom:1.75rem">Masuk ke akun Anda untuk melanjutkan</p>
+
+        <button class="social-btn" onclick="socialLogin('Google')">
+          <span style="font-size:1.2rem">🔴</span> Lanjutkan dengan Google
+        </button>
+        <button class="social-btn" onclick="socialLogin('Facebook')">
+          <span style="font-size:1.2rem">🔵</span> Lanjutkan dengan Facebook
+        </button>
+
+        <div class="divider-text">atau masuk dengan email</div>
+
+        <form onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label class="form-label">Email <span class="required">*</span></label>
+            <input type="email" class="form-control" id="login-email" placeholder="andi@email.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" style="display:flex;justify-content:space-between">
+              <span>Password <span class="required">*</span></span>
+              <a href="#" style="font-size:0.82rem;color:var(--color-primary)">Lupa password?</a>
+            </label>
+            <div class="password-field">
+              <input type="password" class="form-control" id="login-password" placeholder="••••••••" required>
+              <button type="button" class="password-toggle" onclick="togglePassword('login-password',this)">👁</button>
+            </div>
+          </div>
+          <label class="form-check" style="margin-bottom:1.25rem">
+            <input type="checkbox" id="remember-me">
+            <span class="form-check-label">Ingat saya selama 30 hari</span>
+          </label>
+          <button type="submit" class="btn btn-primary btn-full btn-lg" id="login-btn">Masuk ke Akun</button>
+        </form>
+        <p style="text-align:center;margin-top:1.25rem;font-size:0.85rem">
+          Belum punya akun? <a href="#" onclick="switchAuthTab('register',document.querySelectorAll('.auth-tab')[1]);return false" style="color:var(--color-primary);font-weight:600">Daftar sekarang</a>
+        </p>
+      </div>
+
+      <!-- REGISTER FORM -->
+      <div class="auth-form" id="form-register">
+        <h2 style="margin-bottom:0.5rem;font-size:1.6rem">Buat Akun Baru ✨</h2>
+        <p style="margin-bottom:1.75rem">Daftar gratis dan mulai koleksi keramik Anda</p>
+
+        <button class="social-btn" onclick="socialLogin('Google')">
+          <span style="font-size:1.2rem">🔴</span> Daftar dengan Google
+        </button>
+
+        <div class="divider-text">atau daftar dengan email</div>
+
+        <form onsubmit="handleRegister(event)">
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Nama Depan <span class="required">*</span></label><input type="text" class="form-control" id="reg-firstname" placeholder="Andi" required></div>
+            <div class="form-group"><label class="form-label">Nama Belakang</label><input type="text" class="form-control" id="reg-lastname" placeholder="Pratama"></div>
+          </div>
+          <div class="form-group"><label class="form-label">Email <span class="required">*</span></label><input type="email" class="form-control" id="reg-email" placeholder="andi@email.com" required></div>
+          <div class="form-group"><label class="form-label">No. Telepon</label><input type="tel" class="form-control" id="reg-phone" placeholder="0812-3456-7890"></div>
+          <div class="form-group">
+            <label class="form-label">Password <span class="required">*</span></label>
+            <div class="password-field">
+              <input type="password" class="form-control" id="reg-password" placeholder="Min. 8 karakter" required minlength="8" oninput="checkPasswordStrength(this.value)">
+              <button type="button" class="password-toggle" onclick="togglePassword('reg-password',this)">👁</button>
+            </div>
+            <div id="pwd-strength" style="margin-top:0.5rem;height:4px;border-radius:2px;background:var(--color-border);overflow:hidden;display:none">
+              <div id="pwd-bar" style="height:100%;width:0;transition:width 0.3s,background 0.3s;border-radius:2px"></div>
+            </div>
+            <span id="pwd-label" style="font-size:0.72rem;color:var(--color-text-muted)"></span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Konfirmasi Password <span class="required">*</span></label>
+            <div class="password-field">
+              <input type="password" class="form-control" id="reg-confirm" placeholder="Ulangi password" required minlength="8">
+              <button type="button" class="password-toggle" onclick="togglePassword('reg-confirm',this)">👁</button>
+            </div>
+          </div>
+          <label class="form-check" style="margin-bottom:0.75rem"><input type="checkbox" required><span class="form-check-label">Saya setuju dengan <a href="#" style="color:var(--color-primary)">Syarat & Ketentuan</a> dan <a href="#" style="color:var(--color-primary)">Kebijakan Privasi</a></span></label>
+          <label class="form-check" style="margin-bottom:1.25rem"><input type="checkbox" id="reg-newsletter"><span class="form-check-label">Saya ingin menerima penawaran & newsletter (opsional)</span></label>
+          <button type="submit" class="btn btn-primary btn-full btn-lg">Buat Akun Gratis</button>
+        </form>
+        <p style="text-align:center;margin-top:1.25rem;font-size:0.85rem">
+          Sudah punya akun? <a href="#" onclick="switchAuthTab('login',document.querySelectorAll('.auth-tab')[0]);return false" style="color:var(--color-primary);font-weight:600">Masuk di sini</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/js/main.js"></script>
+<script>
+  // Redirect if already logged in
+  if (isLoggedIn()) window.location.href = 'dashboard-pelanggan.html';
+
+  function switchAuthTab(tab, btn) {
+    document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('form-' + tab).classList.add('active');
+  }
+
+  function togglePassword(id, btn) {
+    const input = document.getElementById(id);
+    const isText = input.type === 'text';
+    input.type = isText ? 'password' : 'text';
+    btn.textContent = isText ? '👁' : '🙈';
+  }
+
+  function checkPasswordStrength(val) {
+    const bar = document.getElementById('pwd-bar');
+    const label = document.getElementById('pwd-label');
+    document.getElementById('pwd-strength').style.display = 'block';
+    let score = 0;
+    if (val.length >= 8) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+    const levels = ['', 'Lemah', 'Sedang', 'Kuat', 'Sangat Kuat'];
+    const colors = ['', '#C44A3A', '#C4953A', '#4A7C59', '#2C6B4A'];
+    bar.style.width = (score * 25) + '%';
+    bar.style.background = colors[score] || '#ddd';
+    label.textContent = levels[score] || '';
+    label.style.color = colors[score] || '';
+  }
+
+  function handleLogin(e) {
+    e.preventDefault();
+    const email = document.getElementById('login-email').value;
+    const pass = document.getElementById('login-password').value;
+    const btn = document.getElementById('login-btn');
+    btn.textContent = 'Memproses...';
+    btn.disabled = true;
+    setTimeout(() => {
+      // Simple demo login
+      const user = { name: email.split('@')[0], email, role: 'customer', joinDate: new Date().toLocaleDateString('id-ID') };
+      saveUser(user);
+      showToast(`Selamat datang kembali, ${user.name}! 🎉`, 'success');
+      setTimeout(() => window.location.href = 'dashboard-pelanggan.html', 1200);
+    }, 1200);
+  }
+
+  function handleRegister(e) {
+    e.preventDefault();
+    const pass = document.getElementById('reg-password').value;
+    const confirm = document.getElementById('reg-confirm').value;
+    if (pass !== confirm) { showToast('Password tidak cocok!', 'error'); return; }
+    const fn = document.getElementById('reg-firstname').value;
+    const ln = document.getElementById('reg-lastname').value;
+    const email = document.getElementById('reg-email').value;
+    const user = { name: fn + (ln ? ' ' + ln : ''), email, role: 'customer', joinDate: new Date().toLocaleDateString('id-ID') };
+    saveUser(user);
+    showToast(`Akun berhasil dibuat! Selamat bergabung, ${fn}! 🎉`, 'success');
+    setTimeout(() => window.location.href = 'dashboard-pelanggan.html', 1200);
+  }
+
+  function socialLogin(provider) {
+    const user = { name: 'Demo User', email: 'demo@claye.id', role: 'customer', joinDate: new Date().toLocaleDateString('id-ID') };
+    saveUser(user);
+    showToast(`Login dengan ${provider} berhasil! 🎉`, 'success');
+    setTimeout(() => window.location.href = 'dashboard-pelanggan.html', 1200);
+  }
+</script>
+</body>
+</html>

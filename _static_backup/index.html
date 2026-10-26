@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clayé Ceramic — Kerajinan Tanah Liat Artisan</title>
+  <meta name="description" content="Clayé Ceramic menghadirkan koleksi keramik handmade premium. Setiap karya dibuat dengan tangan penuh cinta oleh pengrajin berpengalaman.">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <div class="container navbar-inner">
+    <a href="index.html" class="navbar-logo">
+      <span class="logo-name">Clayé</span>
+      <span class="logo-tagline">Ceramic Studio</span>
+    </a>
+    <div class="navbar-nav">
+      <a href="index.html" class="active">Beranda</a>
+      <a href="katalog.html">Katalog</a>
+      <a href="index.html#tentang">Tentang</a>
+      <a href="index.html#kontak">Kontak</a>
+    </div>
+    <div class="navbar-actions">
+      <button class="navbar-icon-btn" id="navbar-user-btn" title="Akun Saya">👤</button>
+      <a href="keranjang.html" class="navbar-icon-btn" title="Keranjang">
+        🛒<span class="cart-badge" style="display:none">0</span>
+      </a>
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobile-menu">
+  <div class="mobile-menu-overlay"></div>
+  <div class="mobile-menu-panel">
+    <div class="mobile-menu-header">
+      <a href="index.html" class="navbar-logo">
+        <span class="logo-name">Clayé</span>
+      </a>
+      <button class="mobile-menu-close">✕</button>
+    </div>
+    <nav class="mobile-nav">
+      <a href="index.html">🏠 Beranda</a>
+      <a href="katalog.html">🏺 Katalog</a>
+      <a href="keranjang.html">🛒 Keranjang</a>
+      <a href="login.html">👤 Login / Daftar</a>
+      <a href="dashboard-pelanggan.html">📦 Pesanan Saya</a>
+    </nav>
+    <div style="margin-top:2rem">
+      <a href="login.html" class="btn btn-primary btn-full">Masuk / Daftar</a>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg" style="background-image: url('assets/images/hero_bg.jpg')"></div>
+  <div class="hero-overlay"></div>
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-label">✦ Handmade with Love</div>
+      <h1>Seni Tanah Liat yang <em>Memukau Jiwa</em></h1>
+      <p class="hero-desc">Setiap karya Clayé lahir dari tangan pengrajin terlatih, dibakar dengan api keikhlasan — menghadirkan keramik premium yang sarat cerita dan keindahan alami.</p>
+      <div class="hero-actions">
+        <a href="katalog.html" class="btn btn-light btn-lg">Jelajahi Koleksi</a>
+        <a href="index.html#tentang" class="btn btn-secondary btn-lg" style="color:white;border-color:rgba(255,255,255,0.5)">Tentang Kami</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="stat-num"><span data-count="500" data-suffix="+">0+</span></div>
+          <div class="stat-label">Produk Unik</div>
+        </div>
+        <div class="hero-stat">
+          <div class="stat-num"><span data-count="12000" data-suffix="+">0+</span></div>
+          <div class="stat-label">Pelanggan Puas</div>
+        </div>
+        <div class="hero-stat">
+          <div class="stat-num"><span data-count="8" data-suffix="th">0th</span></div>
+          <div class="stat-label">Pengalaman</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-badge">
+    <div class="badge-icon">🏆</div>
+    <strong>Award Winning</strong>
+    <p>Keramik Terbaik Indonesia 2024</p>
+  </div>
+</section>
+
+<!-- FEATURES STRIP -->
+<section class="features-strip">
+  <div class="container">
+    <div class="features-grid">
+      <div class="feature-item">
+        <div class="feature-icon">🤲</div>
+        <div class="feature-text">
+          <strong>100% Handmade</strong>
+          <span>Dibuat tangan oleh pengrajin ahli</span>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">🚚</div>
+        <div class="feature-text">
+          <strong>Gratis Ongkir</strong>
+          <span>Pembelian di atas Rp 300.000</span>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">🌿</div>
+        <div class="feature-text">
+          <strong>Ramah Lingkungan</strong>
+          <span>Bahan alami & berkelanjutan</span>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">↩️</div>
+        <div class="feature-text">
+          <strong>Garansi 30 Hari</strong>
+          <span>Pengembalian mudah & gratis</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED PRODUCTS -->
+<section class="section" id="produk-unggulan">
+  <div class="container">
+    <div class="section-header animate-on-scroll">
+      <div class="section-label">Pilihan Terbaik Kami</div>
+      <h2>Produk Unggulan</h2>
+      <p>Koleksi keramik artisan terpilih yang menjadi favorit pelanggan setia kami</p>
+    </div>
+    <!-- Filter Tags -->
+    <div class="flex flex-wrap gap-sm mb-xl" style="justify-content:center" id="filter-tags">
+      <button class="tag active" data-filter="all">Semua</button>
+      <button class="tag" data-filter="Mangkuk">Mangkuk</button>
+      <button class="tag" data-filter="Vas">Vas</button>
+      <button class="tag" data-filter="Mug">Mug</button>
+      <button class="tag" data-filter="Piring">Piring</button>
+      <button class="tag" data-filter="Teko">Teko</button>
+      <button class="tag" data-filter="Pot">Pot</button>
+    </div>
+    <div class="products-grid" id="products-container"></div>
+    <div style="text-align:center;margin-top:3rem" class="animate-on-scroll">
+      <a href="katalog.html" class="btn btn-secondary btn-lg">Lihat Semua Produk →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT SECTION -->
+<section class="about-section section" id="tentang">
+  <div class="container">
+    <div class="about-content">
+      <div class="about-image-wrap animate-on-scroll">
+        <div class="about-image-main">
+          <img src="assets/images/hero_bg.jpg" alt="Pengrajin Clayé Ceramic di studio">
+        </div>
+        <div class="about-image-accent">
+          <img src="assets/images/product_bowl.jpg" alt="Detail keramik handmade">
+        </div>
+      </div>
+      <div class="about-text animate-on-scroll animate-delay-2">
+        <div class="section-label">Kisah Kami</div>
+        <h2>Dari Tangan ke Hati, Dari Tanah ke Kehidupan</h2>
+        <p>Clayé lahir pada 2016 dari semangat seorang pengrajin muda Yogyakarta yang percaya bahwa keindahan sejati tersembunyi dalam ketidaksempurnaan tanah liat.</p>
+        <p>Kami merayakan <em>wabi-sabi</em> — filosofi Jepang yang menemukan keindahan dalam hal yang tidak sempurna, tidak permanen, dan tidak lengkap. Setiap guratan jari dan tekstur unik adalah tanda keaslian.</p>
+        <div class="flex gap-md flex-wrap" style="margin-top:1.5rem">
+          <a href="katalog.html" class="btn btn-primary">Belanja Sekarang</a>
+          <a href="index.html#kontak" class="btn btn-ghost">Hubungi Kami</a>
+        </div>
+        <div class="about-stats-row">
+          <div class="about-stat">
+            <div class="stat-num" data-count="500" data-suffix="+">0+</div>
+            <div class="stat-label">Produk</div>
+          </div>
+          <div class="about-stat">
+            <div class="stat-num" data-count="12" data-suffix="K+">0K+</div>
+            <div class="stat-label">Pelanggan</div>
+          </div>
+          <div class="about-stat">
+            <div class="stat-num" data-count="8" data-suffix="th">0th</div>
+            <div class="stat-label">Pengalaman</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORIES HIGHLIGHT -->
+<section class="section" style="background:white">
+  <div class="container">
+    <div class="section-header animate-on-scroll">
+      <div class="section-label">Telusuri Koleksi</div>
+      <h2>Kategori Produk</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem" id="categories-grid">
+      <a href="katalog.html?cat=Mangkuk" class="animate-on-scroll" style="border-radius:20px;overflow:hidden;position:relative;aspect-ratio:4/3;display:block">
+        <img src="assets/images/product_bowl.jpg" alt="Mangkuk" style="width:100%;height:100%;object-fit:cover;transition:transform 0.4s ease">
+        <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(44,24,16,0.7) 0%,transparent 60%);display:flex;align-items:flex-end;padding:1.5rem">
+          <div>
+            <h3 style="color:white;font-size:1.3rem;margin:0">Mangkuk</h3>
+            <p style="color:rgba(255,255,255,0.7);font-size:0.8rem;margin:0.25rem 0 0">12 produk</p>
+          </div>
+        </div>
+      </a>
+      <a href="katalog.html?cat=Vas" class="animate-on-scroll animate-delay-1" style="border-radius:20px;overflow:hidden;position:relative;aspect-ratio:4/3;display:block">
+        <img src="assets/images/product_vase.jpg" alt="Vas" style="width:100%;height:100%;object-fit:cover;transition:transform 0.4s ease">
+        <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(44,24,16,0.7) 0%,transparent 60%);display:flex;align-items:flex-end;padding:1.5rem">
+          <div>
+            <h3 style="color:white;font-size:1.3rem;margin:0">Vas</h3>
+            <p style="color:rgba(255,255,255,0.7);font-size:0.8rem;margin:0.25rem 0 0">8 produk</p>
+          </div>
+        </div>
+      </a>
+      <a href="katalog.html?cat=Mug" class="animate-on-scroll animate-delay-2" style="border-radius:20px;overflow:hidden;position:relative;aspect-ratio:4/3;display:block">
+        <img src="assets/images/product_mug.jpg" alt="Mug" style="width:100%;height:100%;object-fit:cover;transition:transform 0.4s ease">
+        <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(44,24,16,0.7) 0%,transparent 60%);display:flex;align-items:flex-end;padding:1.5rem">
+          <div>
+            <h3 style="color:white;font-size:1.3rem;margin:0">Mug & Cangkir</h3>
+            <p style="color:rgba(255,255,255,0.7);font-size:0.8rem;margin:0.25rem 0 0">15 produk</p>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="section testimonials-section">
+  <div class="container">
+    <div class="section-header animate-on-scroll">
+      <div class="section-label">Kata Mereka</div>
+      <h2>Ulasan Pelanggan Kami</h2>
+      <p>Kepercayaan pelanggan adalah inspirasi terbesar kami untuk terus berkarya</p>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testimonial-card animate-on-scroll">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">"Mangkuk Terra Bowl yang saya beli benar-benar luar biasa. Teksturnya terasa hangat di tangan, dan setiap kali makan jadi pengalaman yang berbeda. Worth every penny!"</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">A</div>
+          <div class="testimonial-author-info">
+            <strong>Anisa Putri</strong>
+            <span>Jakarta — Pelanggan setia 2 tahun</span>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card animate-on-scroll animate-delay-1">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">"Saya pesan vas organik sebagai hadiah ulang tahun ibu, dan beliau sangat terharu. Kualitas packagingnya juga sangat premium. Clayé selalu jadi pilihan pertama saya!"</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">R</div>
+          <div class="testimonial-author-info">
+            <strong>Raka Darmawan</strong>
+            <span>Surabaya — Pelanggan baru</span>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card animate-on-scroll animate-delay-2">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">"Set mug artisan duonya jadi andalan saya tiap pagi. Kopi rasanya lebih nikmat dalam keramik yang dibuat dengan penuh kasih. Pengiriman cepat, aman, dan seller sangat responsif."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">D</div>
+          <div class="testimonial-author-info">
+            <strong>Dewi Rahayu</strong>
+            <span>Bandung — Pelanggan setia 3 tahun</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NEWSLETTER -->
+<section class="newsletter-section" id="kontak">
+  <div class="container">
+    <div class="newsletter-inner">
+      <div class="newsletter-text animate-on-scroll">
+        <div class="section-label" style="color:var(--color-secondary)">Tetap Terhubung</div>
+        <h2>Dapatkan Inspirasi & Penawaran Eksklusif</h2>
+        <p>Bergabunglah dengan 10.000+ pencinta keramik dan dapatkan info koleksi terbaru, tips perawatan, dan diskon spesial.</p>
+      </div>
+      <div class="animate-on-scroll animate-delay-2">
+        <form class="newsletter-form" id="newsletter-form" onsubmit="submitNewsletter(event)">
+          <input type="email" class="newsletter-input" placeholder="Masukkan email Anda..." required id="newsletter-email">
+          <button type="submit" class="btn btn-secondary" style="color:var(--color-secondary);border-color:var(--color-secondary)">
+            Langganan →
+          </button>
+        </form>
+        <p style="color:rgba(255,255,255,0.35);font-size:0.78rem;margin-top:0.75rem">
+          🔒 Privasi terjaga. Berhenti berlangganan kapan saja.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo-name">Clayé</div>
+        <p>Studio keramik artisan premium dari Yogyakarta. Setiap karya adalah ekspresi jiwa, dibuat dengan tangan dan dipersembahkan dengan cinta.</p>
+        <div class="footer-social">
+          <a href="#" aria-label="Instagram">📷</a>
+          <a href="#" aria-label="TikTok">🎵</a>
+          <a href="#" aria-label="Facebook">📘</a>
+          <a href="#" aria-label="Pinterest">📌</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Belanja</h4>
+        <ul>
+          <li><a href="katalog.html">Semua Produk</a></li>
+          <li><a href="katalog.html?cat=Mangkuk">Mangkuk</a></li>
+          <li><a href="katalog.html?cat=Vas">Vas</a></li>
+          <li><a href="katalog.html?cat=Mug">Mug</a></li>
+          <li><a href="katalog.html?cat=Piring">Piring</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Pelanggan</h4>
+        <ul>
+          <li><a href="dashboard-pelanggan.html">Akun Saya</a></li>
+          <li><a href="keranjang.html">Keranjang</a></li>
+          <li><a href="#">Lacak Pesanan</a></li>
+          <li><a href="#">FAQ</a></li>
+          <li><a href="#">Kebijakan Pengembalian</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Kontak</h4>
+        <ul>
+          <li><a href="#">📍 Yogyakarta, Indonesia</a></li>
+          <li><a href="#">📧 halo@claye.id</a></li>
+          <li><a href="#">📞 +62 812-3456-7890</a></li>
+          <li><a href="#">⏰ Sen–Sab, 09.00–18.00</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2024 Clayé Ceramic Studio. Semua hak dilindungi.</p>
+      <div class="footer-bottom-links">
+        <a href="#">Kebijakan Privasi</a>
+        <a href="#">Syarat & Ketentuan</a>
+        <a href="#">Sitemap</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/main.js"></script>
+<script>
+  // Render products
+  function renderProducts(filter = 'all') {
+    const container = document.getElementById('products-container');
+    const filtered = filter === 'all' ? PRODUCTS : PRODUCTS.filter(p => p.category === filter);
+    container.innerHTML = filtered.map(renderProductCard).join('');
+    initScrollAnimations();
+  }
+
+  // Filter tags
+  document.querySelectorAll('#filter-tags .tag').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#filter-tags .tag').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      renderProducts(btn.dataset.filter);
+    });
+  });
+
+  // Category image hover
+  document.querySelectorAll('#categories-grid a img').forEach(img => {
+    img.parentElement.addEventListener('mouseenter', () => img.style.transform = 'scale(1.07)');
+    img.parentElement.addEventListener('mouseleave', () => img.style.transform = 'scale(1)');
+  });
+
+  // Newsletter
+  function submitNewsletter(e) {
+    e.preventDefault();
+    const email = document.getElementById('newsletter-email').value;
+    showToast(`Terima kasih! ${email} telah berlangganan newsletter kami 🎉`, 'success');
+    document.getElementById('newsletter-email').value = '';
+  }
+
+  // Init
+  document.addEventListener('DOMContentLoaded', () => {
+    renderProducts();
+  });
+</script>
+</body>
+</html>

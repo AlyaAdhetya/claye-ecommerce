@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Katalog Produk — Clayé Ceramic</title>
+  <meta name="description" content="Jelajahi koleksi lengkap keramik handmade premium Clayé Ceramic. Mangkuk, vas, mug, piring, teko, dan pot artisan.">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    .catalog-layout { display: grid; grid-template-columns: 280px 1fr; gap: 2rem; align-items: start; }
+    .filter-sidebar { background: white; border-radius: var(--radius-lg); box-shadow: var(--shadow-card); border: 1px solid var(--color-border-light); padding: 1.75rem; position: sticky; top: calc(var(--navbar-height) + 1.5rem); }
+    .filter-title { font-family: var(--font-heading); font-size: 1.1rem; font-weight: 600; color: var(--color-dark); margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--color-border-light); }
+    .filter-section { margin-bottom: 1.75rem; }
+    .filter-section-label { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-text-muted); margin-bottom: 0.85rem; }
+    .filter-option { display: flex; align-items: center; justify-content: space-between; padding: 0.45rem 0; cursor: pointer; border-radius: var(--radius-sm); transition: all var(--transition-base); }
+    .filter-option:hover { color: var(--color-primary); }
+    .filter-option input { accent-color: var(--color-primary); }
+    .filter-option-label { display: flex; align-items: center; gap: 0.6rem; font-size: 0.88rem; color: var(--color-text); cursor: pointer; }
+    .filter-count { font-size: 0.72rem; color: var(--color-text-muted); background: var(--color-bg); padding: 2px 7px; border-radius: 12px; }
+    .price-range { display: flex; flex-direction: column; gap: 0.75rem; }
+    .price-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    .price-input { padding: 0.6rem 0.75rem; border: 1.5px solid var(--color-border); border-radius: var(--radius-sm); font-size: 0.82rem; color: var(--color-text); outline: none; width: 100%; }
+    .price-input:focus { border-color: var(--color-primary); }
+    .range-slider { width: 100%; accent-color: var(--color-primary); }
+    .catalog-toolbar { display: flex; align-items: center; justify-content: space-between; background: white; border-radius: var(--radius-md); padding: 1rem 1.25rem; box-shadow: var(--shadow-card); border: 1px solid var(--color-border-light); margin-bottom: 1.5rem; gap: 1rem; flex-wrap: wrap; }
+    .catalog-count { font-size: 0.88rem; color: var(--color-text-muted); }
+    .catalog-count strong { color: var(--color-dark); }
+    .sort-select { padding: 0.5rem 2rem 0.5rem 0.85rem; border: 1.5px solid var(--color-border); border-radius: var(--radius-full); font-size: 0.85rem; color: var(--color-text); outline: none; background: white url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%238B7355' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e") no-repeat right 0.6rem center; background-size: 12px; cursor: pointer; -webkit-appearance: none; }
+    .sort-select:focus { border-color: var(--color-primary); }
+    .view-toggle { display: flex; gap: 0.25rem; }
+    .view-btn { width: 36px; height: 36px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; border: 1.5px solid var(--color-border); background: white; cursor: pointer; font-size: 0.9rem; transition: all var(--transition-base); }
+    .view-btn.active { background: var(--color-primary); border-color: var(--color-primary); color: white; }
+    .products-grid-list .product-card { display: grid; grid-template-columns: 200px 1fr; }
+    .products-grid-list .product-card-image { aspect-ratio: auto; height: 200px; }
+    .products-grid-list .product-card-body { padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; }
+    .filter-apply-btn { width: 100%; padding: 0.75rem; background: var(--color-primary); color: white; border: none; border-radius: var(--radius-full); font-weight: 600; cursor: pointer; transition: all var(--transition-base); font-size: 0.88rem; margin-top: 0.5rem; }
+    .filter-apply-btn:hover { background: var(--color-primary-dark); }
+    .filter-reset { width: 100%; padding: 0.6rem; background: transparent; color: var(--color-text-muted); border: none; border-radius: var(--radius-full); font-size: 0.82rem; cursor: pointer; transition: all var(--transition-base); margin-top: 0.5rem; }
+    .filter-reset:hover { color: var(--color-primary); }
+    @media(max-width: 900px) { .catalog-layout { grid-template-columns: 1fr; } .filter-sidebar { position: static; display: none; } .filter-sidebar.show { display: block; } }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="container navbar-inner">
+    <a href="index.html" class="navbar-logo">
+      <span class="logo-name">Clayé</span>
+      <span class="logo-tagline">Ceramic Studio</span>
+    </a>
+    <div class="navbar-nav">
+      <a href="index.html">Beranda</a>
+      <a href="katalog.html" class="active">Katalog</a>
+      <a href="index.html#tentang">Tentang</a>
+      <a href="index.html#kontak">Kontak</a>
+    </div>
+    <div class="navbar-actions">
+      <button class="navbar-icon-btn" id="navbar-user-btn">👤</button>
+      <a href="keranjang.html" class="navbar-icon-btn">🛒<span class="cart-badge" style="display:none">0</span></a>
+      <button class="hamburger"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu">
+  <div class="mobile-menu-overlay"></div>
+  <div class="mobile-menu-panel">
+    <div class="mobile-menu-header">
+      <a href="index.html" class="navbar-logo"><span class="logo-name">Clayé</span></a>
+      <button class="mobile-menu-close">✕</button>
+    </div>
+    <nav class="mobile-nav">
+      <a href="index.html">🏠 Beranda</a>
+      <a href="katalog.html">🏺 Katalog</a>
+      <a href="keranjang.html">🛒 Keranjang</a>
+      <a href="login.html">👤 Login / Daftar</a>
+    </nav>
+  </div>
+</div>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="container">
+    <nav class="breadcrumb">
+      <a href="index.html">Beranda</a>
+      <span class="separator">›</span>
+      <span class="current">Katalog Produk</span>
+    </nav>
+    <h1>Katalog Keramik Artisan</h1>
+    <p style="color:var(--color-text-light);margin:0">Temukan karya terbaik dari tangan pengrajin kami</p>
+  </div>
+</div>
+
+<!-- CATALOG MAIN -->
+<section class="section-sm">
+  <div class="container">
+    <!-- Mobile Filter Toggle -->
+    <div style="display:flex;gap:1rem;margin-bottom:1rem;display:none" id="mobile-filter-bar">
+      <button class="btn btn-secondary btn-sm" id="toggle-filter-btn">⚙ Filter</button>
+    </div>
+
+    <div class="catalog-layout">
+      <!-- SIDEBAR FILTER -->
+      <aside class="filter-sidebar" id="filter-sidebar">
+        <div class="filter-title">🔍 Filter Produk</div>
+
+        <!-- Category Filter -->
+        <div class="filter-section">
+          <div class="filter-section-label">Kategori</div>
+          <div id="category-filters">
+            <label class="filter-option"><label class="filter-option-label"><input type="checkbox" data-cat="all" checked> Semua Kategori</label><span class="filter-count">48</span></label>
+            <label class="filter-option"><label class="filter-option-label"><input type="checkbox" data-cat="Mangkuk"> Mangkuk</label><span class="filter-count">12</span></label>
+            <label class="filter-option"><label class="filter-option-label"><input type="checkbox" data-cat="Vas"> Vas</label><span class="filter-count">8</span></label>
+            <label class="filter-option"><label class="filter-option-label"><input type="checkbox" data-cat="Mug"> Mug & Cangkir</label><span class="filter-count">15</span></label>
+            <label class="filter-option"><label class="filter-option-label"><input type="checkbox" data-cat="Piring"> Piring</label><span class="filter-count">7</span></label>
+            <label class="filter-option"><label class="filter-option-label"><input type="checkbox" data-cat="Teko"> Teko</label><span class="filter-count">4</span></label>
+            <label class="filter-option"><label class="filter-option-label"><input type="checkbox" data-cat="Pot"> Pot & Planter</label><span class="filter-count">6</span></label>
+          </div>
+        </div>
+
+        <!-- Price Range -->
+        <div class="filter-section">
+          <div class="filter-section-label">Rentang Harga</div>
+          <div class="price-range">
+            <input type="range" class="range-slider" id="price-range" min="50000" max="1000000" step="25000" value="500000" oninput="updatePriceLabel(this.value)">
+            <div class="flex-between" style="font-size:0.82rem;color:var(--color-text-muted)">
+              <span>Rp 50.000</span>
+              <span id="price-label" style="font-weight:600;color:var(--color-primary)">≤ Rp 500.000</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rating -->
+        <div class="filter-section">
+          <div class="filter-section-label">Rating Minimum</div>
+          <div style="display:flex;flex-direction:column;gap:0.4rem">
+            <label class="form-check"><input type="radio" name="rating" value="4.5" class="form-check-label"><span class="form-check-label">★★★★★ 4.5+</span></label>
+            <label class="form-check"><input type="radio" name="rating" value="4" class="form-check-label"><span class="form-check-label">★★★★☆ 4.0+</span></label>
+            <label class="form-check"><input type="radio" name="rating" value="3" class="form-check-label"><span class="form-check-label">★★★☆☆ 3.0+</span></label>
+            <label class="form-check"><input type="radio" name="rating" value="0" checked><span class="form-check-label">Semua Rating</span></label>
+          </div>
+        </div>
+
+        <!-- Tags -->
+        <div class="filter-section">
+          <div class="filter-section-label">Tag Produk</div>
+          <div style="display:flex;flex-wrap:wrap;gap:0.4rem">
+            <button class="tag active" data-tag="all">Semua</button>
+            <button class="tag" data-tag="sale">Sale</button>
+            <button class="tag" data-tag="new">Baru</button>
+            <button class="tag" data-tag="popular">Populer</button>
+            <button class="tag" data-tag="limited">Terbatas</button>
+          </div>
+        </div>
+
+        <button class="filter-apply-btn" id="apply-filter">Terapkan Filter</button>
+        <button class="filter-reset" id="reset-filter">Reset Semua Filter</button>
+      </aside>
+
+      <!-- MAIN CONTENT -->
+      <div>
+        <!-- Toolbar -->
+        <div class="catalog-toolbar">
+          <div class="catalog-count">Menampilkan <strong id="product-count">8</strong> produk</div>
+          <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+            <div style="display:flex;align-items:center;gap:0.5rem">
+              <span style="font-size:0.82rem;color:var(--color-text-muted)">Urutkan:</span>
+              <select class="sort-select" id="sort-select">
+                <option value="default">Terpopuler</option>
+                <option value="price-asc">Harga: Rendah ke Tinggi</option>
+                <option value="price-desc">Harga: Tinggi ke Rendah</option>
+                <option value="rating">Rating Tertinggi</option>
+                <option value="newest">Terbaru</option>
+              </select>
+            </div>
+            <div class="view-toggle">
+              <button class="view-btn active" id="grid-view-btn" title="Tampilan Grid">▦</button>
+              <button class="view-btn" id="list-view-btn" title="Tampilan List">☰</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Active Filters -->
+        <div id="active-filters" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem"></div>
+
+        <!-- Products Grid -->
+        <div class="products-grid" id="catalog-products"></div>
+
+        <!-- Pagination -->
+        <div class="pagination">
+          <button class="page-item disabled">‹</button>
+          <button class="page-item active">1</button>
+          <button class="page-item">2</button>
+          <button class="page-item">3</button>
+          <span style="padding:0 0.5rem;color:var(--color-text-muted)">...</span>
+          <button class="page-item">8</button>
+          <button class="page-item">›</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo-name">Clayé</div>
+        <p>Studio keramik artisan premium dari Yogyakarta.</p>
+        <div class="footer-social">
+          <a href="#">📷</a><a href="#">🎵</a><a href="#">📘</a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Katalog</h4><ul>
+        <li><a href="katalog.html?cat=Mangkuk">Mangkuk</a></li>
+        <li><a href="katalog.html?cat=Vas">Vas</a></li>
+        <li><a href="katalog.html?cat=Mug">Mug</a></li>
+        <li><a href="katalog.html?cat=Piring">Piring</a></li>
+      </ul></div>
+      <div class="footer-col"><h4>Akun</h4><ul>
+        <li><a href="login.html">Login</a></li>
+        <li><a href="keranjang.html">Keranjang</a></li>
+        <li><a href="dashboard-pelanggan.html">Dashboard</a></li>
+      </ul></div>
+      <div class="footer-col"><h4>Bantuan</h4><ul>
+        <li><a href="#">FAQ</a></li>
+        <li><a href="#">Pengiriman</a></li>
+        <li><a href="#">Pengembalian</a></li>
+      </ul></div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2024 Clayé Ceramic Studio. Semua hak dilindungi.</p>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/main.js"></script>
+<script>
+  let currentProducts = [...PRODUCTS];
+  let viewMode = 'grid';
+
+  function updatePriceLabel(val) {
+    const f = parseInt(val).toLocaleString('id-ID');
+    document.getElementById('price-label').textContent = `≤ Rp ${f}`;
+  }
+
+  function renderCatalog(products) {
+    const container = document.getElementById('catalog-products');
+    document.getElementById('product-count').textContent = products.length;
+    if (products.length === 0) {
+      container.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+        <div class="empty-state-icon">🔍</div>
+        <h3>Produk tidak ditemukan</h3>
+        <p>Coba ubah filter atau kata kunci pencarian Anda.</p>
+        <button class="btn btn-secondary" onclick="resetFilters()">Reset Filter</button>
+      </div>`;
+      return;
+    }
+    if (viewMode === 'list') {
+      container.className = 'products-grid-list';
+      container.style.display = 'flex';
+      container.style.flexDirection = 'column';
+      container.style.gap = '1rem';
+    } else {
+      container.className = 'products-grid';
+      container.style.display = '';
+      container.style.flexDirection = '';
+    }
+    container.innerHTML = products.map(renderProductCard).join('');
+    initScrollAnimations();
+  }
+
+  function applyFilters() {
+    let result = [...PRODUCTS];
+    const priceMax = parseInt(document.getElementById('price-range').value);
+    const ratingMin = parseFloat(document.querySelector('input[name="rating"]:checked')?.value || 0);
+    const activeTags = [...document.querySelectorAll('[data-tag].active')].map(t => t.dataset.tag).filter(t => t !== 'all');
+    result = result.filter(p => p.price <= priceMax && p.rating >= ratingMin);
+    if (activeTags.length > 0) result = result.filter(p => activeTags.includes(p.badge));
+    const sort = document.getElementById('sort-select').value;
+    if (sort === 'price-asc') result.sort((a,b) => a.price - b.price);
+    else if (sort === 'price-desc') result.sort((a,b) => b.price - a.price);
+    else if (sort === 'rating') result.sort((a,b) => b.rating - a.rating);
+    currentProducts = result;
+    renderCatalog(result);
+  }
+
+  function resetFilters() {
+    document.getElementById('price-range').value = 500000;
+    updatePriceLabel(500000);
+    document.querySelectorAll('input[name="rating"]').forEach((r, i) => r.checked = i === 3);
+    document.querySelectorAll('[data-tag]').forEach(t => t.classList.toggle('active', t.dataset.tag === 'all'));
+    document.getElementById('sort-select').value = 'default';
+    currentProducts = [...PRODUCTS];
+    renderCatalog(currentProducts);
+  }
+
+  // View toggle
+  document.getElementById('grid-view-btn').addEventListener('click', () => {
+    viewMode = 'grid';
+    document.getElementById('grid-view-btn').classList.add('active');
+    document.getElementById('list-view-btn').classList.remove('active');
+    renderCatalog(currentProducts);
+  });
+  document.getElementById('list-view-btn').addEventListener('click', () => {
+    viewMode = 'list';
+    document.getElementById('list-view-btn').classList.add('active');
+    document.getElementById('grid-view-btn').classList.remove('active');
+    renderCatalog(currentProducts);
+  });
+
+  // Tag filter
+  document.querySelectorAll('[data-tag]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (btn.dataset.tag === 'all') {
+        document.querySelectorAll('[data-tag]').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+      } else {
+        document.querySelector('[data-tag="all"]').classList.remove('active');
+        btn.classList.toggle('active');
+      }
+    });
+  });
+
+  document.getElementById('apply-filter').addEventListener('click', applyFilters);
+  document.getElementById('reset-filter').addEventListener('click', resetFilters);
+  document.getElementById('sort-select').addEventListener('change', applyFilters);
+
+  // Check URL param
+  const urlParams = new URLSearchParams(window.location.search);
+  const catParam = urlParams.get('cat');
+
+  document.addEventListener('DOMContentLoaded', () => {
+    if (catParam) {
+      currentProducts = PRODUCTS.filter(p => p.category === catParam);
+      renderCatalog(currentProducts);
+    } else {
+      renderCatalog(PRODUCTS);
+    }
+  });
+</script>
+</body>
+</html>
