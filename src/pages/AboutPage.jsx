@@ -126,7 +126,7 @@ export default function AboutPage() {
             </p>
             <div className="about-hero-actions">
               <button onClick={() => navigate('/katalog')} className="claye-terracotta-btn">
-                Jelajahi Karya Kami →
+                Jelajahi Karya Kami
               </button>
               <button
                 onClick={() => openConcierge('Halo tim studio CLAYÉ, saya ingin bertanya tentang jadwal kunjungan studio dan pemesanan khusus')}
@@ -330,7 +330,7 @@ export default function AboutPage() {
                   onClick={() => openConcierge('Halo tim CLAYÉ, saya ingin reservasi kunjungan studio atau privat workshop keramik')}
                   className="claye-terracotta-btn"
                 >
-                  Reservasi Kunjungan Studio →
+                  Reservasi Kunjungan Studio
                 </button>
                 <button
                   onClick={() => navigate('/katalog')}

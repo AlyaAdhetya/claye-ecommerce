@@ -337,7 +337,7 @@ export default function AdminPage() {
                 className="claye-terracotta-btn"
                 style={{ width: '100%', padding: '14px', fontSize: '0.95rem' }}
               >
-                Masuk sebagai Admin Studio →
+                Masuk sebagai Admin Studio
               </button>
 
               <button
@@ -787,7 +787,7 @@ export default function AdminPage() {
                           <td><strong>{ord.id.replace('#', '')}</strong></td>
                           <td><strong>{ord.patron}</strong></td>
                           <td>{ord.city}</td>
-                          <td style={{ fontSize: '0.85rem' }}>{ord.itemsSummary}</td>
+                          <td style={{ fontSize: '0.78rem' }}>{ord.itemsSummary}</td>
                           <td>Rp {ord.total.toLocaleString('id-ID')}</td>
                           <td>
                             <span className={`status-pill ${ord.fulfillment === 'Selesai' ? 'pill-completed' : ord.fulfillment === 'Diproses' ? 'pill-processing' : 'pill-awaiting'}`}>
@@ -907,14 +907,11 @@ export default function AdminPage() {
                               <strong>{ord.id.replace('#', '')}</strong>
                             </td>
                             <td className="cell-collector-patron">
-                              <div className="patron-badge-cell">
-                                <span className="patron-circle-avatar">{ord.initials}</span>
-                                <strong>{ord.patron}</strong>
-                              </div>
+                              <strong>{ord.patron}</strong>
                             </td>
                             <td>{ord.city}</td>
                             <td className="cell-date">{ord.date}</td>
-                            <td style={{ fontSize: '0.82rem', maxWidth: '180px' }}>
+                            <td style={{ fontSize: '0.78rem', maxWidth: '200px' }}>
                               {ord.itemsSummary}
                             </td>
                             <td className="cell-total">
@@ -1382,7 +1379,8 @@ export default function AdminPage() {
                       <tr>
                         <th>KOLEKTOR</th>
                         <th>KOTA</th>
-                        <th>KONTAK</th>
+                        <th>EMAIL</th>
+                        <th>NOMOR</th>
                         <th>TIER LOYALITAS</th>
                         <th>TOTAL PESANAN</th>
                         <th>TOTAL BELANJA</th>
@@ -1394,27 +1392,22 @@ export default function AdminPage() {
                       {collectors.map((c, i) => (
                         <tr key={i}>
                           <td className="cell-collector-patron">
-                            <div className="patron-badge-cell">
-                              <span className="patron-circle-avatar">{c.initials}</span>
-                              <div>
-                                <strong>{c.name}</strong>
-                                <span className="patron-location">Sejak {c.joinedYear}</span>
-                              </div>
+                            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                              <strong>{c.name}</strong>
+                              <span style={{ fontSize: '0.72rem', color: '#8A857F' }}>{c.joinedYear}</span>
                             </div>
                           </td>
                           <td>{c.city}</td>
-                          <td style={{ fontSize: '0.8rem' }}>
-                            <div>{c.email}</div>
-                            <div style={{ color: '#8A857F' }}>{c.phone}</div>
-                          </td>
+                          <td>{c.email}</td>
+                          <td>{c.phone}</td>
                           <td>
                             <span className={`status-pill ${c.tier === 'Patron VIP' ? 'pill-completed' : 'pill-processing'}`}>
                               {c.tier}
                             </span>
                           </td>
-                          <td><strong>{c.totalOrders} kali</strong></td>
+                          <td><strong>{c.totalOrders}</strong></td>
                           <td><strong>Rp {c.totalSpent.toLocaleString('id-ID')}</strong></td>
-                          <td style={{ fontSize: '0.82rem', color: '#6E6962' }}>{c.favoriteGlaze}</td>
+                          <td style={{ color: '#6E6962' }}>{c.favoriteGlaze}</td>
                           <td style={{ textAlign: 'right' }}>
                             <button
                               onClick={() => openConcierge(`Hubungi ${c.name} mengenai pemesanan custom keramik studio CLAYÉ`)}

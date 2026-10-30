@@ -67,14 +67,12 @@ export default function Navbar() {
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                 <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
               </svg>
-              <span className="notif-dot" />
             </button>
 
             <div className="admin-user-profile" title="Profil Admin">
               <div className="admin-user-avatar">{user ? user.name.charAt(0).toUpperCase() : 'A'}</div>
               <div className="admin-user-details">
                 <span className="admin-user-name">{user ? user.name : 'Admin'}</span>
-                <span className="admin-user-role">Admin</span>
               </div>
             </div>
 
@@ -83,7 +81,7 @@ export default function Navbar() {
               className="admin-storefront-switch"
               title="Lihat Pratinjau Toko Pelanggan"
             >
-              Lihat Toko →
+              Lihat Toko
             </button>
 
             <button
