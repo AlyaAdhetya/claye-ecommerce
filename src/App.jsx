@@ -13,6 +13,7 @@ import CheckoutPage from './pages/CheckoutPage';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import AdminPage from './pages/AdminPage';
+import AboutPage from './pages/AboutPage';
 
 export default function App() {
   const { currentRoute, user } = useShop();
@@ -23,6 +24,9 @@ export default function App() {
     }
     if (currentRoute === '/katalog' || currentRoute === '/shop') {
       return <CatalogPage />;
+    }
+    if (currentRoute === '/tentang' || currentRoute === '/about') {
+      return <AboutPage />;
     }
     if (currentRoute.startsWith('/detail')) {
       return <DetailPage />;
@@ -39,7 +43,7 @@ export default function App() {
     if (currentRoute === '/dashboard' || currentRoute === '/account') {
       return <DashboardPage />;
     }
-    if (currentRoute === '/admin') {
+    if (currentRoute === '/admin' || currentRoute.startsWith('/admin')) {
       return <AdminPage />;
     }
     return <HomePage />;

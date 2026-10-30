@@ -401,6 +401,17 @@ export function ShopProvider({ children }) {
     showToast('Produk berhasil dihapus dari katalog.', 'info');
   };
 
+  const updateProductStock = (id, delta) => {
+    setProducts(prev => prev.map(p => {
+      if (p.id === id) {
+        const nextStock = Math.max(0, (p.stock || 0) + delta);
+        return { ...p, stock: nextStock };
+      }
+      return p;
+    }));
+    showToast('Stok karya keramik berhasil disesuaikan.', 'success');
+  };
+
   const viewProduct = (id) => {
     setSelectedProductId(id);
     navigate(`/detail/${id}`);
@@ -443,6 +454,7 @@ export function ShopProvider({ children }) {
       createOrder,
       addProduct,
       deleteProduct,
+      updateProductStock,
       viewProduct
     }}>
       {children}

@@ -4,12 +4,12 @@ import { useShop } from '../context/ShopContext';
 export default function Footer() {
   const { cartCount, navigate, openConcierge, currentRoute } = useShop();
 
-  if (currentRoute === '/admin') {
+  if (currentRoute === '/admin' || currentRoute.startsWith('/admin')) {
     return (
       <footer className="admin-footer-bar">
         <div className="container admin-footer-content">
           <div>CLAYÉ ATELIER MANAGEMENT V2.4 • STUDIO BANDUNG</div>
-          <div>Administrasi Kerajinan Keramik & Inventaris Batch Kecil</div>
+          <div>Administrasi Kerajinan Keramik dan Inventaris Batch Kecil</div>
         </div>
       </footer>
     );
@@ -31,6 +31,9 @@ export default function Footer() {
           <button onClick={() => navigate('/katalog')} className="footer-hlink">
             SEMUA PRODUK
           </button>
+          <button onClick={() => navigate('/tentang')} className="footer-hlink">
+            TENTANG KAMI
+          </button>
           <button onClick={() => navigate('/keranjang')} className="footer-hlink">
             KERANJANG ({cartCount})
           </button>
@@ -46,7 +49,7 @@ export default function Footer() {
           >
             PERAWATAN KERAMIK
           </button>
-          <button onClick={() => navigate('/katalog')} className="footer-hlink">
+          <button onClick={() => navigate('/tentang')} className="footer-hlink">
             STUDIO KAMI
           </button>
           <button
@@ -59,7 +62,7 @@ export default function Footer() {
             onClick={() => openConcierge('Bagaimana garansi pengemasan dan kebijakan pengembalian?')}
             className="footer-hlink"
           >
-            PENGIRIMAN & PENGEMBALIAN
+            PENGIRIMAN DAN PENGEMBALIAN
           </button>
         </nav>
 

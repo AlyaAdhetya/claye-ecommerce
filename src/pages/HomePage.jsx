@@ -125,12 +125,19 @@ export default function HomePage() {
             <p className="promise-body-text">
               Kami menolak pencetakan massal instan. Setiap karya Sunday Mug maupun mangkuk Solace memiliki sedikit perbedaan organik yang unik; bobot dalam jemari dan lengkungan bibir cangkir adalah bukti nyata bahwa waktu, ketulusan, dan tanah liat menyatu menjadi karya bernilai tinggi.
             </p>
-            <div className="promise-action-link">
+            <div className="promise-action-link" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+              <button
+                onClick={() => navigate('/tentang')}
+                className="atelier-inquiry-btn"
+                style={{ backgroundColor: 'var(--color-charcoal)', color: '#FFFFFF', borderColor: 'var(--color-charcoal)' }}
+              >
+                Tentang Studio & Cerita Kami →
+              </button>
               <button
                 onClick={() => openConcierge('Ceritakan proses pembakaran kiln batch di studio')}
                 className="atelier-inquiry-btn"
               >
-                Pelajari Proses Pembakaran Kiln Studio →
+                Tanya Konsultasi Kiln Studio
               </button>
             </div>
           </div>

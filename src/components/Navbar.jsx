@@ -8,7 +8,7 @@ export default function Navbar() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [navSearchQuery, setNavSearchQuery] = useState('');
 
-  const isAdminPage = currentRoute === '/admin';
+  const isAdminPage = currentRoute === '/admin' || currentRoute.startsWith('/admin');
 
   useEffect(() => {
     const onScroll = () => {
@@ -40,7 +40,6 @@ export default function Navbar() {
             <button onClick={() => handleNav('/')} className="claye-brand-logo">
               CLAYÉ
             </button>
-            <span className="admin-atelier-badge">PANEL ADMIN</span>
           </div>
 
           <div className="admin-topbar-search">
@@ -58,11 +57,6 @@ export default function Navbar() {
           </div>
 
           <div className="admin-topbar-right">
-            <div className="admin-studio-time">
-              <span className="studio-location-tag">STUDIO BANDUNG</span>
-              <span className="studio-time-str">Kamis, 24 Okt • 14:32</span>
-            </div>
-
             <button
               onClick={() => openConcierge('Notifikasi pesanan baru dan pembaruan pembakaran kiln')}
               className="admin-notification-bell"
@@ -140,8 +134,8 @@ export default function Navbar() {
               KATALOG
             </button>
             <button
-              onClick={() => handleNav('/katalog')}
-              className="nav-text-link"
+              onClick={() => handleNav('/tentang')}
+              className={`nav-text-link ${currentRoute === '/tentang' ? 'active' : ''}`}
             >
               TENTANG KAMI
             </button>
@@ -243,6 +237,7 @@ export default function Navbar() {
             <div className="mobile-nav-links">
               <button onClick={() => handleNav('/')} className="mobile-link">BERANDA</button>
               <button onClick={() => handleNav('/katalog')} className="mobile-link">KATALOG PRODUK</button>
+              <button onClick={() => handleNav('/tentang')} className="mobile-link">TENTANG KAMI</button>
               <button onClick={() => handleNav('/keranjang')} className="mobile-link">KERANJANG ({cartCount})</button>
               <button onClick={() => handleNav(user ? '/dashboard' : '/login')} className="mobile-link">
                 {user ? 'AKUN SAYA' : 'MASUK / DAFTAR'}
