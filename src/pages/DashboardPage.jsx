@@ -2,358 +2,702 @@ import React, { useState } from 'react';
 import { useShop } from '../context/ShopContext';
 
 export default function DashboardPage() {
-  const { user, orders, updateProfile, logout, navigate, showToast } = useShop();
-  const [activeTab, setActiveTab] = useState('orders'); // 'orders', 'profile', 'addresses'
-  const [editName, setEditName] = useState(user ? user.name : '');
-  const [editPhone, setEditPhone] = useState(user ? user.phone : '');
-  const [editAddress, setEditAddress] = useState(user ? user.address : '');
+  const { user, login, orders, wishlist, products, logout, updateProfile, navigate, openConcierge, showToast, viewProduct, addToCart } = useShop();
 
-  const formatRupiah = (num) => 'Rp ' + Number(num).toLocaleString('id-ID');
+  const [activeMenu, setActiveMenu] = useState('overview');
+  const [selectedOrderModal, setSelectedOrderModal] = useState(null);
+  const [isEditProfileModal, setIsEditProfileModal] = useState(false);
+  const [editFormData, setEditFormData] = useState({
+    name: user ? user.name : 'Arumi',
+    fullName: user ? user.fullName : 'Arumi',
+    email: user ? user.email : 'arumi@example.com',
+    phone: user ? user.phone : '+62 812-3456-7890',
+    address: user ? user.address : 'Jl. Bukit Dago Utara No. 18, Coblong',
+    city: user ? user.city : 'Bandung',
+    postalCode: user ? user.postalCode : '40135'
+  });
 
+  const [isAddressModal, setIsAddressModal] = useState(false);
+  const [careModalOpen, setCareModalOpen] = useState(false);
+
+  const currentUser = user || {
+    name: 'Arumi',
+    fullName: 'Arumi',
+    email: 'arumi@example.com',
+    phone: '+62 812-3456-7890',
+    address: 'Jl. Bukit Dago Utara No. 18, Coblong',
+    city: 'Bandung',
+    postalCode: '40135',
+    patronSince: '2024',
+    cohort: 'Pelanggan Tetap'
+  };
+
+  const handleProfileSubmit = (e) => {
+    e.preventDefault();
+    updateProfile(editFormData);
+    setIsEditProfileModal(false);
+  };
+
+  const savedProductsList = products.filter(p => wishlist.includes(p.id));
+
+  // JIKA BELUM LOGIN: Arahkan ke portal login pelanggan
   if (!user) {
     return (
-      <div style={{ padding: '6rem 0', textAlign: 'center' }}>
-        <div className="container" style={{ maxWidth: '500px', background: 'var(--color-surface)', padding: '3rem 2rem', borderRadius: '16px', border: '1px solid var(--color-border)' }}>
-          <span style={{ fontSize: '3rem', display: 'block', marginBottom: '1rem' }}>🔐</span>
-          <h2>Akses Terbatas</h2>
-          <p style={{ color: 'var(--color-text-muted)', margin: '1rem 0 2rem' }}>
-            Silakan masuk atau buat akun terlebih dahulu untuk mengakses Dashboard Pelanggan.
-          </p>
-          <button onClick={() => navigate('/login')} className="btn btn-primary btn-lg">
-            Masuk / Login Sekarang
-          </button>
+      <div className="claye-login-page" style={{ padding: '6rem 0', minHeight: '75vh', display: 'flex', alignItems: 'center' }}>
+        <div className="container" style={{ maxWidth: '580px', margin: '0 auto', textAlign: 'center' }}>
+          <div className="auth-card-wrapper" style={{ padding: '3rem 2.5rem' }}>
+            <div style={{
+              width: '60px',
+              height: '60px',
+              borderRadius: '50%',
+              backgroundColor: '#F3EFEA',
+              color: '#24201D',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 1.25rem'
+            }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </div>
+
+            <div className="studio-edition-badge" style={{ margin: '0 auto 0.75rem' }}>
+              <span className="badge-dot">•</span> PORTAL PELANGGAN
+            </div>
+
+            <h2 className="auth-main-title" style={{ fontSize: '1.75rem', marginBottom: '0.75rem' }}>
+              Akun Saya (Portal Pembeli)
+            </h2>
+
+            <p className="auth-lead-sub" style={{ fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '1.75rem' }}>
+              Silakan masuk ke akun Pelanggan Anda untuk melihat riwayat pesanan keramik, nomor resi pengiriman ekspedisi, serta mengelola alamat pengiriman.
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              <button
+                onClick={() => login('arumi@example.com', 'claye2026', 'customer')}
+                className="claye-terracotta-btn"
+                style={{ width: '100%', padding: '14px' }}
+              >
+                Masuk Cepat sebagai Pembeli (Arumi) →
+              </button>
+
+              <button
+                onClick={() => navigate('/login')}
+                className="btn-modal-cancel"
+                style={{ width: '100%' }}
+              >
+                Masuk Akun Lain / Daftar Akun Baru
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
-  const handleSaveProfile = (e) => {
-    e.preventDefault();
-    updateProfile({
-      name: editName,
-      phone: editPhone,
-      address: editAddress
-    });
-  };
-
-  const statusColors = {
-    'Selesai': { bg: '#eafaf1', text: '#27ae60' },
-    'Dikirim': { bg: '#ebf5fb', text: '#2980b9' },
-    'Diproses': { bg: '#fef9e7', text: '#f39c12' },
-    'Menunggu Pembayaran': { bg: '#fdf0ed', text: '#e67e22' }
-  };
-
   return (
-    <div className="dashboard-page" style={{ padding: '3rem 0 5rem' }}>
+    <div className="claye-patron-dashboard-page">
       <div className="container">
-        {/* CUSTOMER HEADER CARD */}
-        <div style={{
-          background: 'var(--color-surface)',
-          padding: '2rem 2.5rem',
-          borderRadius: '20px',
-          boxShadow: 'var(--shadow-sm)',
-          border: '1px solid var(--color-border)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '1.5rem',
-          marginBottom: '2.5rem'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-            <div style={{
-              width: '72px',
-              height: '72px',
-              borderRadius: '50%',
-              background: 'var(--color-cream-dark)',
-              color: 'var(--color-primary)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '1.8rem',
-              fontWeight: 700
-            }}>
-              {user.name.charAt(0).toUpperCase()}
+
+
+        {/* BREADCRUMB */}
+        <div className="dashboard-breadcrumb">
+          <button onClick={() => navigate('/')}>BERANDA</button>
+          <span className="bc-sep">/</span>
+          <span className="bc-current">AKUN SAYA</span>
+        </div>
+
+        {/* HEADER AKUN */}
+        <div className="dashboard-account-header">
+          <div>
+            <div className="studio-patron-pill">
+              <span className="patron-dot">•</span> PELANGGAN TERDAFTAR
             </div>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.6rem', color: 'var(--color-text)' }}>
-                  {user.name}
-                </h2>
-                <span style={{ background: '#fdf6e7', color: '#c27d42', padding: '0.2rem 0.6rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700, border: '1px solid #fae1b3' }}>
-                  ⭐ VIP Artisan Member
-                </span>
-              </div>
-              <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', marginTop: '0.2rem' }}>
-                {user.email} • Bergabung sejak {user.joined || '2026'}
-              </p>
-            </div>
+            <h1 className="account-main-title">Akun Saya</h1>
+            <p className="account-welcome-sub">
+              Selamat datang kembali, {currentUser.name}. Berikut ringkasan pesanan keramik dan riwayat arsip Anda.
+            </p>
           </div>
 
-          <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
-            <div style={{ background: 'var(--color-cream-light)', padding: '0.75rem 1.25rem', borderRadius: '12px', textAlign: 'center' }}>
-              <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>Poin Reward</div>
-              <div style={{ fontSize: '1.3rem', fontWeight: 700, color: 'var(--color-primary)' }}>{user.points || 1250} Poin</div>
+          <div className="archived-cohort-badge">
+            <div className="cohort-text">
+              <span className="cohort-label">KOLEKTOR TERDAFTAR</span>
+              <strong className="cohort-name">{currentUser.cohort || 'Angkatan Batch 04'}</strong>
             </div>
-
-            <button
-              onClick={logout}
-              className="btn btn-secondary"
-              style={{ color: '#c0392b', borderColor: '#f5c6cb' }}
-            >
-              Keluar (Logout) 🚪
-            </button>
           </div>
         </div>
 
-        {/* DASHBOARD GRID */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-          gap: '2rem',
-          alignItems: 'start'
-        }}>
-          {/* SIDEBAR TABS */}
-          <div style={{
-            background: 'var(--color-surface)',
-            borderRadius: '16px',
-            padding: '1rem',
-            border: '1px solid var(--color-border)',
-            boxShadow: 'var(--shadow-sm)'
-          }}>
-            <button
-              onClick={() => setActiveTab('orders')}
-              style={{
-                width: '100%',
-                textAlign: 'left',
-                padding: '0.85rem 1.25rem',
-                border: 'none',
-                borderRadius: '8px',
-                background: activeTab === 'orders' ? 'var(--color-primary)' : 'transparent',
-                color: activeTab === 'orders' ? 'white' : 'var(--color-text)',
-                fontWeight: 600,
-                cursor: 'pointer',
-                marginBottom: '0.5rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.75rem'
-              }}
-            >
-              <span>📦</span> Pesanan Saya ({orders.length})
-            </button>
-
-            <button
-              onClick={() => setActiveTab('profile')}
-              style={{
-                width: '100%',
-                textAlign: 'left',
-                padding: '0.85rem 1.25rem',
-                border: 'none',
-                borderRadius: '8px',
-                background: activeTab === 'profile' ? 'var(--color-primary)' : 'transparent',
-                color: activeTab === 'profile' ? 'white' : 'var(--color-text)',
-                fontWeight: 600,
-                cursor: 'pointer',
-                marginBottom: '0.5rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.75rem'
-              }}
-            >
-              <span>👤</span> Edit Profil Akun
-            </button>
-
-            <button
-              onClick={() => setActiveTab('addresses')}
-              style={{
-                width: '100%',
-                textAlign: 'left',
-                padding: '0.85rem 1.25rem',
-                border: 'none',
-                borderRadius: '8px',
-                background: activeTab === 'addresses' ? 'var(--color-primary)' : 'transparent',
-                color: activeTab === 'addresses' ? 'white' : 'var(--color-text)',
-                fontWeight: 600,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.75rem'
-              }}
-            >
-              <span>📍</span> Buku Alamat
-            </button>
-          </div>
-
-          {/* TAB CONTENT (2 SPAN) */}
-          <div style={{
-            gridColumn: 'span 2',
-            background: 'var(--color-surface)',
-            borderRadius: '16px',
-            padding: '2rem',
-            border: '1px solid var(--color-border)',
-            boxShadow: 'var(--shadow-sm)'
-          }}>
-            {/* ORDERS TAB */}
-            {activeTab === 'orders' && (
-              <div>
-                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.4rem', marginBottom: '1.5rem' }}>
-                  Riwayat & Status Pesanan
-                </h3>
-
-                {orders.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '3rem 0', color: 'var(--color-text-muted)' }}>
-                    <p>Belum ada riwayat pesanan.</p>
-                    <button onClick={() => navigate('/katalog')} className="btn btn-primary" style={{ marginTop: '1rem' }}>
-                      Beli Produk Pertama 🏺
-                    </button>
-                  </div>
-                ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                    {orders.map(order => {
-                      const badgeStyle = statusColors[order.status] || { bg: '#eee', text: '#555' };
-                      return (
-                        <div
-                          key={order.id}
-                          style={{
-                            border: '1px solid var(--color-border)',
-                            borderRadius: '12px',
-                            padding: '1.25rem',
-                            background: 'white'
-                          }}
-                        >
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.75rem', marginBottom: '1rem' }}>
-                            <div>
-                              <strong style={{ color: 'var(--color-primary)' }}>{order.id}</strong>
-                              <span style={{ margin: '0 0.5rem', color: 'var(--color-text-muted)' }}>•</span>
-                              <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>{order.date}</span>
-                            </div>
-                            <span style={{
-                              background: badgeStyle.bg,
-                              color: badgeStyle.text,
-                              padding: '0.3rem 0.8rem',
-                              borderRadius: '20px',
-                              fontSize: '0.8rem',
-                              fontWeight: 700
-                            }}>
-                              {order.status}
-                            </span>
-                          </div>
-
-                          <div style={{ marginBottom: '1rem' }}>
-                            {order.items && order.items.map((item, idx) => (
-                              <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.95rem', marginBottom: '0.35rem' }}>
-                                <span>{item.name} × {item.quantity}</span>
-                                <strong>{formatRupiah(item.price * item.quantity)}</strong>
-                              </div>
-                            ))}
-                          </div>
-
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--color-cream-dark)', paddingTop: '0.75rem', fontSize: '0.9rem' }}>
-                            <div>
-                              <span style={{ color: 'var(--color-text-muted)' }}>Metode: </span>
-                              <strong>{order.paymentMethod || 'Online'}</strong>
-                              {order.tracking && (
-                                <span style={{ marginLeft: '1rem', color: '#2980b9' }}>
-                                  Resi: <strong>{order.tracking}</strong>
-                                </span>
-                              )}
-                            </div>
-                            <div>
-                              <span style={{ color: 'var(--color-text-muted)' }}>Total: </span>
-                              <strong style={{ fontSize: '1.15rem', color: 'var(--color-primary)' }}>{formatRupiah(order.total)}</strong>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
+        {/* TATA LETAK 2 KOLOM */}
+        <div className="patron-dashboard-layout">
+          {/* SIDEBAR AKUN */}
+          <aside className="patron-sidebar-card">
+            <div className="patron-profile-identity">
+              <div className="patron-avatar-circle">
+                {currentUser.name.charAt(0).toUpperCase()}
               </div>
-            )}
+              <div className="patron-name-wrap">
+                <h2 className="patron-display-name">{currentUser.name}</h2>
+                <span className="patron-since-text">ANGGOTA SEJAK {currentUser.patronSince || '2024'}</span>
+              </div>
+            </div>
 
-            {/* PROFILE TAB */}
-            {activeTab === 'profile' && (
-              <div>
-                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.4rem', marginBottom: '1.5rem' }}>
-                  Perbarui Informasi Profil
-                </h3>
+            <nav className="patron-nav-menu">
+              <button
+                className={`patron-nav-item ${activeMenu === 'overview' ? 'is-active' : ''}`}
+                onClick={() => setActiveMenu('overview')}
+              >
+                <span className="pnav-text">Ringkasan Akun</span>
+                {activeMenu === 'overview' && <span className="pnav-active-dot" />}
+              </button>
 
-                <form onSubmit={handleSaveProfile} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', maxWidth: '520px' }}>
+              <button
+                className={`patron-nav-item ${activeMenu === 'profile' ? 'is-active' : ''}`}
+                onClick={() => { setActiveMenu('profile'); setIsEditProfileModal(true); }}
+              >
+                <span className="pnav-text">Profil Saya</span>
+              </button>
+
+              <button
+                className={`patron-nav-item ${activeMenu === 'orders' ? 'is-active' : ''}`}
+                onClick={() => setActiveMenu('orders')}
+              >
+                <span className="pnav-text">Pesanan Saya</span>
+                <span className="pnav-counter-pill">{orders.length + 2}</span>
+              </button>
+
+              <button
+                className={`patron-nav-item ${activeMenu === 'addresses' ? 'is-active' : ''}`}
+                onClick={() => { setActiveMenu('addresses'); setIsAddressModal(true); }}
+              >
+                <span className="pnav-text">Buku Alamat</span>
+              </button>
+
+              <button
+                className={`patron-nav-item ${activeMenu === 'saved' ? 'is-active' : ''}`}
+                onClick={() => setActiveMenu('saved')}
+              >
+                <span className="pnav-text">Daftar Favorit</span>
+                <span className="pnav-counter-pill">{wishlist.length}</span>
+              </button>
+
+              <button
+                className={`patron-nav-item ${activeMenu === 'care' ? 'is-active' : ''}`}
+                onClick={() => setCareModalOpen(true)}
+              >
+                <span className="pnav-text">Panduan Perawatan</span>
+              </button>
+
+              <div className="pnav-divider" />
+
+              <button
+                className="patron-nav-item pnav-logout"
+                onClick={logout}
+              >
+                <span className="pnav-text">Keluar dari Akun</span>
+              </button>
+            </nav>
+          </aside>
+
+          {/* KONTEN UTAMA AKUN */}
+          <main className="patron-main-content">
+            {/* 3 KARTU METRIK */}
+            <div className="patron-metrics-row">
+              <div className="patron-stat-card">
+                <div className="pstat-header">
+                  <span className="pstat-label">TOTAL PRODUK DIPESAN</span>
+                </div>
+                <div className="pstat-big-num">5</div>
+                <div className="pstat-subtext">Di berbagai batch pembakaran studio</div>
+              </div>
+
+              <div className="patron-stat-card">
+                <div className="pstat-header">
+                  <span className="pstat-label">SEDANG DIPROSES</span>
+                  <span className="pstat-badge active-badge">AKTIF</span>
+                </div>
+                <div className="pstat-big-num">1</div>
+                <div className="pstat-subtext">Dalam tahap inspeksi & pengemasan</div>
+              </div>
+
+              <div className="patron-stat-card">
+                <div className="pstat-header">
+                  <span className="pstat-label">SELESAI DIKIRIM</span>
+                  <span className="pstat-icon check-icon">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  </span>
+                </div>
+                <div className="pstat-big-num">4</div>
+                <div className="pstat-subtext">Terkirim aman & terkurasi</div>
+              </div>
+            </div>
+
+            {/* TAB DAFTAR FAVORIT JIKA DIPILIH */}
+            {activeMenu === 'saved' && (
+              <div className="dashboard-section-block">
+                <div className="dash-block-header">
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Nama Lengkap</label>
-                    <input
-                      type="text"
-                      required
-                      value={editName}
-                      onChange={(e) => setEditName(e.target.value)}
-                      style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)' }}
-                    />
+                    <h2 className="dash-block-title">Daftar Favorit ({savedProductsList.length})</h2>
+                    <p className="dash-block-sub">Koleksi keramik yang Anda tandai untuk pesanan mendatang.</p>
                   </div>
-
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Alamat Email</label>
-                    <input
-                      type="email"
-                      disabled
-                      value={user.email}
-                      style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', background: 'var(--color-cream-light)', cursor: 'not-allowed' }}
-                    />
-                    <small style={{ color: 'var(--color-text-muted)' }}>Email tidak dapat diubah secara mandiri.</small>
-                  </div>
-
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Nomor Telepon / WhatsApp</label>
-                    <input
-                      type="tel"
-                      value={editPhone}
-                      onChange={(e) => setEditPhone(e.target.value)}
-                      style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)' }}
-                    />
-                  </div>
-
-                  <div>
-                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Alamat Pengiriman Utama</label>
-                    <textarea
-                      rows="3"
-                      value={editAddress}
-                      onChange={(e) => setEditAddress(e.target.value)}
-                      style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', fontFamily: 'inherit' }}
-                    />
-                  </div>
-
-                  <button type="submit" className="btn btn-primary" style={{ alignSelf: 'flex-start', marginTop: '0.5rem' }}>
-                    Simpan Perubahan ✨
+                  <button onClick={() => setActiveMenu('overview')} className="dash-text-action">
+                    Kembali ke Ringkasan →
                   </button>
-                </form>
+                </div>
+
+                <div className="claye-curated-grid" style={{ marginTop: '1.5rem' }}>
+                  {savedProductsList.map((item) => (
+                    <div key={item.id} className="curated-product-card" onClick={() => viewProduct(item.id)}>
+                      <div className="curated-img-wrapper">
+                        <img src={item.image} alt={item.name} />
+                      </div>
+                      <div className="curated-card-info">
+                        <div className="card-title-price-row">
+                          <h3 className="curated-item-name">{item.name}</h3>
+                          <span className="curated-item-price">Rp {item.price.toLocaleString('id-ID')}</span>
+                        </div>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); addToCart(item.id, 1); }}
+                          className="quick-add-pill-btn"
+                          style={{ marginTop: '0.75rem', width: '100%', justifyContent: 'center' }}
+                        >
+                          Masukkan Keranjang
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 
-            {/* ADDRESSES TAB */}
-            {activeTab === 'addresses' && (
-              <div>
-                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.4rem', marginBottom: '1.5rem' }}>
-                  Buku Alamat Pengiriman
-                </h3>
+            {/* TABEL PESANAN TERBARU */}
+            <div className="dashboard-section-block">
+              <div className="dash-block-header">
+                <div>
+                  <h2 className="dash-block-title">Riwayat Pesanan Terbaru</h2>
+                  <p className="dash-block-sub">Pantau perjalanan pesanan keramik Anda dari studio pembakaran hingga tiba di rumah.</p>
+                </div>
+                <button
+                  onClick={() => openConcierge('Cek nomor resi pengiriman untuk pesanan aktif saya')}
+                  className="dash-text-action"
+                >
+                  LIHAT SEMUA RIWAYAT →
+                </button>
+              </div>
 
-                <div style={{ border: '2px solid var(--color-primary)', borderRadius: '12px', padding: '1.25rem', background: 'var(--color-cream-light)', marginBottom: '1.5rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                    <strong>Rumah Utama (Default)</strong>
-                    <span style={{ background: 'var(--color-primary)', color: 'white', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600 }}>Utama</span>
+              <div className="acquisitions-table-wrap">
+                <table className="claye-patron-table">
+                  <thead>
+                    <tr>
+                      <th>NO. PESANAN</th>
+                      <th>TANGGAL</th>
+                      <th>KARYA KERAMIK</th>
+                      <th>TOTAL</th>
+                      <th>STATUS PENGIRIMAN</th>
+                      <th style={{ textAlign: 'right' }}>RINCIAN</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {orders.map((ord) => (
+                      <tr key={ord.id}>
+                        <td className="cell-order-ref">
+                          <strong>{ord.id}</strong>
+                        </td>
+                        <td className="cell-date">
+                          {ord.date}
+                        </td>
+                        <td className="cell-pieces">
+                          <div className="pieces-item-preview">
+                            <img src={ord.image || '/assets/images/product_mug.jpg'} alt="Foto produk" />
+                            <div>
+                              <strong className="piece-title">{ord.itemsSummary || 'The Sunday Mug'}</strong>
+                              <span className="piece-variant">{ord.variantSummary || 'Batu Pasir & Gading'}</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="cell-total">
+                          Rp {ord.total.toLocaleString('id-ID')}
+                        </td>
+                        <td className="cell-fulfillment">
+                          <span className={`status-pill ${ord.fulfillment === 'SELESAI' ? 'pill-completed' : 'pill-processing'}`}>
+                            • {ord.fulfillment}
+                          </span>
+                        </td>
+                        <td className="cell-details" style={{ textAlign: 'right' }}>
+                          <button
+                            onClick={() => setSelectedOrderModal(ord)}
+                            className="order-view-btn"
+                          >
+                            LIHAT ›
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="explore-archive-bottom-btn">
+                <button
+                  onClick={() => openConcierge('Tampilkan seluruh arsip pesanan keramik tahun 2024-2026')}
+                  className="explore-archives-btn"
+                >
+                  JELAJAHI SELURUH ARSIP PESANAN →
+                </button>
+              </div>
+            </div>
+
+            {/* 2 KARTU INFORMASI: DATA PRIBADI & ALAMAT */}
+            <div className="patron-twin-cards-grid">
+              {/* DATA PRIBADI */}
+              <div className="patron-info-panel">
+                <div className="panel-badge-row">
+                  <span className="panel-label">DATA PRIBADI</span>
+                </div>
+                <h3 className="panel-heading">Informasi Akun</h3>
+                <p className="panel-desc">Kredensial kontak utama yang terhubung dengan akun Anda.</p>
+
+                <div className="panel-fields-list">
+                  <div className="field-group">
+                    <span className="field-label">NAMA LENGKAP</span>
+                    <strong className="field-val">{currentUser.fullName || currentUser.name}</strong>
                   </div>
-                  <div style={{ fontWeight: 600 }}>{user.name} ({user.phone || '08123456789'})</div>
-                  <p style={{ color: 'var(--color-text-muted)', margin: '0.5rem 0' }}>
-                    {user.address || 'Jl. Senopati No. 45, Kebayoran Baru, Jakarta Selatan, DKI Jakarta 12180'}
+                  <div className="field-group">
+                    <span className="field-label">ALAMAT EMAIL</span>
+                    <strong className="field-val">{currentUser.email}</strong>
+                  </div>
+                  <div className="field-group">
+                    <span className="field-label">NOMOR TELEPON</span>
+                    <strong className="field-val">{currentUser.phone}</strong>
+                  </div>
+                </div>
+
+                <div className="panel-actions-row">
+                  <button
+                    onClick={() => setIsEditProfileModal(true)}
+                    className="panel-btn-primary"
+                  >
+                    UBAH DATA
+                  </button>
+                  <button
+                    onClick={() => showToast('Instruksi pengaturan ulang kata sandi dikirim ke email.', 'info')}
+                    className="panel-btn-ghost"
+                  >
+                    Ubah Kata Sandi
+                  </button>
+                </div>
+              </div>
+
+              {/* ALAMAT PENGIRIMAN */}
+              <div className="patron-info-panel">
+                <div className="panel-badge-row">
+                  <span className="panel-label">TUJUAN PENGIRIMAN</span>
+                  <span className="primary-dest-pill">Utama</span>
+                </div>
+                <h3 className="panel-heading">Alamat Pengiriman</h3>
+                <p className="panel-desc">Alamat tujuan untuk ekspedisi dan kemasan keramik aman.</p>
+
+                <div className="destination-address-box">
+                  <div className="dest-title-row">
+                    <strong>Rumah Pribadi</strong>
+                    <span className="dest-country">{currentUser.country || 'Indonesia'}</span>
+                  </div>
+                  <p className="dest-recipient">Penerima: {currentUser.name}</p>
+                  <p className="dest-street">
+                    {currentUser.address}
+                  </p>
+                  <p className="dest-city">
+                    {currentUser.city}, {currentUser.province || 'Jawa Barat'} {currentUser.postalCode}
+                  </p>
+                  <p className="dest-phone">
+                    Telp: {currentUser.phone}
                   </p>
                 </div>
 
-                <button onClick={() => showToast('Fitur tambah alamat tambahan siap digunakan.', 'info')} className="btn btn-secondary">
-                  + Tambah Alamat Baru
-                </button>
+                <div className="panel-actions-row">
+                  <button
+                    onClick={() => setIsAddressModal(true)}
+                    className="panel-btn-primary"
+                  >
+                    KELOLA ALAMAT (2)
+                  </button>
+                  <button
+                    onClick={() => setIsAddressModal(true)}
+                    className="panel-btn-ghost"
+                  >
+                    + Tambah Alamat Baru
+                  </button>
+                </div>
               </div>
-            )}
-          </div>
+            </div>
+
+            {/* JAMINAN PERAWATAN KERAMIK */}
+            <div className="studio-care-guarantee-card">
+              <div className="care-guarantee-left">
+                <div className="care-guarantee-text">
+                  <h4 className="care-title">Jaminan Kualitas & Perawatan Studio</h4>
+                  <p className="care-body">
+                    Semua stoneware CLAYÉ diproses food-safe dan dibakar pada suhu 1240°C. Butuh panduan merawat bagian dasar unglazed atau penyimpanan jangka panjang?
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setCareModalOpen(true)}
+                className="read-care-ritual-btn"
+              >
+                BACA PANDUAN PERAWATAN
+              </button>
+            </div>
+          </main>
         </div>
       </div>
+
+      {/* MODAL: RINCIAN PESANAN */}
+      {selectedOrderModal && (
+        <div className="claye-modal-overlay" onClick={() => setSelectedOrderModal(null)}>
+          <div className="claye-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <div>
+                <span className="modal-subtitle">ARSIP PESANAN STUDIO</span>
+                <h3 className="modal-title">{selectedOrderModal.id}</h3>
+              </div>
+              <button onClick={() => setSelectedOrderModal(null)} className="modal-close-btn" aria-label="Tutup">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </div>
+
+            <div className="modal-body">
+              <div className="order-modal-details-grid">
+                <div>
+                  <span className="detail-tag">Tanggal Pesanan</span>
+                  <p><strong>{selectedOrderModal.date}</strong></p>
+                </div>
+                <div>
+                  <span className="detail-tag">Status Pengiriman</span>
+                  <p><span className="status-pill pill-completed">• {selectedOrderModal.fulfillment}</span></p>
+                </div>
+                <div>
+                  <span className="detail-tag">Nomor Resi</span>
+                  <p><strong>{selectedOrderModal.trackingNumber}</strong></p>
+                </div>
+                <div>
+                  <span className="detail-tag">Jasa Ekspedisi</span>
+                  <p><strong>{selectedOrderModal.courier}</strong></p>
+                </div>
+              </div>
+
+              <div className="order-modal-items-table">
+                <h4>Daftar Karya Keramik</h4>
+                {selectedOrderModal.items?.map((it, idx) => (
+                  <div key={idx} className="modal-item-row">
+                    <span>{it.name} ({it.glaze || 'Glasir Khusus'}) × {it.quantity}</span>
+                    <strong>Rp {(it.price * it.quantity).toLocaleString('id-ID')}</strong>
+                  </div>
+                ))}
+                <div className="modal-item-row" style={{ borderTop: '1px solid #EAE6DF', paddingTop: '0.75rem', marginTop: '0.75rem' }}>
+                  <span>Ongkos Kirim (Proteksi Kemasan Ekstra)</span>
+                  <strong>Rp 15.000</strong>
+                </div>
+                <div className="modal-item-row total-row">
+                  <span>Total Pembayaran</span>
+                  <strong style={{ fontSize: '1.2rem', color: '#24201D' }}>
+                    Rp {(selectedOrderModal.total + 15000).toLocaleString('id-ID')}
+                  </strong>
+                </div>
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button
+                onClick={() => {
+                  setSelectedOrderModal(null);
+                  openConcierge(`Bantu saya melacak resi pengiriman ${selectedOrderModal.trackingNumber}`);
+                }}
+                className="btn-modal-action"
+              >
+                Lacak Status Ekspedisi →
+              </button>
+              <button onClick={() => setSelectedOrderModal(null)} className="btn-modal-cancel">
+                Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: UBAH PROFIL */}
+      {isEditProfileModal && (
+        <div className="claye-modal-overlay" onClick={() => setIsEditProfileModal(false)}>
+          <div className="claye-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <div>
+                <span className="modal-subtitle">DATA PRIBADI</span>
+                <h3 className="modal-title">Ubah Profil Saya</h3>
+              </div>
+              <button onClick={() => setIsEditProfileModal(false)} className="modal-close-btn" aria-label="Tutup">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </div>
+
+            <form onSubmit={handleProfileSubmit} className="modal-body">
+              <div className="form-group-claye">
+                <label>Nama Panggilan</label>
+                <input
+                  type="text"
+                  value={editFormData.name}
+                  onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div className="form-group-claye">
+                <label>Nama Lengkap</label>
+                <input
+                  type="text"
+                  value={editFormData.fullName}
+                  onChange={(e) => setEditFormData({ ...editFormData, fullName: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div className="form-group-claye">
+                <label>Alamat Email</label>
+                <input
+                  type="email"
+                  value={editFormData.email}
+                  onChange={(e) => setEditFormData({ ...editFormData, email: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div className="form-group-claye">
+                <label>Nomor Telepon</label>
+                <input
+                  type="tel"
+                  value={editFormData.phone}
+                  onChange={(e) => setEditFormData({ ...editFormData, phone: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div className="modal-footer">
+                <button type="submit" className="btn-modal-action">
+                  Simpan Perubahan
+                </button>
+                <button type="button" onClick={() => setIsEditProfileModal(false)} className="btn-modal-cancel">
+                  Batal
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: KELOLA ALAMAT */}
+      {isAddressModal && (
+        <div className="claye-modal-overlay" onClick={() => setIsAddressModal(false)}>
+          <div className="claye-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <div>
+                <span className="modal-subtitle">TUJUAN PENGIRIMAN</span>
+                <h3 className="modal-title">Kelola Alamat Pengiriman</h3>
+              </div>
+              <button onClick={() => setIsAddressModal(false)} className="modal-close-btn" aria-label="Tutup">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </div>
+
+            <div className="modal-body">
+              <div className="address-card-item primary">
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
+                  <strong>Rumah Pribadi (Alamat Utama)</strong>
+                  <span className="primary-dest-pill">Aktif</span>
+                </div>
+                <p>{currentUser.address}, {currentUser.city}, {currentUser.postalCode}</p>
+                <p>Nomor Telepon: {currentUser.phone}</p>
+              </div>
+
+              <div className="address-card-item secondary" style={{ marginTop: '1rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
+                  <strong>Kantor / Studio Bandung</strong>
+                  <button
+                    onClick={() => showToast('Alamat kantor ditetapkan sebagai alamat utama.', 'success')}
+                    style={{ background: 'none', border: 'none', color: '#B87355', fontSize: '0.8rem', cursor: 'pointer' }}
+                  >
+                    Jadikan Utama
+                  </button>
+                </div>
+                <p>Jl. Riau No. 54, Citarum, Bandung 40115</p>
+                <p>Nomor Telepon: +62 811-2233-4455</p>
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button
+                onClick={() => {
+                  showToast('Formulir alamat baru siap diisi.', 'info');
+                  setIsAddressModal(false);
+                }}
+                className="btn-modal-action"
+              >
+                + Tambah Alamat Baru
+              </button>
+              <button onClick={() => setIsAddressModal(false)} className="btn-modal-cancel">
+                Selesai
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: PANDUAN PERAWATAN */}
+      {careModalOpen && (
+        <div className="claye-modal-overlay" onClick={() => setCareModalOpen(false)}>
+          <div className="claye-modal-content" style={{ maxWidth: '580px' }} onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <div>
+                <span className="modal-subtitle">PANDUAN STUDIO</span>
+                <h3 className="modal-title">Panduan Perawatan Keramik</h3>
+              </div>
+              <button onClick={() => setCareModalOpen(false)} className="modal-close-btn" aria-label="Tutup">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </div>
+
+            <div className="modal-body">
+              <div className="care-guide-step">
+                <h4>1. Pencucian Harian</h4>
+                <p>Seluruh karya stoneware CLAYÉ aman untuk mesin cuci piring, namun mencuci secara manual dengan spons halus dan sabun ramah lingkungan sangat dianjurkan untuk merawat keindahan glasir.</p>
+              </div>
+              <div className="care-guide-step" style={{ marginTop: '1rem' }}>
+                <h4>2. Mencegah Perubahan Suhu Mendadak</h4>
+                <p>Hindari memindahkan keramik langsung dari kulkas yang sangat dingin ke oven pemanggang bersuhu tinggi dalam seketika.</p>
+              </div>
+              <div className="care-guide-step" style={{ marginTop: '1rem' }}>
+                <h4>3. Bagian Bawah Tanah Liat Mentah (Unglazed)</h4>
+                <p>Dasar keramik yang telah dipoles diamond aman dari resapan air, namun pastikan keramik telah kering sempurna sebelum ditumpuk di dalam lemari.</p>
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button
+                onClick={() => {
+                  setCareModalOpen(false);
+                  openConcierge('Tanya lebih banyak tentang perawatan keramik');
+                }}
+                className="btn-modal-action"
+              >
+                Tanya Asisten Studio →
+              </button>
+              <button onClick={() => setCareModalOpen(false)} className="btn-modal-cancel">
+                Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

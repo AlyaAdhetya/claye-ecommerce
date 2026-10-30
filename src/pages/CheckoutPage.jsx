@@ -2,136 +2,115 @@ import React, { useState } from 'react';
 import { useShop } from '../context/ShopContext';
 
 export default function CheckoutPage() {
-  const { cart, user, createOrder, navigate, showToast } = useShop();
+  const { cart, user, createOrder, navigate, openConcierge, showToast } = useShop();
 
-  const [step, setStep] = useState(1); // 1: Info, 2: Payment, 3: Success
   const [formData, setFormData] = useState({
-    name: user ? user.name : '',
-    phone: user ? user.phone : '',
-    email: user ? user.email : '',
-    address: user ? user.address : '',
-    city: 'Jakarta Selatan',
-    postalCode: '12180',
-    notes: 'Mohon tambahkan packing kayu ekstra ya kak.',
-    courier: 'jne',
-    paymentMethod: 'bca'
+    fullName: user ? (user.fullName || user.name) : 'Raden Ayu Paramitha',
+    email: user ? user.email : 'paramitha.studio@example.com',
+    phone: user ? user.phone : '+62 812 3456 7890',
+    address: user ? user.address : 'Jl. Bukit Dago Utara No. 18, Coblong',
+    city: user ? user.city : 'Bandung',
+    postalCode: user ? user.postalCode : '40135',
+    instructions: 'Titipkan di pos keamanan atau hubungi interkom rumah.'
   });
 
-  const [completedOrder, setCompletedOrder] = useState(null);
+  const [shippingMethod, setShippingMethod] = useState('regular');
+  const [paymentMethod, setPaymentMethod] = useState('bank');
+  const [copiedBank, setCopiedBank] = useState(false);
+  const [orderCompleteData, setOrderCompleteData] = useState(null);
 
-  const couriers = [
-    { id: 'jne', name: 'JNE Express (Standard Woodpack)', time: '2-3 Hari', price: 25000 },
-    { id: 'sicepat', name: 'SiCepat Cargo (Garansi Aman)', time: '1-2 Hari', price: 35000 },
-    { id: 'gosend', name: 'GoSend Instant (Area Terbatas)', time: 'Hari Ini (3-4 Jam)', price: 48000 }
-  ];
-
-  const paymentMethods = [
-    { id: 'bca', name: 'BCA Virtual Account', icon: '🏦', desc: 'Verifikasi instan otomatis 24 jam' },
-    { id: 'mandiri', name: 'Mandiri Virtual Account', icon: '🏛️', desc: 'Transfer dari Livin by Mandiri' },
-    { id: 'qris', name: 'QRIS (GoPay, OVO, ShopeePay, DANA)', icon: '📱', desc: 'Scan barcode QRIS langsung' },
-    { id: 'cc', name: 'Kartu Kredit / Debit Online', icon: '💳', desc: 'Visa, MasterCard, JCB terproteksi 3DS' }
-  ];
-
-  const formatRupiah = (num) => 'Rp ' + Number(num).toLocaleString('id-ID');
-
-  const selectedCourier = couriers.find(c => c.id === formData.courier) || couriers[0];
+  const shippingCost = shippingMethod === 'express' ? 25000 : 15000;
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const shippingFee = cart.length > 0 ? selectedCourier.price : 0;
-  const grandTotal = subtotal + shippingFee;
+  const totalWithShipping = subtotal + shippingCost;
+  const totalPieces = cart.reduce((sum, item) => sum + item.quantity, 0);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+  const handleCopyAccount = () => {
+    navigator.clipboard?.writeText('8092 1190 44');
+    setCopiedBank(true);
+    showToast('Nomor rekening BCA studio berhasil disalin.', 'success');
+    setTimeout(() => setCopiedBank(false), 2500);
   };
 
   const handlePlaceOrder = (e) => {
     e.preventDefault();
-    if (!formData.name || !formData.phone || !formData.address) {
-      showToast('Harap lengkapi nama, nomor telepon, dan alamat pengiriman!', 'error');
+
+    if (!formData.fullName || !formData.email || !formData.phone || !formData.address) {
+      showToast('Harap lengkapi semua kolom rincian pengiriman bertanda bintang (*)', 'error');
       return;
     }
 
-    const order = createOrder({
-      customer: formData,
-      items: cart,
-      subtotal,
-      shippingFee,
-      total: grandTotal,
-      courier: selectedCourier.name,
-      paymentMethod: paymentMethods.find(p => p.id === formData.paymentMethod)?.name || 'BCA Virtual Account',
-      status: 'Menunggu Pembayaran'
+    if (cart.length === 0) {
+      showToast('Keranjang belanja Anda kosong!', 'error');
+      navigate('/katalog');
+      return;
+    }
+
+    const paymentLabel = paymentMethod === 'bank'
+      ? 'Transfer Bank (BCA Manual)'
+      : paymentMethod === 'qris'
+      ? 'E-Wallet Instan & QRIS'
+      : 'Virtual Account Otomatis';
+
+    const courierLabel = shippingMethod === 'express'
+      ? 'Pengiriman Kilat (Prioritas)'
+      : 'Pengiriman Reguler (Eco Shield)';
+
+    const newOrder = createOrder({
+      shippingFee: shippingCost,
+      paymentMethod: paymentLabel,
+      courier: courierLabel,
+      shippingAddress: `${formData.address}, ${formData.city} ${formData.postalCode}`
     });
 
-    setCompletedOrder(order);
-    setStep(3);
-    showToast('Pesanan berhasil dibuat! Silakan lakukan pembayaran 🎉', 'success');
+    setOrderCompleteData(newOrder);
+    showToast('Pesanan berhasil dibuat. Tim studio bersiap mengemas karya Anda.', 'success');
   };
 
-  if (step === 3 && completedOrder) {
+  if (orderCompleteData) {
     return (
-      <div className="checkout-success" style={{ padding: '5rem 0' }}>
-        <div className="container" style={{ maxWidth: '680px' }}>
-          <div style={{
-            background: 'var(--color-surface)',
-            padding: '3rem 2.5rem',
-            borderRadius: '20px',
-            boxShadow: 'var(--shadow-md)',
-            border: '1px solid var(--color-border)',
-            textAlign: 'center'
-          }}>
-            <div style={{
-              width: '80px',
-              height: '80px',
-              borderRadius: '50%',
-              background: '#eafaf1',
-              color: '#27ae60',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '2.5rem',
-              margin: '0 auto 1.5rem'
-            }}>
-              ✓
+      <div className="claye-checkout-page" style={{ padding: '4rem 0 6rem' }}>
+        <div className="container" style={{ maxWidth: '640px' }}>
+          <div className="checkout-success-card">
+            <div className="success-icon-badge">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
             </div>
-
-            <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '2.2rem', marginBottom: '0.75rem', color: 'var(--color-text)' }}>
-              Pesanan Berhasil Dibuat!
-            </h1>
-            <p style={{ color: 'var(--color-text-muted)', fontSize: '1.05rem', marginBottom: '2rem' }}>
-              Terima kasih telah berbelanja di studio Clayé. Instruksi pembayaran telah dikirim ke email Anda.
+            <span className="order-received-tag">PENGIRIMAN STUDIO DIKONFIRMASI</span>
+            <h1 className="success-title">Terima Kasih Atas Pesanan Anda</h1>
+            <p className="success-body">
+              Pesanan keramik Anda telah terdaftar dengan nomor referensi <strong>{orderCompleteData.id}</strong>. Tim artisan kami di Bandung sedang menyiapkan karya pilihan Anda dengan perlindungan kemasan ramah lingkungan.
             </p>
 
-            <div style={{
-              background: 'var(--color-cream-light)',
-              padding: '1.5rem',
-              borderRadius: '12px',
-              textAlign: 'left',
-              marginBottom: '2rem'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.75rem', borderBottom: '1px solid var(--color-border)' }}>
-                <span style={{ color: 'var(--color-text-muted)' }}>Nomor Pesanan:</span>
-                <strong style={{ color: 'var(--color-primary)', fontSize: '1.1rem' }}>{completedOrder.id}</strong>
+            <div className="success-summary-box">
+              <div className="summary-line">
+                <span>Total Pembayaran:</span>
+                <strong>Rp {orderCompleteData.grandTotal?.toLocaleString('id-ID')}</strong>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.75rem 0', borderBottom: '1px solid var(--color-border)' }}>
-                <span style={{ color: 'var(--color-text-muted)' }}>Metode Pembayaran:</span>
-                <strong>{completedOrder.paymentMethod}</strong>
+              <div className="summary-line">
+                <span>Metode Pembayaran:</span>
+                <strong>{orderCompleteData.paymentMethod}</strong>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.75rem 0', borderBottom: '1px solid var(--color-border)' }}>
-                <span style={{ color: 'var(--color-text-muted)' }}>Total Pembayaran:</span>
-                <strong style={{ fontSize: '1.3rem', color: 'var(--color-primary)' }}>{formatRupiah(completedOrder.total)}</strong>
+              <div className="summary-line">
+                <span>Metode Pengiriman:</span>
+                <strong>{orderCompleteData.courier}</strong>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '0.75rem' }}>
-                <span style={{ color: 'var(--color-text-muted)' }}>Kurir Pengiriman:</span>
-                <strong>{completedOrder.courier}</strong>
+              <div className="summary-line">
+                <span>Estimasi Waktu Tiba:</span>
+                <strong>2-3 Hari Kerja</strong>
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <button onClick={() => navigate('/dashboard')} className="btn btn-primary btn-lg">
-                Lihat di Dashboard Pelanggan 👤
+            <div className="success-actions-row">
+              <button
+                onClick={() => navigate('/dashboard')}
+                className="btn-success-primary"
+              >
+                Lihat di Akun Saya (Dashboard) →
               </button>
-              <button onClick={() => navigate('/katalog')} className="btn btn-secondary btn-lg">
-                Belanja Lagi 🏺
+              <button
+                onClick={() => navigate('/katalog')}
+                className="btn-success-secondary"
+              >
+                Kembali Jelajahi Koleksi Studio
               </button>
             </div>
           </div>
@@ -140,267 +119,426 @@ export default function CheckoutPage() {
     );
   }
 
-  if (cart.length === 0) {
-    return (
-      <div style={{ padding: '5rem 0', textAlign: 'center' }}>
-        <h2>Tidak ada item untuk di-checkout</h2>
-        <button onClick={() => navigate('/katalog')} className="btn btn-primary" style={{ marginTop: '1rem' }}>
-          Kembali ke Katalog
-        </button>
-      </div>
-    );
-  }
-
   return (
-    <div className="checkout-page" style={{ padding: '3rem 0 5rem' }}>
+    <div className="claye-checkout-page">
       <div className="container">
-        {/* HEADER & STEPS */}
-        <div style={{ marginBottom: '2.5rem', textAlign: 'center' }}>
-          <h1 className="section-title" style={{ fontSize: '2.4rem', marginBottom: '0.5rem' }}>
-            Proses Pembayaran & Checkout
-          </h1>
-          <p style={{ color: 'var(--color-text-muted)' }}>
-            Langkah aman dan cepat untuk menyelesaikan pesanan karya keramik Anda.
-          </p>
+        {/* BREADCRUMB */}
+        <div className="checkout-breadcrumb-row">
+          <div className="checkout-breadcrumb">
+            <button onClick={() => navigate('/')}>BERANDA</button>
+            <span className="bc-sep">/</span>
+            <button onClick={() => navigate('/keranjang')}>KERANJANG BELANJA</button>
+            <span className="bc-sep">/</span>
+            <span className="bc-current">PEMBAYARAN</span>
+          </div>
         </div>
 
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-          gap: '2.5rem',
-          alignItems: 'start'
-        }}>
-          {/* FORM COLUMN */}
-          <form onSubmit={handlePlaceOrder} style={{
-            background: 'var(--color-surface)',
-            borderRadius: '16px',
-            padding: '2rem',
-            border: '1px solid var(--color-border)',
-            boxShadow: 'var(--shadow-sm)'
-          }}>
-            {/* SECTION 1: DATA PENERIMA */}
-            <div style={{ marginBottom: '2rem' }}>
-              <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.25rem', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ background: 'var(--color-primary)', color: 'white', width: '26px', height: '26px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem' }}>1</span>
-                Alamat & Kontak Penerima
-              </h3>
+        {/* HEADER PEMBAYARAN */}
+        <div className="checkout-page-header">
+          <div>
+            <div className="checkout-dispatch-tag">PENGIRIMAN STUDIO — BATCH 08</div>
+            <h1 className="checkout-main-title">Pembayaran</h1>
+          </div>
+          <div className="checkout-header-right-note">
+            Satu langkah lagi menuju pesanan keramik pilihan Anda yang dikemas dengan rapi dan aman dari studio Bandung kami.
+          </div>
+        </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Nama Lengkap *</label>
+        {/* 2-KOLOM TATA LETAK PEMBAYARAN */}
+        <div className="checkout-split-layout">
+          {/* KOLOM KIRI: 3 TAHAP FORMULIR */}
+          <div className="checkout-steps-column">
+            {/* TAHAP 1: DATA PENGIRIMAN */}
+            <div className="checkout-step-card">
+              <div className="step-card-header">
+                <div className="step-title-group">
+                  <span className="step-number-pill">1</span>
+                  <h2 className="step-title-text">Rincian Pengiriman</h2>
+                </div>
+                <span className="required-tag">• KOLOM WAJIB DIISI</span>
+              </div>
+
+              <div className="step-form-body">
+                <div className="checkout-form-group">
+                  <label>NAMA LENGKAP *</label>
                   <input
                     type="text"
-                    name="name"
+                    value={formData.fullName}
+                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                    placeholder="Raden Ayu Paramitha"
                     required
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    placeholder="Contoh: Budi Santoso"
-                    style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)' }}
                   />
                 </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Nomor WhatsApp *</label>
+
+                <div className="checkout-form-row">
+                  <div className="checkout-form-group">
+                    <label>ALAMAT EMAIL *</label>
+                    <input
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      placeholder="paramitha.studio@example.com"
+                      required
+                    />
+                  </div>
+
+                  <div className="checkout-form-group">
+                    <label>NOMOR TELEPON *</label>
+                    <input
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      placeholder="+62 812 3456 7890"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="checkout-form-group">
+                  <label>ALAMAT LENGKAP PENGIRIMAN *</label>
                   <input
-                    type="tel"
-                    name="phone"
+                    type="text"
+                    value={formData.address}
+                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    placeholder="Jl. Bukit Dago Utara No. 18, Coblong"
                     required
-                    value={formData.phone}
-                    onChange={handleInputChange}
-                    placeholder="Contoh: 08123456789"
-                    style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)' }}
                   />
                 </div>
-              </div>
 
-              <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Alamat Email (untuk resi digital) *</label>
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  placeholder="budi@example.com"
-                  style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)' }}
-                />
-              </div>
+                <div className="checkout-form-row">
+                  <div className="checkout-form-group">
+                    <label>KOTA *</label>
+                    <input
+                      type="text"
+                      value={formData.city}
+                      onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                      placeholder="Bandung"
+                      required
+                    />
+                  </div>
 
-              <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Alamat Lengkap *</label>
-                <textarea
-                  name="address"
-                  required
-                  rows="3"
-                  value={formData.address}
-                  onChange={handleInputChange}
-                  placeholder="Nama jalan, nomor rumah, RT/RW, kelurahan, kecamatan"
-                  style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)', fontFamily: 'inherit' }}
-                />
-              </div>
+                  <div className="checkout-form-group">
+                    <label>KODE POS *</label>
+                    <input
+                      type="text"
+                      value={formData.postalCode}
+                      onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
+                      placeholder="40135"
+                      required
+                    />
+                  </div>
+                </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Kota / Kabupaten</label>
+                <div className="checkout-form-group">
+                  <label>CATATAN PENGIRIMAN (OPSIONAL)</label>
                   <input
                     type="text"
-                    name="city"
-                    value={formData.city}
-                    onChange={handleInputChange}
-                    style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)' }}
-                  />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Kode Pos</label>
-                  <input
-                    type="text"
-                    name="postalCode"
-                    value={formData.postalCode}
-                    onChange={handleInputChange}
-                    style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)' }}
+                    value={formData.instructions}
+                    onChange={(e) => setFormData({ ...formData, instructions: e.target.value })}
+                    placeholder="Titipkan di pos keamanan atau hubungi interkom rumah."
                   />
                 </div>
               </div>
             </div>
 
-            {/* SECTION 2: OPSI KURIR */}
-            <div style={{ marginBottom: '2rem' }}>
-              <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.25rem', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ background: 'var(--color-primary)', color: 'white', width: '26px', height: '26px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem' }}>2</span>
-                Pilihan Pengiriman & Proteksi Keramik
-              </h3>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                {couriers.map(c => (
-                  <label
-                    key={c.id}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      padding: '1rem',
-                      borderRadius: '8px',
-                      border: formData.courier === c.id ? '2px solid var(--color-primary)' : '1px solid var(--color-border)',
-                      background: formData.courier === c.id ? 'var(--color-cream-light)' : 'white',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                      <input
-                        type="radio"
-                        name="courier"
-                        value={c.id}
-                        checked={formData.courier === c.id}
-                        onChange={handleInputChange}
-                      />
-                      <div>
-                        <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>{c.name}</div>
-                        <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>Estimasi: {c.time}</div>
-                      </div>
-                    </div>
-                    <strong style={{ color: 'var(--color-primary)' }}>{formatRupiah(c.price)}</strong>
-                  </label>
-                ))}
+            {/* TAHAP 2: METODE PENGIRIMAN */}
+            <div className="checkout-step-card">
+              <div className="step-card-header">
+                <div className="step-title-group">
+                  <span className="step-number-pill">2</span>
+                  <h2 className="step-title-text">Metode Pengiriman</h2>
+                </div>
               </div>
-            </div>
 
-            {/* SECTION 3: METODE PEMBAYARAN */}
-            <div style={{ marginBottom: '2rem' }}>
-              <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.25rem', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ background: 'var(--color-primary)', color: 'white', width: '26px', height: '26px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem' }}>3</span>
-                Metode Pembayaran
-              </h3>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                {paymentMethods.map(pm => (
-                  <label
-                    key={pm.id}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      padding: '1rem',
-                      borderRadius: '8px',
-                      border: formData.paymentMethod === pm.id ? '2px solid var(--color-primary)' : '1px solid var(--color-border)',
-                      background: formData.paymentMethod === pm.id ? 'var(--color-cream-light)' : 'white',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                      <input
-                        type="radio"
-                        name="paymentMethod"
-                        value={pm.id}
-                        checked={formData.paymentMethod === pm.id}
-                        onChange={handleInputChange}
-                      />
-                      <span style={{ fontSize: '1.4rem' }}>{pm.icon}</span>
-                      <div>
-                        <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>{pm.name}</div>
-                        <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>{pm.desc}</div>
+              <div className="shipping-methods-container">
+                {/* PENGIRIMAN REGULER */}
+                <label
+                  className={`shipping-option-card ${shippingMethod === 'regular' ? 'selected' : ''}`}
+                  onClick={() => setShippingMethod('regular')}
+                >
+                  <div className="shipping-radio-left">
+                    <input
+                      type="radio"
+                      name="shipping"
+                      checked={shippingMethod === 'regular'}
+                      onChange={() => setShippingMethod('regular')}
+                    />
+                    <div className="shipping-desc-wrap">
+                      <div className="shipping-name-row">
+                        <strong>Pengiriman Reguler</strong>
+                        <span className="method-pill eco-pill">ECO SHIELD</span>
                       </div>
-                    </div>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            <button type="submit" className="btn btn-primary btn-lg" style={{ width: '100%' }}>
-              Bayar Sekarang — {formatRupiah(grandTotal)} 🔒
-            </button>
-          </form>
-
-          {/* SIDEBAR ORDER SUMMARY */}
-          <div style={{
-            background: 'var(--color-surface)',
-            borderRadius: '16px',
-            padding: '2rem',
-            border: '1px solid var(--color-border)',
-            boxShadow: 'var(--shadow-sm)',
-            position: 'sticky',
-            top: '100px'
-          }}>
-            <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.3rem', marginBottom: '1.25rem' }}>
-              Pesanan Anda ({cart.length} Jenis Produk)
-            </h3>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem', maxHeight: '280px', overflowY: 'auto' }}>
-              {cart.map(item => (
-                <div key={item.id} style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '6px' }}
-                  />
-                  <div style={{ flex: '1' }}>
-                    <div style={{ fontSize: '0.9rem', fontWeight: 600 }}>{item.name}</div>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
-                      {item.quantity} × {formatRupiah(item.price)}
+                      <p className="shipping-subtext">
+                        Estimasi 2–3 hari kerja. Dilindungi kertas sarang lebah ramah lingkungan & bantalan pulp anti-benturan.
+                      </p>
                     </div>
                   </div>
-                  <strong style={{ fontSize: '0.95rem' }}>{formatRupiah(item.price * item.quantity)}</strong>
-                </div>
-              ))}
+                  <div className="shipping-price-tag">Rp15.000</div>
+                </label>
+
+                {/* PENGIRIMAN KILAT */}
+                <label
+                  className={`shipping-option-card ${shippingMethod === 'express' ? 'selected' : ''}`}
+                  onClick={() => setShippingMethod('express')}
+                >
+                  <div className="shipping-radio-left">
+                    <input
+                      type="radio"
+                      name="shipping"
+                      checked={shippingMethod === 'express'}
+                      onChange={() => setShippingMethod('express')}
+                    />
+                    <div className="shipping-desc-wrap">
+                      <div className="shipping-name-row">
+                        <strong>Pengiriman Kilat</strong>
+                        <span className="method-pill priority-pill">PRIORITAS</span>
+                      </div>
+                      <p className="shipping-subtext">
+                        Pengiriman prioritas langsung dari atelier studio ke alamat tujuan Anda.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="shipping-price-tag">Rp25.000</div>
+                </label>
+              </div>
             </div>
 
-            <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.95rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--color-text-muted)' }}>
-                <span>Subtotal Barang:</span>
-                <span>{formatRupiah(subtotal)}</span>
+            {/* TAHAP 3: METODE PEMBAYARAN */}
+            <div className="checkout-step-card">
+              <div className="step-card-header">
+                <div className="step-title-group">
+                  <span className="step-number-pill">3</span>
+                  <h2 className="step-title-text">Metode Pembayaran</h2>
+                </div>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--color-text-muted)' }}>
-                <span>Ongkos Kirim ({selectedCourier.name.split(' ')[0]}):</span>
-                <span>{formatRupiah(shippingFee)}</span>
+
+              <div className="payment-options-container">
+                {/* 1. TRANSFER BANK */}
+                <div
+                  className={`payment-option-card ${paymentMethod === 'bank' ? 'selected' : ''}`}
+                  onClick={() => setPaymentMethod('bank')}
+                >
+                  <div className="payment-header-row">
+                    <div className="payment-radio-title">
+                      <input
+                        type="radio"
+                        name="payment"
+                        checked={paymentMethod === 'bank'}
+                        onChange={() => setPaymentMethod('bank')}
+                      />
+                      <strong>Transfer Bank (Verifikasi Manual Studio)</strong>
+                    </div>
+                    <div className="bank-badges-row">
+                      <span className="bank-tag">BCA</span>
+                      <span className="bank-tag">MANDIRI</span>
+                      <span className="bank-tag">BNI</span>
+                    </div>
+                  </div>
+                  <p className="payment-desc-text">
+                    Transfer langsung ke rekening resmi studio CLAYÉ. Verifikasi bukti pembayaran dalam 2 jam kerja.
+                  </p>
+
+                  {paymentMethod === 'bank' && (
+                    <div className="copyable-account-box" onClick={(e) => e.stopPropagation()}>
+                      <div className="account-details-text">
+                        <span>Rekening BCA Studio:</span> <strong>8092 1190 44</strong> <span>(a.n. CLAYÉ Studio)</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleCopyAccount}
+                        className="copy-btn-pill"
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                      >
+                        {copiedBank ? (
+                          <>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            TERSALIN
+                          </>
+                        ) : 'SALIN'}
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* 2. E-WALLET INSTAN & QRIS */}
+                <div
+                  className={`payment-option-card ${paymentMethod === 'qris' ? 'selected' : ''}`}
+                  onClick={() => setPaymentMethod('qris')}
+                >
+                  <div className="payment-header-row">
+                    <div className="payment-radio-title">
+                      <input
+                        type="radio"
+                        name="payment"
+                        checked={paymentMethod === 'qris'}
+                        onChange={() => setPaymentMethod('qris')}
+                      />
+                      <strong>E-Wallet Instan & QRIS</strong>
+                    </div>
+                    <div className="bank-badges-row">
+                      <span className="bank-tag">QRIS</span>
+                      <span className="bank-tag">GOPAY</span>
+                      <span className="bank-tag">OVO</span>
+                      <span className="bank-tag">SHOPEEPAY</span>
+                    </div>
+                  </div>
+                  <p className="payment-desc-text">
+                    Pindai kode QRIS langsung melalui aplikasi dompet digital pilihan Anda.
+                  </p>
+
+                  {paymentMethod === 'qris' && (
+                    <div className="qris-preview-box" onClick={(e) => e.stopPropagation()}>
+                      <div className="qris-barcode-dummy">
+                        <span>Kode Pembayaran QRIS Studio Otomatis</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 3. VIRTUAL ACCOUNT */}
+                <div
+                  className={`payment-option-card ${paymentMethod === 'va' ? 'selected' : ''}`}
+                  onClick={() => setPaymentMethod('va')}
+                >
+                  <div className="payment-header-row">
+                    <div className="payment-radio-title">
+                      <input
+                        type="radio"
+                        name="payment"
+                        checked={paymentMethod === 'va'}
+                        onChange={() => setPaymentMethod('va')}
+                      />
+                      <strong>Virtual Account (Verifikasi Otomatis)</strong>
+                    </div>
+                    <div className="bank-badges-row">
+                      <span className="bank-tag">BCA VA</span>
+                      <span className="bank-tag">MANDIRI VA</span>
+                      <span className="bank-tag">BNI VA</span>
+                    </div>
+                  </div>
+                  <p className="payment-desc-text">
+                    Nomor Virtual Account dibuat otomatis saat pesanan dikonfirmasi. Tidak perlu unggah bukti transfer.
+                  </p>
+                </div>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', color: '#27ae60' }}>
-                <span>Packing Kayu & Bubble Wrap:</span>
-                <span>GRATIS</span>
+            </div>
+          </div>
+
+          {/* KOLOM KANAN: RINGKASAN PESANAN & JAMINAN */}
+          <div className="checkout-summary-column">
+            {/* KARTU RINGKASAN */}
+            <div className="order-summary-card">
+              <div className="order-summary-header">
+                <h2 className="summary-title">Ringkasan Pesanan</h2>
+                <span className="summary-pieces-count">{totalPieces} PRODUK</span>
               </div>
-              <div style={{ borderTop: '2px dashed var(--color-border)', marginTop: '0.5rem', paddingTop: '0.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                <span style={{ fontWeight: 700, fontSize: '1.1rem' }}>Total Bayar:</span>
-                <span style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--color-primary)' }}>
-                  {formatRupiah(grandTotal)}
-                </span>
+
+              {/* DAFTAR ITEM */}
+              <div className="summary-items-list">
+                {cart.map((item, idx) => (
+                  <div key={idx} className="summary-item-card">
+                    <div className="summary-item-thumb">
+                      <img src={item.image} alt={item.name} />
+                    </div>
+                    <div className="summary-item-info">
+                      <h3 className="summary-item-name">{item.name}</h3>
+                      <div className="summary-item-variant">
+                        <span
+                          className="summary-color-dot"
+                          style={{
+                            backgroundColor: item.selectedGlaze === 'Hijau Sage' ? '#BDC7B9' : '#EBE5D8'
+                          }}
+                        />
+                        <span>Warna: {item.selectedGlaze || 'Alami'}</span>
+                      </div>
+                      {item.stamp && (
+                        <div className="summary-item-stamp">
+                          Grafir: "{item.stamp}"
+                        </div>
+                      )}
+                      <div className="summary-item-qty">
+                        Jumlah: {item.quantity}
+                      </div>
+                    </div>
+                    <div className="summary-item-price">
+                      Rp {(item.price * item.quantity).toLocaleString('id-ID')}
+                    </div>
+                  </div>
+                ))}
               </div>
+
+              {/* RINCIAN BIAYA */}
+              <div className="summary-cost-breakdown">
+                <div className="cost-row">
+                  <span>Subtotal</span>
+                  <strong>Rp {subtotal.toLocaleString('id-ID')}</strong>
+                </div>
+                <div className="cost-row">
+                  <span>Ongkos Kirim ({shippingMethod === 'express' ? 'Pengiriman Kilat' : 'Pengiriman Reguler'})</span>
+                  <strong>Rp {shippingCost.toLocaleString('id-ID')}</strong>
+                </div>
+                <div className="cost-row">
+                  <span>Kemasan Protektif Studio</span>
+                  <strong className="free-tag">Gratis</strong>
+                </div>
+
+                <div className="cost-total-row">
+                  <div>
+                    <span className="total-label">Total Pembayaran</span>
+                    <span className="total-tax-note">SUDAH TERMASUK PAJAK</span>
+                  </div>
+                  <div className="total-big-amount">
+                    Rp {totalWithShipping.toLocaleString('id-ID')}
+                  </div>
+                </div>
+              </div>
+
+              {/* TOMBOL BAYAR SEKARANG */}
+              <button
+                type="button"
+                onClick={handlePlaceOrder}
+                className="place-order-cta-btn"
+              >
+                Buat Pesanan Sekarang →
+              </button>
+              <p className="order-disclaimer-note">
+                Harap periksa kembali rincian data Anda sebelum menyelesaikan pesanan.
+              </p>
+            </div>
+
+            {/* JAMINAN KUALITAS & KEAMANAN (CLEAN TANPA EMOJI) */}
+            <div className="studio-trust-badges-card">
+              <div className="trust-badge-item">
+                <div>
+                  <strong>ENKRIPSI DATA 256-BIT AMAN</strong>
+                  <p>Data pribadi dan informasi pembayaran Anda terlindungi dengan standar keamanan perbankan.</p>
+                </div>
+              </div>
+
+              <div className="trust-badge-item">
+                <div>
+                  <strong>KEMASAN RAMAH LINGKUNGAN BERGARANSI</strong>
+                  <p>100% pembungkus sarang lebah dapat terurai alami dan bebas butiran plastik sintetis.</p>
+                </div>
+              </div>
+
+              <div className="trust-badge-item">
+                <div>
+                  <strong>JAMINAN KERAJINAN ASLI BANDUNG</strong>
+                  <p>Setiap produk keramik dibentuk di atas roda putar, diglasir, dan diinspeksi kualitasnya sebelum dikirim.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* BANTUAN ASISTEN STUDIO */}
+            <div className="checkout-concierge-callout">
+              Butuh bantuan penataan atau pesanan kado khusus?<br />
+              <button
+                onClick={() => openConcierge('Halo, saya sedang berada di halaman checkout dan butuh bantuan pemesanan')}
+                className="concierge-link-action"
+              >
+                Hubungi tim asisten studio kami
+              </button>
             </div>
           </div>
         </div>

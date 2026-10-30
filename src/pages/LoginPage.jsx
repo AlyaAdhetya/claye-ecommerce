@@ -1,32 +1,37 @@
 import React, { useState } from 'react';
-import { useShop } from '../context/ShopContext';
+import { useShop, DEMO_USERS } from '../context/ShopContext';
 
 export default function LoginPage() {
-  const { user, login, navigate, showToast } = useShop();
-  const [isRegister, setIsRegister] = useState(false);
+  const { user, login, register, logout, navigate, showToast, currentRoute } = useShop();
+
+  const [isRegister, setIsRegister] = useState(currentRoute === '/register');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
+  const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
-  const [showPass, setShowPass] = useState(false);
 
-  // If already logged in, show redirect prompt
-  if (user) {
+  // Jika sudah login sebagai pelanggan
+  if (user && user.role !== 'admin') {
     return (
-      <div style={{ padding: '6rem 0', textAlign: 'center' }}>
-        <div className="container" style={{ maxWidth: '520px', background: 'var(--color-surface)', padding: '3rem 2rem', borderRadius: '16px', boxShadow: 'var(--shadow-sm)' }}>
-          <span style={{ fontSize: '3rem', display: 'block', marginBottom: '1rem' }}>👋</span>
-          <h2>Halo, {user.name}!</h2>
-          <p style={{ color: 'var(--color-text-muted)', margin: '1rem 0 2rem' }}>
-            Anda saat ini telah masuk menggunakan akun <strong>{user.email}</strong>.
-          </p>
-          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-            <button onClick={() => navigate('/dashboard')} className="btn btn-primary">
-              Buka Dashboard Pelanggan
-            </button>
-            <button onClick={() => navigate('/katalog')} className="btn btn-secondary">
-              Mulai Belanja
-            </button>
+      <div className="claye-login-page" style={{ padding: '5rem 0 6rem', minHeight: '70vh', display: 'flex', alignItems: 'center' }}>
+        <div className="container" style={{ maxWidth: '480px', margin: '0 auto', textAlign: 'center' }}>
+          <div className="auth-card-wrapper">
+            <h2 className="auth-main-title" style={{ fontSize: '1.6rem', marginBottom: '0.5rem' }}>Halo, {user.name}</h2>
+            <p className="auth-lead-sub" style={{ marginBottom: '2rem' }}>Anda sudah masuk sebagai <strong>{user.email}</strong>.</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              <button onClick={() => navigate('/dashboard')} className="claye-terracotta-btn" style={{ width: '100%' }}>
+                Lihat Akun Saya
+              </button>
+              <button onClick={() => navigate('/katalog')} className="btn-modal-cancel" style={{ width: '100%' }}>
+                Lanjutkan Belanja
+              </button>
+              <button
+                onClick={logout}
+                style={{ background: 'none', border: 'none', color: '#827D76', fontSize: '0.875rem', cursor: 'pointer', marginTop: '0.25rem', textDecoration: 'underline' }}
+              >
+                Keluar dari Akun
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -35,233 +40,168 @@ export default function LoginPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!email || !password) {
-      showToast('Harap isi email dan password!', 'error');
-      return;
-    }
-    if (isRegister && !name) {
-      showToast('Harap isi nama lengkap Anda!', 'error');
-      return;
-    }
-
-    login(email, password);
-  };
-
-  const handleFillDemo = (type) => {
-    if (type === 'customer') {
-      setEmail('pelanggan@claye.id');
-      setPassword('ceramic123');
-      setName('Clarissa Putri');
-      setPhone('081234567890');
+    if (isRegister) {
+      if (!fullName.trim()) {
+        showToast('Harap masukkan nama lengkap Anda.', 'error');
+        return;
+      }
+      if (!email || !password) {
+        showToast('Harap lengkapi email dan kata sandi.', 'error');
+        return;
+      }
+      register({ fullName, email, phone });
     } else {
-      // Go directly to admin
-      navigate('/admin');
+      if (!email || !password) {
+        showToast('Harap masukkan email dan kata sandi.', 'error');
+        return;
+      }
+      login(email, password, 'customer');
     }
   };
 
   return (
-    <div className="login-page" style={{ padding: '4rem 0 6rem' }}>
-      <div className="container" style={{ maxWidth: '480px' }}>
-        <div style={{
-          background: 'var(--color-surface)',
-          padding: '2.5rem',
-          borderRadius: '20px',
-          boxShadow: 'var(--shadow-md)',
-          border: '1px solid var(--color-border)'
-        }}>
-          {/* LOGO & HEADING */}
-          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-            <span className="navbar-logo" style={{ fontSize: '2.2rem', marginBottom: '0.5rem', display: 'inline-block' }}>
-              Clayé<span>.</span>
-            </span>
-            <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.6rem', color: 'var(--color-text)' }}>
-              {isRegister ? 'Buat Akun Baru' : 'Selamat Datang Kembali'}
-            </h2>
-            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', marginTop: '0.25rem' }}>
-              {isRegister ? 'Daftar untuk menikmati reward poin & promo khusus' : 'Masuk ke akun Anda untuk melacak pesanan & wishlist'}
-            </p>
-          </div>
+    <div className="claye-login-page">
+      <div className="container" style={{ maxWidth: '480px', margin: '0 auto' }}>
+        <div className="auth-card-wrapper">
+          {/* Logo */}
+          <div className="auth-brand-logo" style={{ textAlign: 'center', marginBottom: '0.25rem' }}>CLAYÉ</div>
+          <p style={{ textAlign: 'center', fontSize: '0.8rem', letterSpacing: '0.1em', color: '#8C8680', marginBottom: '2rem' }}>
+            STUDIO KERAMIK BANDUNG
+          </p>
 
-          {/* TAB SWITCH */}
-          <div style={{ display: 'flex', background: 'var(--color-cream-light)', padding: '4px', borderRadius: '10px', marginBottom: '1.75rem' }}>
+          {/* Tab Masuk / Daftar */}
+          <div className="auth-tabs-toggle" style={{ marginBottom: '1.75rem' }}>
             <button
+              type="button"
+              className={`auth-tab-btn ${!isRegister ? 'is-active' : ''}`}
               onClick={() => setIsRegister(false)}
-              style={{
-                flex: 1,
-                padding: '0.65rem',
-                border: 'none',
-                borderRadius: '8px',
-                background: !isRegister ? 'white' : 'none',
-                fontWeight: !isRegister ? 600 : 500,
-                color: !isRegister ? 'var(--color-primary)' : 'var(--color-text-muted)',
-                boxShadow: !isRegister ? 'var(--shadow-sm)' : 'none',
-                cursor: 'pointer'
-              }}
             >
               Masuk
             </button>
             <button
+              type="button"
+              className={`auth-tab-btn ${isRegister ? 'is-active' : ''}`}
               onClick={() => setIsRegister(true)}
-              style={{
-                flex: 1,
-                padding: '0.65rem',
-                border: 'none',
-                borderRadius: '8px',
-                background: isRegister ? 'white' : 'none',
-                fontWeight: isRegister ? 600 : 500,
-                color: isRegister ? 'var(--color-primary)' : 'var(--color-text-muted)',
-                boxShadow: isRegister ? 'var(--shadow-sm)' : 'none',
-                cursor: 'pointer'
-              }}
             >
-              Daftar Baru
+              Daftar Akun
             </button>
           </div>
 
-          {/* DEMO QUICK FILL BUTTONS */}
-          <div style={{ marginBottom: '1.5rem', background: '#fdf6e7', padding: '0.75rem 1rem', borderRadius: '8px', fontSize: '0.85rem', border: '1px solid #fae1b3' }}>
-            <div style={{ fontWeight: 600, color: '#8c5936', marginBottom: '0.35rem' }}>💡 Quick Demo Login:</div>
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <button
-                type="button"
-                onClick={() => handleFillDemo('customer')}
-                style={{ flex: 1, padding: '0.4rem', border: '1px solid #e3a857', background: 'white', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 500 }}
-              >
-                👤 Isi Akun Pelanggan
-              </button>
-              <button
-                type="button"
-                onClick={() => handleFillDemo('admin')}
-                style={{ flex: 1, padding: '0.4rem', border: '1px solid #8c5936', background: '#8c5936', color: 'white', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 500 }}
-              >
-                ⚡ Akses Admin Langsung
-              </button>
-            </div>
-          </div>
+          {/* Heading */}
+          <h1 className="auth-main-title" style={{ fontSize: '1.5rem', marginBottom: '0.4rem' }}>
+            {isRegister ? 'Buat Akun Baru' : 'Selamat Datang'}
+          </h1>
+          <p className="auth-lead-sub" style={{ marginBottom: '1.5rem' }}>
+            {isRegister
+              ? 'Daftar untuk melacak pesanan dan menyimpan alamat pengiriman.'
+              : 'Masuk untuk melihat pesanan dan mengelola akun Anda.'}
+          </p>
 
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          {/* Form */}
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {isRegister && (
-              <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Nama Lengkap</label>
+              <div className="checkout-form-group" style={{ marginBottom: 0 }}>
+                <label>NAMA LENGKAP *</label>
                 <input
                   type="text"
+                  placeholder="Nama lengkap Anda"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
                   required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Nama Anda"
-                  style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)' }}
                 />
               </div>
             )}
 
             {isRegister && (
-              <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Nomor Telepon / WhatsApp</label>
+              <div className="checkout-form-group" style={{ marginBottom: 0 }}>
+                <label>NO. TELEPON / WHATSAPP</label>
                 <input
                   type="tel"
+                  placeholder="+62 812 3456 7890"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  placeholder="08123456789"
-                  style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)' }}
                 />
               </div>
             )}
 
-            <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Alamat Email</label>
+            <div className="checkout-form-group" style={{ marginBottom: 0 }}>
+              <label>ALAMAT EMAIL *</label>
               <input
                 type="email"
-                required
+                placeholder="email@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="nama@email.com"
-                style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)' }}
+                required
               />
             </div>
 
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
-                <label style={{ fontSize: '0.85rem', fontWeight: 600 }}>Kata Sandi</label>
+            <div className="checkout-form-group" style={{ marginBottom: 0 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                <label style={{ marginBottom: 0 }}>KATA SANDI *</label>
                 {!isRegister && (
-                  <span style={{ fontSize: '0.8rem', color: 'var(--color-primary)', cursor: 'pointer' }} onClick={() => showToast('Tautan reset password telah dikirim ke email.', 'info')}>
-                    Lupa Password?
-                  </span>
+                  <button
+                    type="button"
+                    onClick={() => showToast('Tautan atur ulang dikirim ke email Anda.', 'info')}
+                    style={{ background: 'none', border: 'none', color: '#B87355', fontSize: '0.75rem', cursor: 'pointer' }}
+                  >
+                    Lupa kata sandi?
+                  </button>
                 )}
               </div>
-              <div style={{ position: 'relative' }}>
-                <input
-                  type={showPass ? 'text' : 'password'}
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Minimal 6 karakter"
-                  style={{ width: '100%', padding: '0.75rem 2.5rem 0.75rem 0.75rem', borderRadius: '8px', border: '1px solid var(--color-border)' }}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPass(!showPass)}
-                  style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.1rem' }}
-                >
-                  {showPass ? '👁️' : '🙈'}
-                </button>
-              </div>
+              <input
+                type="password"
+                placeholder="Minimal 8 karakter"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
             </div>
 
-            <button type="submit" className="btn btn-primary btn-lg" style={{ width: '100%', marginTop: '0.5rem' }}>
-              {isRegister ? 'Daftar Sekarang 🚀' : 'Masuk ke Akun 🔑'}
+            <button
+              type="submit"
+              className="claye-terracotta-btn"
+              style={{ width: '100%', marginTop: '0.5rem', padding: '14px' }}
+            >
+              {isRegister ? 'Daftar Sekarang' : 'Masuk'}
             </button>
           </form>
 
-          {/* SOCIAL LOGIN */}
-          <div style={{ textAlign: 'center', margin: '1.5rem 0 1rem', position: 'relative' }}>
-            <span style={{ background: 'var(--color-surface)', padding: '0 0.75rem', color: 'var(--color-text-muted)', fontSize: '0.85rem', position: 'relative', zIndex: 1 }}>
-              atau masuk dengan
-            </span>
-            <div style={{ position: 'absolute', top: '50%', left: 0, right: 0, height: '1px', background: 'var(--color-border)' }}></div>
+          {/* Demo login cepat */}
+          <div style={{
+            marginTop: '1.75rem',
+            paddingTop: '1.5rem',
+            borderTop: '1px solid #EAE6DF',
+            textAlign: 'center'
+          }}>
+            <p style={{ fontSize: '0.75rem', color: '#8C8680', marginBottom: '0.75rem', letterSpacing: '0.06em' }}>
+              AKSES DEMO CEPAT
+            </p>
+            <button
+              type="button"
+              onClick={() => login(DEMO_USERS.customer.email, 'claye2026', 'customer')}
+              className="demo-pill-btn"
+              style={{ width: '100%' }}
+            >
+              Masuk Cepat sebagai Pelanggan (Arumi)
+            </button>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
-            <button
-              onClick={() => {
-                login('google.user@gmail.com', 'demo');
-              }}
-              style={{
-                padding: '0.65rem',
-                border: '1px solid var(--color-border)',
-                borderRadius: '8px',
-                background: 'white',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.5rem',
-                fontSize: '0.85rem',
-                fontWeight: 600
-              }}
-            >
-              <span>🌐</span> Google
-            </button>
-            <button
-              onClick={() => {
-                login('apple.user@icloud.com', 'demo');
-              }}
-              style={{
-                padding: '0.65rem',
-                border: '1px solid var(--color-border)',
-                borderRadius: '8px',
-                background: 'white',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.5rem',
-                fontSize: '0.85rem',
-                fontWeight: 600
-              }}
-            >
-              <span>🍎</span> Apple ID
-            </button>
-          </div>
+          {/* Ganti mode */}
+          <p style={{ textAlign: 'center', marginTop: '1.25rem', fontSize: '0.875rem', color: '#6E6962' }}>
+            {isRegister ? (
+              <>Sudah punya akun?{' '}
+                <button type="button" onClick={() => setIsRegister(false)} style={{ background: 'none', border: 'none', color: '#B87355', cursor: 'pointer', textDecoration: 'underline', fontSize: 'inherit' }}>
+                  Masuk di sini
+                </button>
+              </>
+            ) : (
+              <>Belum punya akun?{' '}
+                <button type="button" onClick={() => setIsRegister(true)} style={{ background: 'none', border: 'none', color: '#B87355', cursor: 'pointer', textDecoration: 'underline', fontSize: 'inherit' }}>
+                  Daftar gratis
+                </button>
+              </>
+            )}
+          </p>
         </div>
       </div>
     </div>

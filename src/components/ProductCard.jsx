@@ -2,18 +2,13 @@ import React from 'react';
 import { useShop } from '../context/ShopContext';
 
 export default function ProductCard({ product }) {
-  const { addToCart, viewProduct, showToast } = useShop();
+  const { addToCart, viewProduct, showToast, toggleWishlist, wishlist } = useShop();
 
-  const badgeMap = {
-    new: 'badge-new',
-    sale: 'badge-sale',
-    popular: 'badge-popular',
-    limited: 'badge-limited'
-  };
+  const isSaved = wishlist.includes(product.id);
 
   const badgeLabels = {
     new: 'Baru',
-    sale: 'Sale',
+    sale: 'Promo',
     popular: 'Populer',
     limited: 'Terbatas'
   };
@@ -21,67 +16,58 @@ export default function ProductCard({ product }) {
   const formatRupiah = (num) => 'Rp ' + Number(num).toLocaleString('id-ID');
 
   return (
-    <div className="product-card">
-      <div className="product-card-image">
+    <div className="curated-product-card" onClick={() => viewProduct(product.id)}>
+      <div className="curated-img-wrapper">
         <img
           src={product.image}
           alt={product.name}
           loading="lazy"
-          onClick={() => viewProduct(product.id)}
-          style={{ cursor: 'pointer' }}
         />
         {product.badge && (
-          <span className={`product-card-badge ${badgeMap[product.badge] || 'badge-new'}`}>
-            {badgeLabels[product.badge] || product.badge}
+          <span className="card-top-badge">
+            {badgeLabels[product.badge] || product.badge.toUpperCase()}
           </span>
         )}
-        <div className="product-card-actions">
+        <div className="curated-card-overlay">
           <button
-            className="product-card-action-btn"
-            title="Tambah ke Wishlist"
-            onClick={() => showToast(`"${product.name}" ditambahkan ke wishlist ❤️`, 'success')}
+            onClick={(e) => {
+              e.stopPropagation();
+              addToCart(product.id, 1);
+            }}
+            className="quick-add-pill-btn"
           >
-            ♡
-          </button>
-          <button
-            className="product-card-action-btn"
-            title="Lihat Detail"
-            onClick={() => viewProduct(product.id)}
-          >
-            👁
+            + Tambah Cepat
           </button>
         </div>
       </div>
 
-      <div className="product-card-body">
-        <div className="product-category">{product.category}</div>
-        <div
-          className="product-name"
-          onClick={() => viewProduct(product.id)}
-          style={{ cursor: 'pointer' }}
-        >
-          {product.name}
+      <div className="curated-card-info">
+        <div className="card-title-price-row">
+          <h3 className="curated-item-name">{product.name}</h3>
+          <span className="curated-item-price">{formatRupiah(product.price)}</span>
         </div>
-        <div className="product-rating">
-          <span className="stars">
-            {'★'.repeat(Math.floor(product.rating || 5))}
-            {'☆'.repeat(5 - Math.floor(product.rating || 5))}
-          </span>
-          <span className="rating-count">({product.reviews || 0})</span>
-        </div>
-        <div className="product-price-row">
-          <div>
-            <div className="product-price">{formatRupiah(product.price)}</div>
-            {product.oldPrice && (
-              <div className="product-price-old">{formatRupiah(product.oldPrice)}</div>
-            )}
-          </div>
+        <div className="card-subtitle-dots-row">
+          <span className="curated-item-subtitle">{product.subtitle || product.category}</span>
           <button
-            className="product-add-btn"
-            onClick={() => addToCart(product.id)}
-            title="Tambah ke Keranjang"
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleWishlist(product.id);
+            }}
+            style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
+            title={isSaved ? 'Hapus dari favorit' : 'Simpan favorit'}
           >
-            +
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill={isSaved ? '#B87355' : 'none'}
+              stroke={isSaved ? '#B87355' : '#827D76'}
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
           </button>
         </div>
       </div>

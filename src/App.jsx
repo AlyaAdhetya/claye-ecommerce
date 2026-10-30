@@ -3,6 +3,7 @@ import { useShop } from './context/ShopContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Toast from './components/Toast';
+import Chatbot from './components/Chatbot';
 
 import HomePage from './pages/HomePage';
 import CatalogPage from './pages/CatalogPage';
@@ -14,28 +15,28 @@ import DashboardPage from './pages/DashboardPage';
 import AdminPage from './pages/AdminPage';
 
 export default function App() {
-  const { currentRoute } = useShop();
+  const { currentRoute, user } = useShop();
 
   const renderCurrentPage = () => {
     if (currentRoute === '' || currentRoute === '/') {
       return <HomePage />;
     }
-    if (currentRoute === '/katalog') {
+    if (currentRoute === '/katalog' || currentRoute === '/shop') {
       return <CatalogPage />;
     }
     if (currentRoute.startsWith('/detail')) {
       return <DetailPage />;
     }
-    if (currentRoute === '/keranjang') {
+    if (currentRoute === '/keranjang' || currentRoute === '/cart') {
       return <CartPage />;
     }
     if (currentRoute === '/checkout') {
       return <CheckoutPage />;
     }
-    if (currentRoute === '/login') {
+    if (currentRoute === '/login' || currentRoute === '/register' || currentRoute === '/admin/login') {
       return <LoginPage />;
     }
-    if (currentRoute === '/dashboard') {
+    if (currentRoute === '/dashboard' || currentRoute === '/account') {
       return <DashboardPage />;
     }
     if (currentRoute === '/admin') {
@@ -51,6 +52,7 @@ export default function App() {
         {renderCurrentPage()}
       </main>
       <Footer />
+      <Chatbot />
       <Toast />
     </div>
   );

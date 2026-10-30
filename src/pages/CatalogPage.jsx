@@ -1,24 +1,24 @@
 import React, { useState, useMemo } from 'react';
 import { useShop } from '../context/ShopContext';
 import { CATEGORIES } from '../data/products';
-import ProductCard from '../components/ProductCard';
 
 export default function CatalogPage() {
-  const { products } = useShop();
+  const { products, viewProduct, addToCart, navigate } = useShop();
+
   const [selectedCategory, setSelectedCategory] = useState('Semua');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('popular');
-  const [badgeFilter, setBadgeFilter] = useState('all');
 
   const filteredProducts = useMemo(() => {
     return products
-      .filter(p => {
-        const matchesCategory = selectedCategory === 'Semua' || p.category === selectedCategory;
-        const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                              p.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                              (p.description && p.description.toLowerCase().includes(searchQuery.toLowerCase()));
-        const matchesBadge = badgeFilter === 'all' || p.badge === badgeFilter;
-        return matchesCategory && matchesSearch && matchesBadge;
+      .filter((p) => {
+        const matchesCategory =
+          selectedCategory === 'Semua' || p.category.toLowerCase() === selectedCategory.toLowerCase();
+        const matchesSearch =
+          p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          p.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (p.subtitle && p.subtitle.toLowerCase().includes(searchQuery.toLowerCase()));
+        return matchesCategory && matchesSearch;
       })
       .sort((a, b) => {
         if (sortBy === 'price-asc') return a.price - b.price;
@@ -26,149 +26,145 @@ export default function CatalogPage() {
         if (sortBy === 'rating') return (b.rating || 0) - (a.rating || 0);
         return (b.reviews || 0) - (a.reviews || 0);
       });
-  }, [products, selectedCategory, searchQuery, sortBy, badgeFilter]);
+  }, [products, selectedCategory, searchQuery, sortBy]);
 
   return (
-    <div className="catalog-page" style={{ padding: '3rem 0 5rem' }}>
+    <div className="claye-catalog-page">
       <div className="container">
-        {/* CATALOG HEADER */}
-        <div className="catalog-hero" style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-          <div className="section-badge">Artisan Stoneware</div>
-          <h1 className="section-title" style={{ fontSize: '2.6rem' }}>Katalog Produk Keramik</h1>
-          <p className="section-desc">
-            Jelajahi seluruh karya keramik buatan tangan kami yang memadukan fungsi praktis dan estetika alami.
+        {/* BREADCRUMB */}
+        <div className="catalog-breadcrumb">
+          <button onClick={() => navigate('/')}>BERANDA</button>
+          <span className="bc-sep">/</span>
+          <span className="bc-current">SEMUA KOLEKSI</span>
+        </div>
+
+        {/* HEADER KATALOG */}
+        <div className="catalog-page-header">
+          <div className="studio-edition-badge">
+            <span className="badge-dot">•</span> KOLEKSI KERAMIK ATELIER
+          </div>
+          <h1 className="catalog-main-title">Katalog Produk Keramik</h1>
+          <p className="catalog-lead-text">
+            Koleksi stoneware buatan tangan yang dibakar dengan suhu tinggi menggunakan tanah liat mineral nusantara dan glasir alami food-grade.
           </p>
         </div>
 
-        {/* SEARCH & FILTERS BAR */}
-        <div className="catalog-controls" style={{
-          background: 'var(--color-surface)',
-          padding: '1.5rem',
-          borderRadius: '12px',
-          boxShadow: 'var(--shadow-sm)',
-          border: '1px solid var(--color-border)',
-          marginBottom: '2rem'
-        }}>
-          {/* SEARCH INPUT */}
-          <div style={{ marginBottom: '1.25rem', display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-            <div style={{ flex: '1', minWidth: '240px', position: 'relative' }}>
-              <input
-                type="text"
-                placeholder="Cari mangkuk, vas bunga, mug kopi..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '0.75rem 1rem 0.75rem 2.5rem',
-                  borderRadius: '8px',
-                  border: '1px solid var(--color-border)',
-                  fontSize: '0.95rem'
-                }}
-              />
-              <span style={{ position: 'absolute', left: '0.9rem', top: '50%', transform: 'translateY(-50%)', opacity: 0.6 }}>
-                🔍
-              </span>
-            </div>
-
-            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                style={{
-                  padding: '0.75rem 1rem',
-                  borderRadius: '8px',
-                  border: '1px solid var(--color-border)',
-                  background: 'white',
-                  fontSize: '0.9rem'
-                }}
-              >
-                <option value="popular">🔥 Paling Populer</option>
-                <option value="price-asc">💵 Harga: Rendah ke Tinggi</option>
-                <option value="price-desc">💎 Harga: Tinggi ke Rendah</option>
-                <option value="rating">⭐ Rating Tertinggi</option>
-              </select>
-
-              <select
-                value={badgeFilter}
-                onChange={(e) => setBadgeFilter(e.target.value)}
-                style={{
-                  padding: '0.75rem 1rem',
-                  borderRadius: '8px',
-                  border: '1px solid var(--color-border)',
-                  background: 'white',
-                  fontSize: '0.9rem'
-                }}
-              >
-                <option value="all">Semua Tipe</option>
-                <option value="sale">Diskon (Sale)</option>
-                <option value="new">Koleksi Baru</option>
-                <option value="limited">Edisi Terbatas</option>
-              </select>
-            </div>
-          </div>
-
-          {/* CATEGORY TABS */}
-          <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '0.25rem' }}>
-            {CATEGORIES.map(cat => (
+        {/* FILTER KATEGORI & PENCARIAN */}
+        <div className="catalog-toolbar-panel">
+          {/* DAFTAR KATEGORI */}
+          <div className="catalog-category-pills">
+            {CATEGORIES.map((cat) => (
               <button
                 key={cat}
+                className={`cat-pill-btn ${selectedCategory === cat ? 'is-active' : ''}`}
                 onClick={() => setSelectedCategory(cat)}
-                style={{
-                  padding: '0.5rem 1.15rem',
-                  borderRadius: '30px',
-                  fontSize: '0.9rem',
-                  fontWeight: 500,
-                  whiteSpace: 'nowrap',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                  border: selectedCategory === cat ? '1px solid var(--color-primary)' : '1px solid var(--color-border)',
-                  background: selectedCategory === cat ? 'var(--color-primary)' : 'white',
-                  color: selectedCategory === cat ? 'white' : 'var(--color-text)'
-                }}
               >
                 {cat}
               </button>
             ))}
           </div>
+
+          {/* PENCARIAN & URUTAN */}
+          <div className="catalog-search-sort-row">
+            <div className="search-field-wrap">
+              <input
+                type="text"
+                placeholder="Cari mug, piring, mangkuk, vas, teko..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="catalog-search-input"
+              />
+              {searchQuery && (
+                <button onClick={() => setSearchQuery('')} className="search-clear-btn" aria-label="Hapus pencarian">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+              )}
+            </div>
+
+            <div className="sort-dropdown-wrap">
+              <span className="sort-label">URUTKAN:</span>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="catalog-sort-select"
+              >
+                <option value="popular">Paling Populer</option>
+                <option value="price-asc">Harga: Rendah ke Tinggi</option>
+                <option value="price-desc">Harga: Tinggi ke Rendah</option>
+                <option value="rating">Rating Tertinggi</option>
+              </select>
+            </div>
+          </div>
         </div>
 
-        {/* RESULTS INFO */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', color: 'var(--color-text-muted)', fontSize: '0.95rem' }}>
-          <div>
-            Menampilkan <strong>{filteredProducts.length}</strong> karya keramik
-            {selectedCategory !== 'Semua' && ` dalam kategori "${selectedCategory}"`}
-            {searchQuery && ` untuk pencarian "${searchQuery}"`}
-          </div>
-          {(selectedCategory !== 'Semua' || searchQuery || badgeFilter !== 'all') && (
+        {/* JUMLAH HASIL */}
+        <div className="catalog-results-meta">
+          Menampilkan <strong>{filteredProducts.length}</strong> karya keramik
+          {selectedCategory !== 'Semua' && <span> pada kategori "{selectedCategory}"</span>}
+        </div>
+
+        {/* GRID PRODUK */}
+        {filteredProducts.length === 0 ? (
+          <div className="catalog-empty-notice">
+            <h3>Karya Keramik Tidak Ditemukan</h3>
+            <p>Coba gunakan kata kunci lain atau hapus filter kategori.</p>
             <button
-              onClick={() => { setSelectedCategory('Semua'); setSearchQuery(''); setBadgeFilter('all'); }}
-              style={{ background: 'none', border: 'none', color: 'var(--color-primary)', cursor: 'pointer', textDecoration: 'underline' }}
+              onClick={() => { setSelectedCategory('Semua'); setSearchQuery(''); }}
+              className="claye-terracotta-btn"
+              style={{ marginTop: '1rem' }}
             >
               Reset Filter
             </button>
-          )}
-        </div>
-
-        {/* PRODUCTS GRID */}
-        {filteredProducts.length > 0 ? (
-          <div className="products-grid">
-            {filteredProducts.map(product => (
-              <ProductCard key={product.id} product={product} />
-            ))}
           </div>
         ) : (
-          <div style={{ textAlign: 'center', padding: '5rem 1rem', background: 'var(--color-surface)', borderRadius: '12px', border: '1px dashed var(--color-border)' }}>
-            <span style={{ fontSize: '3.5rem', display: 'block', marginBottom: '1rem' }}>🏺</span>
-            <h3 style={{ fontSize: '1.4rem', marginBottom: '0.5rem' }}>Karya Tidak Ditemukan</h3>
-            <p style={{ color: 'var(--color-text-muted)', marginBottom: '1.5rem' }}>
-              Maaf, tidak ada produk keramik yang sesuai dengan filter atau pencarian Anda.
-            </p>
-            <button
-              onClick={() => { setSelectedCategory('Semua'); setSearchQuery(''); setBadgeFilter('all'); }}
-              className="btn btn-primary"
-            >
-              Tampilkan Semua Koleksi
-            </button>
+          <div className="claye-curated-grid catalog-grid">
+            {filteredProducts.map((item) => (
+              <div
+                key={item.id}
+                className="curated-product-card"
+                onClick={() => viewProduct(item.id)}
+              >
+                <div className="curated-img-wrapper">
+                  <img src={item.image} alt={item.name} />
+                  {item.badge && (
+                    <span className="card-top-badge">
+                      {item.badge.toUpperCase()}
+                    </span>
+                  )}
+                  <div className="curated-card-overlay">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        addToCart(item.id, 1, { glaze: item.glazeOptions?.[0]?.name });
+                      }}
+                      className="quick-add-pill-btn"
+                    >
+                      + Tambah Cepat
+                    </button>
+                  </div>
+                </div>
+
+                <div className="curated-card-info">
+                  <div className="card-title-price-row">
+                    <h3 className="curated-item-name">{item.name}</h3>
+                    <span className="curated-item-price">Rp {item.price.toLocaleString('id-ID')}</span>
+                  </div>
+                  <div className="card-subtitle-dots-row">
+                    <span className="curated-item-subtitle">{item.subtitle}</span>
+                    <div className="color-swatch-dots">
+                      {item.glazeOptions?.map((glaze, idx) => (
+                        <span
+                          key={idx}
+                          className="swatch-dot"
+                          style={{ backgroundColor: glaze.hex }}
+                          title={glaze.name}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>

@@ -3,77 +3,172 @@ import { INITIAL_PRODUCTS } from '../data/products';
 
 const ShopContext = createContext();
 
+export const DEMO_USERS = {
+  customer: {
+    role: 'customer',
+    roleName: 'Pelanggan',
+    name: 'Arumi',
+    fullName: 'Arumi',
+    email: 'arumi@example.com',
+    phone: '+62 812-3456-7890',
+    address: 'Jl. Bukit Dago Utara No. 18, Coblong',
+    city: 'Bandung',
+    province: 'Jawa Barat',
+    postalCode: '40135',
+    country: 'Indonesia',
+    patronSince: '2024',
+    cohort: 'Pelanggan Tetap'
+  },
+  admin: {
+    role: 'admin',
+    roleName: 'Admin',
+    name: 'Admin',
+    fullName: 'Admin',
+    email: 'admin@claye.id',
+    phone: '+62 811-2233-4455',
+    address: 'Studio CLAYÉ, Jl. Rancabentang No. 29, Ciumbuleuit',
+    city: 'Bandung',
+    province: 'Jawa Barat',
+    postalCode: '40142',
+    country: 'Indonesia',
+    patronSince: '2021',
+    cohort: 'Admin CLAYÉ'
+  }
+};
+
+const INITIAL_USER = DEMO_USERS.customer;
+
+const INITIAL_CART = [
+  {
+    ...INITIAL_PRODUCTS[0], // The Sunday Mug
+    quantity: 1,
+    selectedGlaze: 'Hijau Sage',
+    stamp: 'Arumi',
+    customPrice: 125000
+  },
+  {
+    ...INITIAL_PRODUCTS[3], // The Everyday Plate
+    quantity: 1,
+    selectedGlaze: 'Gading (Ivory)',
+    stamp: '',
+    customPrice: 150000
+  }
+];
+
+const INITIAL_ORDERS = [
+  {
+    id: '#CLY-2026-003',
+    date: '22 Okt 2026',
+    itemsSummary: 'The Sunday Mug + The Everyday Plate',
+    variantSummary: 'Batu Pasir & Gading',
+    items: [
+      { name: 'The Sunday Mug', glaze: 'Batu Pasir', quantity: 1, price: 125000 },
+      { name: 'The Everyday Plate', glaze: 'Gading (Ivory)', quantity: 1, price: 150000 }
+    ],
+    total: 275000,
+    shippingFee: 15000,
+    grandTotal: 290000,
+    fulfillment: 'SELESAI',
+    paymentStatus: 'LUNAS',
+    paymentMethod: 'Transfer Bank (BCA)',
+    courier: 'Pengiriman Reguler (Eco Shield)',
+    trackingNumber: 'CLY-EXP-89021-BDG',
+    image: '/assets/images/product_mug.jpg'
+  },
+  {
+    id: '#CLY-2026-002',
+    date: '18 Okt 2026',
+    itemsSummary: 'The Everyday Plate',
+    variantSummary: 'Gading (Ivory) • Jml: 1',
+    items: [
+      { name: 'The Everyday Plate', glaze: 'Gading (Ivory)', quantity: 1, price: 150000 }
+    ],
+    total: 150000,
+    shippingFee: 15000,
+    grandTotal: 165000,
+    fulfillment: 'DIPROSES',
+    paymentStatus: 'LUNAS',
+    paymentMethod: 'E-Wallet Instan (QRIS)',
+    courier: 'Pengiriman Reguler (Eco Shield)',
+    trackingNumber: 'CLY-EXP-87944-BDG',
+    image: '/assets/images/product_plate.jpg'
+  },
+  {
+    id: '#CLY-2026-001',
+    date: '12 Okt 2026',
+    itemsSummary: 'The Sunday Mug',
+    variantSummary: 'Glasir Hijau Sage • Jml: 1',
+    items: [
+      { name: 'The Sunday Mug', glaze: 'Hijau Sage', quantity: 1, price: 125000 }
+    ],
+    total: 125000,
+    shippingFee: 15000,
+    grandTotal: 140000,
+    fulfillment: 'SELESAI',
+    paymentStatus: 'LUNAS',
+    paymentMethod: 'Virtual Account (BCA)',
+    courier: 'Pengiriman Reguler (Eco Shield)',
+    trackingNumber: 'CLY-EXP-86104-BDG',
+    image: '/assets/images/product_mug.jpg'
+  }
+];
+
 export function ShopProvider({ children }) {
-  // Products state (can be edited/added in Admin)
   const [products, setProducts] = useState(() => {
     try {
-      const saved = localStorage.getItem('claye_products');
+      const saved = localStorage.getItem('claye_products_id_v1');
       return saved ? JSON.parse(saved) : INITIAL_PRODUCTS;
     } catch {
       return INITIAL_PRODUCTS;
     }
   });
 
-  // Cart state
   const [cart, setCart] = useState(() => {
     try {
-      const saved = localStorage.getItem('claye_cart');
-      return saved ? JSON.parse(saved) : [];
+      const saved = localStorage.getItem('claye_cart_id_v1');
+      return saved ? JSON.parse(saved) : INITIAL_CART;
     } catch {
-      return [];
+      return INITIAL_CART;
     }
   });
 
-  // User state
   const [user, setUser] = useState(() => {
     try {
-      const saved = localStorage.getItem('claye_user');
-      return saved ? JSON.parse(saved) : null;
+      const saved = localStorage.getItem('claye_user_id_v1');
+      return saved ? JSON.parse(saved) : INITIAL_USER;
     } catch {
-      return null;
+      return INITIAL_USER;
     }
   });
 
-  // Orders state
   const [orders, setOrders] = useState(() => {
     try {
-      const saved = localStorage.getItem('claye_orders');
-      return saved ? JSON.parse(saved) : [
-        {
-          id: 'ORD-8921',
-          date: '24 Okt 2026',
-          items: [{ name: 'Terra Bowl Klasik', quantity: 2, price: 185000 }],
-          total: 395000,
-          status: 'Dikirim',
-          tracking: 'JNE-8829104829',
-          paymentMethod: 'BCA Virtual Account'
-        },
-        {
-          id: 'ORD-8714',
-          date: '12 Okt 2026',
-          items: [{ name: 'Set Mug Artisan Duo', quantity: 1, price: 245000 }],
-          total: 270000,
-          status: 'Selesai',
-          tracking: 'SICEPAT-72910381',
-          paymentMethod: 'GoPay / QRIS'
-        }
-      ];
+      const saved = localStorage.getItem('claye_orders_id_v1');
+      return saved ? JSON.parse(saved) : INITIAL_ORDERS;
     } catch {
-      return [];
+      return INITIAL_ORDERS;
     }
   });
 
-  // Toast notifications
+  const [wishlist, setWishlist] = useState(() => {
+    try {
+      const saved = localStorage.getItem('claye_wishlist_id_v1');
+      return saved ? JSON.parse(saved) : [2, 3];
+    } catch {
+      return [2, 3];
+    }
+  });
+
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [chatInitialPrompt, setChatInitialPrompt] = useState('');
+  const [isCartDrawerOpen, setIsCartDrawerOpen] = useState(false);
   const [toasts, setToasts] = useState([]);
 
-  // Routing State
   const [currentRoute, setCurrentRoute] = useState(() => {
-    const hash = window.location.hash.replace('#', '') || '/';
-    return hash;
+    return window.location.hash.replace('#', '') || '/';
   });
   const [selectedProductId, setSelectedProductId] = useState(1);
 
-  // Sync hash routing
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '') || '/';
@@ -86,7 +181,6 @@ export function ShopProvider({ children }) {
     };
 
     window.addEventListener('hashchange', handleHashChange);
-    // Initialize
     if (window.location.hash.startsWith('#/detail/')) {
       const id = parseInt(window.location.hash.replace('#/detail/', ''));
       if (!isNaN(id)) setSelectedProductId(id);
@@ -94,28 +188,30 @@ export function ShopProvider({ children }) {
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
-  // Save changes to localStorage
   useEffect(() => {
-    localStorage.setItem('claye_cart', JSON.stringify(cart));
+    localStorage.setItem('claye_cart_id_v1', JSON.stringify(cart));
   }, [cart]);
 
   useEffect(() => {
     if (user) {
-      localStorage.setItem('claye_user', JSON.stringify(user));
+      localStorage.setItem('claye_user_id_v1', JSON.stringify(user));
     } else {
-      localStorage.removeItem('claye_user');
+      localStorage.removeItem('claye_user_id_v1');
     }
   }, [user]);
 
   useEffect(() => {
-    localStorage.setItem('claye_orders', JSON.stringify(orders));
+    localStorage.setItem('claye_orders_id_v1', JSON.stringify(orders));
   }, [orders]);
 
   useEffect(() => {
-    localStorage.setItem('claye_products', JSON.stringify(products));
+    localStorage.setItem('claye_products_id_v1', JSON.stringify(products));
   }, [products]);
 
-  // Navigate helper
+  useEffect(() => {
+    localStorage.setItem('claye_wishlist_id_v1', JSON.stringify(wishlist));
+  }, [wishlist]);
+
   const navigate = (path) => {
     window.location.hash = path;
   };
@@ -125,76 +221,161 @@ export function ShopProvider({ children }) {
     setToasts(prev => [...prev, { id, message, type }]);
     setTimeout(() => {
       setToasts(prev => prev.filter(t => t.id !== id));
-    }, 3500);
+    }, 3800);
   };
 
-  const addToCart = (productId, quantity = 1) => {
+  const addToCart = (productId, quantity = 1, customOpts = {}) => {
     const product = products.find(p => p.id === productId);
     if (!product) return;
 
+    const glaze = customOpts.glaze || (product.glazeOptions && product.glazeOptions[0]?.name) || 'Alami';
+    const stamp = customOpts.stamp || '';
+    const addCost = stamp ? 25000 : 0;
+    const finalPrice = product.price + addCost;
+
     setCart(prev => {
-      const existing = prev.find(item => item.id === productId);
-      if (existing) {
-        return prev.map(item =>
-          item.id === productId ? { ...item, quantity: item.quantity + quantity } : item
+      const existingIndex = prev.findIndex(item => 
+        item.id === productId && item.selectedGlaze === glaze && item.stamp === stamp
+      );
+      if (existingIndex > -1) {
+        return prev.map((item, idx) => 
+          idx === existingIndex ? { ...item, quantity: item.quantity + quantity } : item
         );
       }
-      return [...prev, { ...product, quantity }];
+      return [
+        ...prev,
+        {
+          ...product,
+          price: finalPrice,
+          basePrice: product.price,
+          quantity,
+          selectedGlaze: glaze,
+          stamp
+        }
+      ];
     });
 
-    showToast(`"${product.name}" ditambahkan ke keranjang! 🛒`, 'success');
+    showToast(`"${product.name}" (${glaze}) berhasil dimasukkan ke keranjang.`, 'success');
   };
 
-  const updateCartQty = (productId, qty) => {
+  const updateCartQty = (index, qty) => {
     setCart(prev =>
-      prev.map(item =>
-        item.id === productId ? { ...item, quantity: Math.max(1, qty) } : item
+      prev.map((item, idx) =>
+        idx === index ? { ...item, quantity: Math.max(1, qty) } : item
       )
     );
   };
 
-  const removeFromCart = (productId) => {
-    setCart(prev => prev.filter(item => item.id !== productId));
-    showToast('Produk dihapus dari keranjang', 'info');
+  const removeFromCart = (index) => {
+    setCart(prev => prev.filter((_, idx) => idx !== index));
+    showToast('Produk dihapus dari keranjang belanja.', 'info');
   };
 
   const clearCart = () => {
     setCart([]);
   };
 
+  const toggleWishlist = (productId) => {
+    setWishlist(prev => {
+      if (prev.includes(productId)) {
+        showToast('Karya dihapus dari daftar simpan.', 'info');
+        return prev.filter(id => id !== productId);
+      } else {
+        showToast('Karya disimpan ke daftar favorit.', 'success');
+        return [...prev, productId];
+      }
+    });
+  };
+
   const cartTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
-  const login = (email, password) => {
-    const mockUser = {
-      name: email.split('@')[0].replace('.', ' '),
-      email: email,
-      phone: '081234567890',
-      address: 'Jl. Senopati No. 45, Kebayoran Baru, Jakarta Selatan',
-      points: 1250,
-      joined: 'Februari 2026'
+  const login = (email, password, forcedRole = null) => {
+    const isAdmin = forcedRole === 'admin' || (email && email.toLowerCase().includes('admin'));
+
+    if (isAdmin) {
+      const adminUser = {
+        ...DEMO_USERS.admin,
+        email: email || DEMO_USERS.admin.email
+      };
+      setUser(adminUser);
+      showToast('Masuk berhasil sebagai Admin.', 'success');
+      navigate('/admin');
+      return;
+    }
+
+    const isDemoCustomer = !email || email.toLowerCase() === DEMO_USERS.customer.email.toLowerCase() || email.toLowerCase() === 'fie@example.com';
+    const customerUser = {
+      ...DEMO_USERS.customer,
+      name: isDemoCustomer ? DEMO_USERS.customer.name : (email.split('@')[0].replace(/[._]/g, ' ')),
+      fullName: isDemoCustomer ? DEMO_USERS.customer.fullName : (email.split('@')[0].replace(/[._]/g, ' ')),
+      email: email || DEMO_USERS.customer.email,
+      role: 'customer',
+      roleName: 'Pelanggan'
     };
-    setUser(mockUser);
-    showToast(`Selamat datang kembali, ${mockUser.name}! 👋`, 'success');
+    setUser(customerUser);
+    showToast(`Masuk berhasil sebagai Pelanggan. Selamat datang, ${customerUser.name}.`, 'success');
+    navigate('/dashboard');
+  };
+
+  const register = (registerData) => {
+    // Registrasi hanya untuk pembeli/pelanggan
+    const newUser = {
+      role: 'customer',
+      roleName: 'Pelanggan',
+      name: registerData.name || (registerData.fullName ? registerData.fullName.split(' ')[0] : 'Pelanggan'),
+      fullName: registerData.fullName || 'Pelanggan Baru CLAYÉ',
+      email: registerData.email,
+      phone: registerData.phone || '+62 812-0000-0000',
+      address: registerData.address || 'Bandung, Jawa Barat',
+      city: registerData.city || 'Bandung',
+      province: 'Jawa Barat',
+      postalCode: registerData.postalCode || '40135',
+      country: 'Indonesia',
+      patronSince: '2026',
+      cohort: 'Angkatan Batch 05'
+    };
+    setUser(newUser);
+    showToast(`Pendaftaran akun pembeli berhasil. Selamat bergabung, ${newUser.name}.`, 'success');
     navigate('/dashboard');
   };
 
   const logout = () => {
     setUser(null);
-    showToast('Berhasil keluar dari akun.', 'info');
-    navigate('/');
+    showToast('Anda telah keluar dari akun.', 'info');
+    navigate('/login');
   };
 
   const updateProfile = (updatedFields) => {
     setUser(prev => ({ ...prev, ...updatedFields }));
-    showToast('Profil berhasil diperbarui! ✨', 'success');
+    showToast('Data akun berhasil diperbarui.', 'success');
   };
 
   const createOrder = (orderData) => {
+    const randNum = Math.floor(100 + Math.random() * 900);
+    const orderId = `#CLY-2026-${randNum}`;
     const newOrder = {
-      id: 'ORD-' + Math.floor(1000 + Math.random() * 9000),
+      id: orderId,
       date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
-      ...orderData
+      itemsSummary: cart.map(i => i.name).join(' + '),
+      variantSummary: cart.map(i => `${i.selectedGlaze || 'Gading'} • Jml: ${i.quantity}`).join(', '),
+      items: cart.map(i => ({
+        name: i.name,
+        glaze: i.selectedGlaze,
+        stamp: i.stamp,
+        quantity: i.quantity,
+        price: i.price
+      })),
+      total: cartTotal,
+      shippingFee: orderData.shippingFee || 15000,
+      grandTotal: (cartTotal + (orderData.shippingFee || 15000)),
+      fulfillment: 'DIPROSES',
+      paymentStatus: 'LUNAS',
+      paymentMethod: orderData.paymentMethod || 'Transfer Bank (BCA)',
+      courier: orderData.courier || 'Pengiriman Reguler (Eco Shield)',
+      trackingNumber: `CLY-EXP-${randNum}-BDG`,
+      image: cart[0]?.image || '/assets/images/product_mug.jpg',
+      shippingAddress: orderData.shippingAddress || (user ? `${user.address}, ${user.city}` : 'Bandung, Jawa Barat')
     };
     setOrders(prev => [newOrder, ...prev]);
     clearCart();
@@ -203,19 +384,31 @@ export function ShopProvider({ children }) {
 
   const addProduct = (newProd) => {
     const id = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
-    const item = { ...newProd, id, rating: 5.0, reviews: 0 };
+    const item = {
+      ...newProd,
+      id,
+      usdPrice: Math.round(newProd.price / 2600),
+      rating: 5.0,
+      reviews: 0,
+      thumbnails: [newProd.image || '/assets/images/product_mug.jpg']
+    };
     setProducts(prev => [item, ...prev]);
-    showToast(`Produk "${item.name}" berhasil ditambahkan! 🏺`, 'success');
+    showToast(`Produk "${item.name}" berhasil ditambahkan ke katalog studio.`, 'success');
   };
 
   const deleteProduct = (id) => {
     setProducts(prev => prev.filter(p => p.id !== id));
-    showToast('Produk berhasil dihapus.', 'info');
+    showToast('Produk berhasil dihapus dari katalog.', 'info');
   };
 
   const viewProduct = (id) => {
     setSelectedProductId(id);
     navigate(`/detail/${id}`);
+  };
+
+  const openConcierge = (prompt = '') => {
+    setChatInitialPrompt(prompt);
+    setIsChatOpen(true);
   };
 
   return (
@@ -224,18 +417,27 @@ export function ShopProvider({ children }) {
       cart,
       user,
       orders,
+      wishlist,
       toasts,
       currentRoute,
       selectedProductId,
       cartTotal,
       cartCount,
+      isChatOpen,
+      chatInitialPrompt,
+      isCartDrawerOpen,
+      setIsCartDrawerOpen,
+      setIsChatOpen,
+      openConcierge,
       navigate,
       showToast,
       addToCart,
       updateCartQty,
       removeFromCart,
       clearCart,
+      toggleWishlist,
       login,
+      register,
       logout,
       updateProfile,
       createOrder,
