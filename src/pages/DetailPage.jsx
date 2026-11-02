@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useShop } from '../context/ShopContext';
 
 export default function DetailPage() {
-  const { products, selectedProductId, addToCart, wishlist, toggleWishlist, navigate, viewProduct, openConcierge } = useShop();
+  const { products, selectedProductId, addToCart, wishlist, toggleWishlist, navigate, viewProduct, openConcierge, user } = useShop();
 
   const product = products.find(p => p.id === selectedProductId) || products[0];
 
@@ -36,6 +36,25 @@ export default function DetailPage() {
   return (
     <div className="claye-detail-page">
       <div className="container">
+        {/* BANNER KHUSUS PEMILIK TOKO DI DETAIL PRODUK */}
+        {user && user.role === 'admin' && (
+          <div className="detail-owner-admin-banner">
+            <div className="owner-banner-left">
+              <span className="owner-crown-tag">👑 KARYA TOKO ANDA</span>
+              <strong>{product.name}</strong>
+              <span className="stock-info-pill">Stok di Studio: {product.stock !== undefined ? product.stock : 10} unit</span>
+            </div>
+            <div className="owner-banner-right">
+              <button onClick={() => navigate('/katalog')} className="btn-return-store">
+                ← Kembali ke Katalog
+              </button>
+              <button onClick={() => navigate('/admin')} className="btn-manage-admin">
+                Kelola di Panel Admin
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* NAVIGASI ATAS & BATCH */}
         <div className="detail-top-nav-bar">
           <div className="detail-breadcrumb">

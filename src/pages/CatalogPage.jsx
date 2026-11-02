@@ -3,11 +3,12 @@ import { useShop } from '../context/ShopContext';
 import { CATEGORIES } from '../data/products';
 
 export default function CatalogPage() {
-  const { products, viewProduct, addToCart, navigate } = useShop();
+  const { products, viewProduct, addToCart, navigate, user } = useShop();
 
   const [selectedCategory, setSelectedCategory] = useState('Semua');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('popular');
+  const isAdmin = user && user.role === 'admin';
 
   const filteredProducts = useMemo(() => {
     return products
@@ -126,21 +127,38 @@ export default function CatalogPage() {
               >
                 <div className="curated-img-wrapper">
                   <img src={item.image} alt={item.name} />
-                  {item.badge && (
+                  {isAdmin ? (
+                    <span className="card-top-badge" style={{ backgroundColor: '#24201D', color: '#FAF7F2' }}>
+                      STOK: {item.stock !== undefined ? item.stock : 10}
+                    </span>
+                  ) : item.badge ? (
                     <span className="card-top-badge">
                       {item.badge.toUpperCase()}
                     </span>
-                  )}
+                  ) : null}
                   <div className="curated-card-overlay">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        addToCart(item.id, 1, { glaze: item.glazeOptions?.[0]?.name });
-                      }}
-                      className="quick-add-pill-btn"
-                    >
-                      + Tambah Cepat
-                    </button>
+                    {isAdmin ? (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate('/admin');
+                        }}
+                        className="quick-add-pill-btn"
+                        style={{ backgroundColor: 'var(--color-terracotta)' }}
+                      >
+                        ⚙️ Kelola di Admin
+                      </button>
+                    ) : (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          addToCart(item.id, 1, { glaze: item.glazeOptions?.[0]?.name });
+                        }}
+                        className="quick-add-pill-btn"
+                      >
+                        + Tambah Cepat
+                      </button>
+                    )}
                   </div>
                 </div>
 

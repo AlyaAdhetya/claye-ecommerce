@@ -15,10 +15,12 @@ import DashboardPage from './pages/DashboardPage';
 import AdminPage from './pages/AdminPage';
 import AboutPage from './pages/AboutPage';
 
+
 export default function App() {
   const { currentRoute, user } = useShop();
 
   const renderCurrentPage = () => {
+
     if (currentRoute === '' || currentRoute === '/') {
       return <HomePage />;
     }
@@ -40,7 +42,7 @@ export default function App() {
     if (currentRoute === '/login' || currentRoute === '/register' || currentRoute === '/admin/login') {
       return <LoginPage />;
     }
-    if (currentRoute === '/dashboard' || currentRoute === '/account') {
+    if (currentRoute === '/dashboard' || currentRoute === '/account' || currentRoute === '/admin/akun' || currentRoute === '/admin/profile') {
       return <DashboardPage />;
     }
     if (currentRoute === '/admin' || currentRoute.startsWith('/admin')) {

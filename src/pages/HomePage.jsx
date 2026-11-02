@@ -134,10 +134,10 @@ export default function HomePage() {
                 Tentang Studio & Cerita Kami →
               </button>
               <button
-                onClick={() => openConcierge('Ceritakan proses pembakaran kiln batch di studio')}
+                onClick={() => openConcierge('Ceritakan proses kurasi karya keramik di studio CLAYÉ')}
                 className="atelier-inquiry-btn"
               >
-                Tanya Konsultasi Kiln Studio
+                Konsultasi Karya Keramik
               </button>
             </div>
           </div>

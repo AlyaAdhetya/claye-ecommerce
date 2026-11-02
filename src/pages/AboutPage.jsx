@@ -21,9 +21,9 @@ export default function AboutPage() {
     },
     {
       name: 'Danu Setiawan',
-      role: 'Operator Tungku Kiln dan Kontrol Kualitas',
-      experience: '9 Tahun Manajemen Pembakaran',
-      bio: 'Menjaga api reduksi pada suhu 1260°C selama 14 jam penuh. Memastikan setiap karya mencapai vitrifikasi sempurna, kokoh, dan tahan suhu tinggi.',
+      role: 'Master Craftsman dan Kontrol Kualitas',
+      experience: '9 Tahun Pengrajin Keramik',
+      bio: 'Bertanggung jawab penuh atas kualitas fisik dan estetika setiap karya. Memastikan ketahanan keramik stoneware yang kokoh, berbobot pas, dan nyaman digunakan sehari-hari.',
       image: '/assets/images/product_bowl.jpg'
     }
   ];
@@ -55,9 +55,9 @@ export default function AboutPage() {
     },
     {
       step: '05',
-      title: 'Pembakaran Reduksi Kiln 1260°C',
-      subtitle: 'Cone 10 High-Fire Stoneware',
-      desc: 'Karya dibakar dalam tungku reduksi pada suhu ekstrem 1260°C. Pada suhu ini, partikel tanah memadat sempurna (vitrified) menjadi batu keras non-porous yang aman untuk microwave, dishwasher, dan penggunaan sehari-hari.'
+      title: 'Proses Pematangan Keramik (High-Fire)',
+      subtitle: 'Stoneware Padat Tahan Lama',
+      desc: 'Karya melewati proses pematangan bersuhu tinggi agar partikel tanah memadat sempurna menjadi keramik non-porous yang kokoh, higienis, serta aman untuk microwave, dishwasher, dan penggunaan harian.'
     }
   ];
 
@@ -149,8 +149,8 @@ export default function AboutPage() {
               <span className="stat-caption">Buatan Tangan (Handmade Stoneware)</span>
             </div>
             <div className="about-stat-item">
-              <strong className="stat-number">1260°C</strong>
-              <span className="stat-caption">Suhu Pembakaran Reduksi Kiln</span>
+              <strong className="stat-number">5+</strong>
+              <span className="stat-caption">Tahun Dedikasi Kerajinan Seni</span>
             </div>
             <div className="about-stat-item">
               <strong className="stat-number">2021</strong>
@@ -317,7 +317,7 @@ export default function AboutPage() {
                 </div>
                 <div className="vdetail-item">
                   <strong>Jam Kunjungan:</strong>
-                  <span>Selasa – Minggu: 10:00 – 17:00 WIB (Senin Tutup untuk Pembakaran Kiln)</span>
+                  <span>Selasa – Minggu: 10:00 – 17:00 WIB (Senin Tutup untuk Pemeliharaan Studio)</span>
                 </div>
                 <div className="vdetail-item">
                   <strong>Sesi Workshop Keramik:</strong>
@@ -350,7 +350,7 @@ export default function AboutPage() {
                   className="visit-main-img"
                 />
                 <div className="visit-floating-tag">
-                  <span>Studio Aktif - Kiln Beroperasi</span>
+                  <span>Studio & Galeri Aktif</span>
                 </div>
               </div>
             </div>

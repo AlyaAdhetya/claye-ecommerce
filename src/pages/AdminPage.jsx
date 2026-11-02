@@ -5,6 +5,7 @@ export default function AdminPage() {
   const {
     products,
     addProduct,
+    updateProduct,
     deleteProduct,
     updateProductStock,
     showToast,
@@ -12,17 +13,27 @@ export default function AdminPage() {
     user,
     login,
     logout,
-    navigate
+    navigate,
+    adminActivePage,
+    setAdminActivePage,
+    adminInventoryView,
+    setAdminInventoryView,
+    openAdminStorefront
   } = useShop();
 
   // Active page state for sidebar navigation
-  const [activePage, setActivePage] = useState('overview');
+  const activePage = adminActivePage;
+  const setActivePage = setAdminActivePage;
+  const inventoryViewMode = adminInventoryView;
+  const setInventoryViewMode = setAdminInventoryView;
 
   // Chart range toggle for overview / analytics
   const [chartRange, setChartRange] = useState('7d');
 
   // Modals
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
   const [inspectOrderData, setInspectOrderData] = useState(null);
 
   // Form input for new ceramic product
@@ -32,6 +43,15 @@ export default function AdminPage() {
   const [newProdStock, setNewProdStock] = useState('12');
   const [newProdSubtitle, setNewProdSubtitle] = useState('');
   const [newProdDesc, setNewProdDesc] = useState('');
+
+  // Form input for edit ceramic product
+  const [editProdName, setEditProdName] = useState('');
+  const [editProdCategory, setEditProdCategory] = useState('Cangkir & Mug');
+  const [editProdPrice, setEditProdPrice] = useState('');
+  const [editProdStock, setEditProdStock] = useState('12');
+  const [editProdSubtitle, setEditProdSubtitle] = useState('');
+  const [editProdDesc, setEditProdDesc] = useState('');
+  const [editProdBadge, setEditProdBadge] = useState('Studio');
 
   // Filter states
   const [orderStatusFilter, setOrderStatusFilter] = useState('Semua');
@@ -46,7 +66,7 @@ export default function AdminPage() {
     phone: '+62 811-2233-4455',
     email: 'atelier@claye.id',
     openingHours: 'Selasa – Minggu: 10:00 – 17:00 WIB',
-    kilnCapacity: '2 Tungku Gas Reduksi Cone 10 (Total 350 Liter)',
+    workshopCapacity: 'Kapasitas Studio 250 Karya per Bulan',
     shippingProtection: true,
     qrisActive: true,
     bcaActive: true
@@ -260,6 +280,40 @@ export default function AdminPage() {
     showToast(`Produk "${newProdName}" berhasil didaftarkan ke inventaris!`, 'success');
   };
 
+  const handleOpenEditModal = (prod) => {
+    setEditingProduct(prod);
+    setEditProdName(prod.name || '');
+    setEditProdCategory(prod.category || 'Cangkir & Mug');
+    setEditProdPrice(prod.price !== undefined ? prod.price.toString() : '');
+    setEditProdStock(prod.stock !== undefined ? prod.stock.toString() : '0');
+    setEditProdSubtitle(prod.subtitle || '');
+    setEditProdDesc(prod.description || '');
+    setEditProdBadge(prod.badge || 'Studio');
+    setIsEditModalOpen(true);
+  };
+
+  const handleEditProductSubmit = (e) => {
+    e.preventDefault();
+    if (!editProdName || !editProdPrice) {
+      showToast('Harap masukkan nama dan harga karya keramik!', 'error');
+      return;
+    }
+    if (!editingProduct) return;
+
+    updateProduct(editingProduct.id, {
+      name: editProdName,
+      category: editProdCategory,
+      price: parseInt(editProdPrice) || 0,
+      stock: parseInt(editProdStock) || 0,
+      subtitle: editProdSubtitle,
+      description: editProdDesc,
+      badge: editProdBadge
+    });
+
+    setIsEditModalOpen(false);
+    setEditingProduct(null);
+  };
+
   const handleUpdateFulfillment = (orderId, newStatus) => {
     setAdminOrders(prev =>
       prev.map(ord => ord.id === orderId ? { ...ord, fulfillment: newStatus } : ord)
@@ -327,7 +381,7 @@ export default function AdminPage() {
               {user ? (
                 <>Anda saat ini masuk sebagai <strong>{user.name}</strong> ({user.roleName || 'Pelanggan'}). Halaman ini memerlukan hak akses Admin Atelier.</>
               ) : (
-                <>Panel kontrol ini memuat manajemen inventaris keramik, status tungku kiln, dan logistik pengiriman. Silakan masuk dengan akun Admin.</>
+                <>Panel kontrol ini memuat manajemen inventaris keramik, pesanan pelanggan, dan logistik pengiriman. Silakan masuk dengan akun Admin.</>
               )}
             </p>
 
@@ -403,7 +457,7 @@ export default function AdminPage() {
         },
         {
           id: 'inventory',
-          label: 'Inventaris',
+          label: 'Inventaris & Katalog',
           icon: (
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
@@ -413,17 +467,6 @@ export default function AdminPage() {
           ),
           badge: `${products.length}`,
           badgeClass: 'badge-count'
-        },
-        {
-          id: 'kiln',
-          label: 'Kiln dan Formula',
-          icon: (
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path>
-            </svg>
-          ),
-          badge: '1260°C',
-          badgeClass: 'badge-fire'
         }
       ]
     },
@@ -501,34 +544,40 @@ export default function AdminPage() {
             ))}
           </div>
 
-          {/* WIDGET STATUS LIVE KILN DI BAWAH SIDEBAR */}
-          <div className="admin-kiln-status-widget">
-            <div className="kiln-status-header">
-              <span className="status-label">STATUS KILN UTAMA</span>
-              <span className="firing-tag">1260°C AKTIF</span>
-            </div>
-            <div className="kiln-batch-info">
-              Batch #14 Reduksi Cone 10
-            </div>
-            <div className="kiln-cooling-timer">
-              Pendinginan: ~18 Jam Menuju Unload
-            </div>
-          </div>
-
-          {/* AKSI BAWAH: LIHAT TOKO & KELUAR */}
-          <div className="sidebar-footer-actions">
+          {/* TOMBOL PINTAS LIHAT TOKO / KATALOG PELANGGAN */}
+          <div style={{ padding: '0 0.85rem', marginBottom: '0.85rem' }}>
             <button
-              onClick={() => navigate('/')}
-              className="sidebar-store-btn"
-              title="Lihat Pratinjau Toko Pelanggan"
+              onClick={openAdminStorefront}
+              className="sidebar-view-store-btn"
+              title="Lihat Tampilan Etalase Toko / Katalog Produk Langsung"
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
+                backgroundColor: 'rgba(184, 115, 85, 0.08)',
+                color: 'var(--color-terracotta)',
+                border: '1px solid rgba(184, 115, 85, 0.3)',
+                padding: '0.65rem 0.85rem',
+                borderRadius: '6px',
+                fontSize: '0.8rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                letterSpacing: '0.02em'
+              }}
             >
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                <polyline points="15 3 21 3 21 9"></polyline>
-                <line x1="10" y1="14" x2="21" y2="3"></line>
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
               </svg>
-              <span>Lihat Toko Publik</span>
+              <span>Lihat Tampilan Toko</span>
             </button>
+          </div>
+
+          {/* AKSI BAWAH: KELUAR */}
+          <div className="sidebar-footer-actions">
             <button
               onClick={logout}
               className="sidebar-logout-btn"
@@ -705,10 +754,10 @@ export default function AdminPage() {
                   </div>
                 </div>
 
-                {/* KANAN: FOKUS PEMBAKARAN KILN */}
+                {/* KANAN: KARYA UNGGULAN ATELIER */}
                 <div className="admin-kiln-focus-card">
                   <div className="focus-card-header">
-                    <span className="focus-tag">FOKUS PEMBAKARAN KILN AKTIF</span>
+                    <span className="focus-tag">KARYA UNGGULAN ATELIER</span>
                     <span className="limited-series-pill">EDISI TERBATAS</span>
                   </div>
 
@@ -723,31 +772,31 @@ export default function AdminPage() {
                       <h4 className="focus-vessel-title">Wabi Matcha Chawan</h4>
                     </div>
                     <div className="focus-made-counter">
-                      <strong>08/25</strong> Dibuat
+                      <strong>08/25</strong> Tersedia
                     </div>
                   </div>
 
                   <div className="focus-specs-list">
                     <div className="fspec-row">
-                      <span className="fspec-key">Pembakaran Reduksi Cone 10</span>
-                      <strong className="fspec-val">1260°C Terverifikasi</strong>
+                      <span className="fspec-key">Status Stok</span>
+                      <strong className="fspec-val" style={{ color: '#5E7958' }}>✓ Siap Dikirim Segera</strong>
                     </div>
                     <div className="fspec-row">
                       <span className="fspec-key">Asal Tanah Liat</span>
                       <strong className="fspec-val">Stoneware Sukabumi</strong>
                     </div>
                     <div className="fspec-row">
-                      <span className="fspec-key">Formulasi Glasir</span>
-                      <strong className="fspec-val">Abu Kayu dan Besi Matte</strong>
+                      <span className="fspec-key">Finishing Glasir</span>
+                      <strong className="fspec-val">Abu Kayu & Besi Matte</strong>
                     </div>
                   </div>
 
                   <button
-                    onClick={() => setActivePage('kiln')}
+                    onClick={() => setActivePage('inventory')}
                     className="focus-health-footer"
                     style={{ width: '100%', border: 'none', background: 'none', cursor: 'pointer' }}
                   >
-                    <span className="health-label">Buka Monitor Kiln Lengkap</span>
+                    <span className="health-label">Kelola Inventaris Produk →</span>
                   </button>
                 </div>
               </div>
@@ -987,7 +1036,21 @@ export default function AdminPage() {
                 <h2 className="purpose-title" style={{ marginBottom: '0.25rem' }}>Manajemen Stok Fisik Studio dan Katalog E-Commerce</h2>
                 <div className="purpose-quick-nav" style={{ marginTop: '0.85rem', paddingTop: '0.85rem' }}>
                   <button onClick={() => setIsAddModalOpen(true)} className="purpose-action-btn primary">
-                    tambah produk
+                    + Tambah Produk
+                  </button>
+                  <button
+                    onClick={() => setInventoryViewMode(inventoryViewMode === 'storefront' ? 'table' : 'storefront')}
+                    className="purpose-action-btn secondary"
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                    title="Ganti Tampilan Etalase Toko / Tabel Stok"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="3" width="7" height="7"></rect>
+                      <rect x="14" y="3" width="7" height="7"></rect>
+                      <rect x="14" y="14" width="7" height="7"></rect>
+                      <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    {inventoryViewMode === 'storefront' ? 'Buka Tabel Stok' : 'Lihat Tampilan Toko'}
                   </button>
                   <button onClick={() => showToast('Stok seluruh katalog telah diperbarui sesuai kondisi rak studio.', 'success')} className="purpose-action-btn secondary">
                     sinkronkan stok
@@ -1051,266 +1114,409 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              {/* TABEL INVENTARIS PRODUK */}
-              <div className="admin-section-container">
-                <div className="acquisitions-table-wrap">
-                  <table className="claye-patron-table">
-                    <thead>
-                      <tr>
-                        <th>PRODUK DAN EDISI GLASIR</th>
-                        <th>KATEGORI</th>
-                        <th>HARGA SATUAN</th>
-                        <th>STOK TERSEDIA</th>
-                        <th>STATUS BADGE</th>
-                        <th style={{ textAlign: 'right' }}>AKSI</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredProducts.length === 0 ? (
-                        <tr>
-                          <td colSpan="6" style={{ textAlign: 'center', padding: '3rem', color: '#8A857F' }}>
-                            Tidak ada produk keramik yang sesuai dengan filter.
-                          </td>
-                        </tr>
-                      ) : (
-                        filteredProducts.map(p => (
-                          <tr key={p.id}>
-                            <td className="cell-pieces">
-                              <div className="pieces-item-preview">
-                                <img src={p.image} alt={p.name} style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '4px' }} />
-                                <div>
-                                  <strong className="piece-title">{p.name}</strong>
-                                  <span className="piece-variant">{p.subtitle}</span>
-                                </div>
-                              </div>
-                            </td>
-                            <td>{p.category}</td>
-                            <td><strong>Rp {p.price.toLocaleString('id-ID')}</strong></td>
-                            <td>
-                              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                                <button
-                                  onClick={() => updateProductStock(p.id, -1)}
-                                  style={{
-                                    width: '24px',
-                                    height: '24px',
-                                    borderRadius: '4px',
-                                    border: '1px solid #EAE6DF',
-                                    backgroundColor: '#FAF8F5',
-                                    fontSize: '0.85rem',
-                                    fontWeight: 'bold',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center'
-                                  }}
-                                  title="Kurangi 1 pcs"
-                                >
-                                  -
-                                </button>
-                                <span style={{ fontWeight: '700', minWidth: '40px', textAlign: 'center' }}>
-                                  {p.stock || 0} pcs
-                                </span>
-                                <button
-                                  onClick={() => updateProductStock(p.id, 1)}
-                                  style={{
-                                    width: '24px',
-                                    height: '24px',
-                                    borderRadius: '4px',
-                                    border: '1px solid #EAE6DF',
-                                    backgroundColor: '#FAF8F5',
-                                    fontSize: '0.85rem',
-                                    fontWeight: 'bold',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center'
-                                  }}
-                                  title="Tambah 1 pcs"
-                                >
-                                  +
-                                </button>
-                              </div>
-                            </td>
-                            <td>
-                              <span className={`status-pill ${(p.stock || 0) < 5 ? 'pill-pending' : 'pill-completed'}`}>
-                                {p.badge || 'Studio'}
-                              </span>
-                            </td>
-                            <td style={{ textAlign: 'right' }}>
+              {/* SEGMENTED SWITCHER: TAMPILAN TOKO (KATALOG) vs TABEL STOK */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '1rem',
+                backgroundColor: '#FAF8F5',
+                padding: '0.75rem 1rem',
+                borderRadius: '8px',
+                border: '1px solid #EAE6DF',
+                marginBottom: '1.25rem'
+              }}>
+                <div style={{ display: 'inline-flex', gap: '4px', backgroundColor: '#EDE8E1', padding: '4px', borderRadius: '6px' }}>
+                  <button
+                    type="button"
+                    onClick={() => setInventoryViewMode('storefront')}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '8px 16px',
+                      borderRadius: '5px',
+                      border: 'none',
+                      backgroundColor: inventoryViewMode === 'storefront' ? '#24201D' : 'transparent',
+                      color: inventoryViewMode === 'storefront' ? '#FAF7F2' : '#656059',
+                      fontWeight: 600,
+                      fontSize: '0.82rem',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="3" width="7" height="7"></rect>
+                      <rect x="14" y="3" width="7" height="7"></rect>
+                      <rect x="14" y="14" width="7" height="7"></rect>
+                      <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    Tampilan Toko (Etalase Produk)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setInventoryViewMode('table')}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '8px 16px',
+                      borderRadius: '5px',
+                      border: 'none',
+                      backgroundColor: inventoryViewMode === 'table' ? '#24201D' : 'transparent',
+                      color: inventoryViewMode === 'table' ? '#FAF7F2' : '#656059',
+                      fontWeight: 600,
+                      fontSize: '0.82rem',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="8" y1="6" x2="21" y2="6"></line>
+                      <line x1="8" y1="12" x2="21" y2="12"></line>
+                      <line x1="8" y1="18" x2="21" y2="18"></line>
+                      <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                      <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                      <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                    </svg>
+                    Tabel Data Stok
+                  </button>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <button
+                    onClick={() => setIsAddModalOpen(true)}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      backgroundColor: 'var(--color-terracotta)',
+                      color: '#FFFFFF',
+                      border: 'none',
+                      padding: '8px 16px',
+                      borderRadius: '6px',
+                      fontWeight: 600,
+                      fontSize: '0.82rem',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    + Tambah Produk Baru
+                  </button>
+                </div>
+              </div>
+
+              {/* TAMPILAN 1: TAMPILAN TOKO (ETALASE KATALOG VISUAL DENGAN KONTROL ADMIN) */}
+              {inventoryViewMode === 'storefront' ? (
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+                  gap: '1.25rem',
+                  marginBottom: '2rem'
+                }}>
+                  {filteredProducts.length === 0 ? (
+                    <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '3rem', backgroundColor: '#FFFFFF', borderRadius: '8px', border: '1px solid #EAE6DF', color: '#8A857F' }}>
+                      Tidak ada karya keramik yang sesuai dengan filter pencarian.
+                    </div>
+                  ) : (
+                    filteredProducts.map(p => (
+                      <div
+                        key={p.id}
+                        style={{
+                          backgroundColor: '#FFFFFF',
+                          border: '1px solid #EAE6DF',
+                          borderRadius: '8px',
+                          overflow: 'hidden',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          boxShadow: '0 2px 6px rgba(0,0,0,0.03)'
+                        }}
+                      >
+                        <div style={{ position: 'relative', width: '100%', paddingTop: '85%', backgroundColor: '#F5F2EC', overflow: 'hidden' }}>
+                          <img
+                            src={p.image}
+                            alt={p.name}
+                            style={{
+                              position: 'absolute',
+                              top: 0,
+                              left: 0,
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'cover'
+                            }}
+                          />
+                          <div style={{ position: 'absolute', top: '10px', left: '10px', display: 'flex', gap: '6px' }}>
+                            <span style={{
+                              backgroundColor: 'rgba(36, 32, 29, 0.88)',
+                              color: '#FAF7F2',
+                              fontSize: '0.68rem',
+                              fontWeight: 700,
+                              padding: '3px 8px',
+                              borderRadius: '4px',
+                              textTransform: 'uppercase',
+                              letterSpacing: '0.04em'
+                            }}>
+                              {p.badge || 'Studio'}
+                            </span>
+                            <span style={{
+                              backgroundColor: (p.stock || 0) < 5 ? '#FFF1F0' : '#F6FFED',
+                              color: (p.stock || 0) < 5 ? '#CF1322' : '#389E0D',
+                              border: `1px solid ${(p.stock || 0) < 5 ? '#FFA39E' : '#B7EB8F'}`,
+                              fontSize: '0.68rem',
+                              fontWeight: 700,
+                              padding: '3px 8px',
+                              borderRadius: '4px'
+                            }}>
+                              Stok: {p.stock || 0} pcs
+                            </span>
+                          </div>
+                        </div>
+
+                        <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+                          <div style={{ fontSize: '0.72rem', color: '#8A857F', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>
+                            {p.category}
+                          </div>
+                          <h4 style={{ fontSize: '0.96rem', fontWeight: 700, color: '#24201D', margin: '0 0 0.3rem 0', lineHeight: 1.3 }}>
+                            {p.name}
+                          </h4>
+                          <p style={{ fontSize: '0.78rem', color: '#736B63', margin: '0 0 0.75rem 0', flexGrow: 1, lineHeight: 1.4 }}>
+                            {p.subtitle}
+                          </p>
+                          
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #F0ECE4', paddingTop: '0.75rem', marginBottom: '0.75rem' }}>
+                            <span style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--color-terracotta)' }}>
+                              Rp {p.price.toLocaleString('id-ID')}
+                            </span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                               <button
-                                onClick={() => {
-                                  if (confirm(`Hapus produk "${p.name}" dari katalog toko?`)) {
-                                    deleteProduct(p.id);
-                                  }
-                                }}
-                                style={{
-                                  display: 'inline-flex',
-                                  alignItems: 'center',
-                                  gap: '4px',
-                                  background: 'none',
-                                  border: 'none',
-                                  color: '#c0392b',
-                                  cursor: 'pointer',
-                                  fontSize: '0.82rem'
-                                }}
-                                title="Hapus produk"
+                                onClick={() => updateProductStock(p.id, -1)}
+                                style={{ width: '22px', height: '22px', borderRadius: '4px', border: '1px solid #D8D2C7', background: '#FAF8F5', cursor: 'pointer', fontWeight: 700 }}
+                                title="Kurangi stok 1 pcs"
                               >
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                  <polyline points="3 6 5 6 21 6"></polyline>
-                                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                </svg>
-                                Hapus
+                                -
                               </button>
+                              <span style={{ fontSize: '0.78rem', fontWeight: 700, minWidth: '24px', textAlign: 'center' }}>
+                                {p.stock || 0}
+                              </span>
+                              <button
+                                onClick={() => updateProductStock(p.id, 1)}
+                                style={{ width: '22px', height: '22px', borderRadius: '4px', border: '1px solid #D8D2C7', background: '#FAF8F5', cursor: 'pointer', fontWeight: 700 }}
+                                title="Tambah stok 1 pcs"
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
+
+                          <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <button
+                              onClick={() => handleOpenEditModal(p)}
+                              style={{
+                                flex: 1,
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '5px',
+                                backgroundColor: '#FAF8F5',
+                                border: '1px solid #D8D2C7',
+                                color: '#24201D',
+                                padding: '6px 10px',
+                                borderRadius: '5px',
+                                fontSize: '0.78rem',
+                                fontWeight: 600,
+                                cursor: 'pointer'
+                              }}
+                            >
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                              </svg>
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => {
+                                if (confirm(`Hapus karya "${p.name}" dari katalog toko?`)) {
+                                  deleteProduct(p.id);
+                                }
+                              }}
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                backgroundColor: '#FFF5F5',
+                                border: '1px solid #F5C6CB',
+                                color: '#c0392b',
+                                padding: '6px 10px',
+                                borderRadius: '5px',
+                                fontSize: '0.78rem',
+                                fontWeight: 600,
+                                cursor: 'pointer'
+                              }}
+                              title="Hapus produk"
+                            >
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              ) : (
+                /* TAMPILAN 2: TABEL INVENTARIS PRODUK */
+                <div className="admin-section-container">
+                  <div className="acquisitions-table-wrap">
+                    <table className="claye-patron-table">
+                      <thead>
+                        <tr>
+                          <th>PRODUK DAN EDISI GLASIR</th>
+                          <th>KATEGORI</th>
+                          <th>HARGA SATUAN</th>
+                          <th>STOK TERSEDIA</th>
+                          <th>STATUS BADGE</th>
+                          <th style={{ textAlign: 'right' }}>AKSI</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredProducts.length === 0 ? (
+                          <tr>
+                            <td colSpan="6" style={{ textAlign: 'center', padding: '3rem', color: '#8A857F' }}>
+                              Tidak ada produk keramik yang sesuai dengan filter.
                             </td>
                           </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
+                        ) : (
+                          filteredProducts.map(p => (
+                            <tr key={p.id}>
+                              <td className="cell-pieces">
+                                <div className="pieces-item-preview">
+                                  <img src={p.image} alt={p.name} style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '4px' }} />
+                                  <div>
+                                    <strong className="piece-title">{p.name}</strong>
+                                    <span className="piece-variant">{p.subtitle}</span>
+                                  </div>
+                                </div>
+                              </td>
+                              <td>{p.category}</td>
+                              <td><strong>Rp {p.price.toLocaleString('id-ID')}</strong></td>
+                              <td>
+                                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                                  <button
+                                    onClick={() => updateProductStock(p.id, -1)}
+                                    style={{
+                                      width: '24px',
+                                      height: '24px',
+                                      borderRadius: '4px',
+                                      border: '1px solid #EAE6DF',
+                                      backgroundColor: '#FAF8F5',
+                                      fontSize: '0.85rem',
+                                      fontWeight: 'bold',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center'
+                                    }}
+                                    title="Kurangi 1 pcs"
+                                  >
+                                    -
+                                  </button>
+                                  <span style={{ fontWeight: '700', minWidth: '40px', textAlign: 'center' }}>
+                                    {p.stock || 0} pcs
+                                  </span>
+                                  <button
+                                    onClick={() => updateProductStock(p.id, 1)}
+                                    style={{
+                                      width: '24px',
+                                      height: '24px',
+                                      borderRadius: '4px',
+                                      border: '1px solid #EAE6DF',
+                                      backgroundColor: '#FAF8F5',
+                                      fontSize: '0.85rem',
+                                      fontWeight: 'bold',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center'
+                                    }}
+                                    title="Tambah 1 pcs"
+                                  >
+                                    +
+                                  </button>
+                                </div>
+                              </td>
+                              <td>
+                                <span className={`status-pill ${(p.stock || 0) < 5 ? 'pill-pending' : 'pill-completed'}`}>
+                                  {p.badge || 'Studio'}
+                                </span>
+                              </td>
+                              <td style={{ textAlign: 'right' }}>
+                                <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px' }}>
+                                  <button
+                                    onClick={() => handleOpenEditModal(p)}
+                                    style={{
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: '5px',
+                                      backgroundColor: '#FFFFFF',
+                                      border: '1px solid #D8D2C7',
+                                      color: '#2C2825',
+                                      borderRadius: '5px',
+                                      padding: '5px 10px',
+                                      cursor: 'pointer',
+                                      fontSize: '0.8rem',
+                                      fontWeight: 600,
+                                      transition: 'all 0.2s'
+                                    }}
+                                    title={`Edit produk "${p.name}"`}
+                                  >
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                    </svg>
+                                    Edit
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      if (confirm(`Hapus produk "${p.name}" dari katalog toko?`)) {
+                                        deleteProduct(p.id);
+                                      }
+                                    }}
+                                    style={{
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: '5px',
+                                      backgroundColor: '#FFF5F5',
+                                      border: '1px solid #F5C6CB',
+                                      color: '#c0392b',
+                                      borderRadius: '5px',
+                                      padding: '5px 10px',
+                                      cursor: 'pointer',
+                                      fontSize: '0.8rem',
+                                      fontWeight: 600,
+                                      transition: 'all 0.2s'
+                                    }}
+                                    title="Hapus produk dari katalog"
+                                  >
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                      <polyline points="3 6 5 6 21 6"></polyline>
+                                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                    </svg>
+                                    Hapus
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           )}
 
-          {/* ===============================================================
-              HALAMAN 4: KILN & FORMULA GLASIR (KILN)
-              =============================================================== */}
-          {activePage === 'kiln' && (
-            <div className="admin-page-view">
-              {/* PENJELASAN KEGUNAAN HALAMAN */}
-              <div className="admin-purpose-card">
-                <div className="purpose-header">
-                  <div className="purpose-icon-pill">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path>
-                    </svg>
-                    <span>KEGUNAAN HALAMAN KILN DAN FORMULA GLASIR</span>
-                  </div>
-                  <span className="purpose-badge-tag">Tungku dan Laboratorium Keramik</span>
-                </div>
-                <h2 className="purpose-title" style={{ marginBottom: '0.25rem' }}>Pemantauan Siklus Firing Tungku dan Resep Glasir Mineral</h2>
-                <div className="purpose-quick-nav" style={{ marginTop: '0.85rem', paddingTop: '0.85rem' }}>
-                  <button onClick={() => showToast('Catatan log suhu kiln batch #14 berhasil disimpan.', 'success')} className="purpose-action-btn primary">
-                    catat suhu tungku
-                  </button>
-                  <button onClick={() => openConcierge('Buka kalkulator rasio silika-alumina untuk formula glasir Cone 10')} className="purpose-action-btn secondary">
-                    konsultasi resep
-                  </button>
-                </div>
-              </div>
 
-              {/* LIVE KILN CHAMBER STATUS */}
-              <div className="kiln-live-monitor-card" style={{
-                backgroundColor: '#24201D',
-                color: '#FAF8F5',
-                borderRadius: '8px',
-                padding: '2rem',
-                marginBottom: '2rem'
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
-                  <div>
-                    <span style={{ fontSize: '0.72rem', letterSpacing: '0.14em', color: '#B87355', fontWeight: '700', textTransform: 'uppercase' }}>
-                      MONITORING SUHU LIVE — TUNGKU KILN 01 BANDUNG
-                    </span>
-                    <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.9rem', marginTop: '0.3rem' }}>
-                      Siklus Pembakaran Reduksi Cone 10
-                    </h3>
-                  </div>
-                  <div style={{
-                    backgroundColor: 'rgba(184, 115, 85, 0.25)',
-                    border: '1px solid #B87355',
-                    padding: '8px 16px',
-                    borderRadius: '20px',
-                    color: '#FAF8F5',
-                    fontSize: '0.85rem',
-                    fontWeight: '600',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px'
-                  }}>
-                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#E74C3C', animation: 'pulse 1.5s infinite' }} />
-                    TAHAP PEMBAKARAN AKTIF: 1260°C
-                  </div>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '1.5rem' }}>
-                  <div style={{ backgroundColor: 'rgba(255,255,255,0.05)', padding: '1.25rem', borderRadius: '6px' }}>
-                    <span style={{ fontSize: '0.75rem', color: '#8A857F' }}>SUHU SAAT INI</span>
-                    <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#FAF8F5', marginTop: '0.2rem' }}>1260°C</div>
-                    <span style={{ fontSize: '0.75rem', color: '#27AE60' }}>Target vitrifikasi tercapai</span>
-                  </div>
-                  <div style={{ backgroundColor: 'rgba(255,255,255,0.05)', padding: '1.25rem', borderRadius: '6px' }}>
-                    <span style={{ fontSize: '0.75rem', color: '#8A857F' }}>DURASI PEMBAKARAN</span>
-                    <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#FAF8F5', marginTop: '0.2rem' }}>8 Jam 30 Mnt</div>
-                    <span style={{ fontSize: '0.75rem', color: '#8A857F' }}>Total siklus 14 jam penuh</span>
-                  </div>
-                  <div style={{ backgroundColor: 'rgba(255,255,255,0.05)', padding: '1.25rem', borderRadius: '6px' }}>
-                    <span style={{ fontSize: '0.75rem', color: '#8A857F' }}>ATMOSFER TUNGKU</span>
-                    <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#FAF8F5', marginTop: '0.2rem' }}>Reduksi Berat</div>
-                    <span style={{ fontSize: '0.75rem', color: '#B87355' }}>Karbon mengikat oksigen mineral</span>
-                  </div>
-                  <div style={{ backgroundColor: 'rgba(255,255,255,0.05)', padding: '1.25rem', borderRadius: '6px' }}>
-                    <span style={{ fontSize: '0.75rem', color: '#8A857F' }}>ESTIMASI PENDINGINAN</span>
-                    <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#FAF8F5', marginTop: '0.2rem' }}>~18 Jam</div>
-                    <span style={{ fontSize: '0.75rem', color: '#8A857F' }}>Siap bongkar besok pagi</span>
-                  </div>
-                </div>
-
-                {/* Progress bar firing */}
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#8A857F', marginBottom: '6px' }}>
-                    <span>Bisque 900°C</span>
-                    <span>Transisi Kuarsa 1050°C</span>
-                    <span style={{ color: '#B87355', fontWeight: 'bold' }}>Puncak 1260°C (Cone 10)</span>
-                    <span>Pendinginan 50°C</span>
-                  </div>
-                  <div style={{ height: '8px', backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: '4px', overflow: 'hidden' }}>
-                    <div style={{ width: '75%', height: '100%', backgroundColor: '#B87355', borderRadius: '4px' }} />
-                  </div>
-                </div>
-              </div>
-
-              {/* DAFTAR FORMULA GLASIR STUDIO */}
-              <div className="admin-section-container">
-                <div className="admin-section-top">
-                  <div>
-                    <h3 className="section-serif-heading">Katalog Formula dan Resep Glasir Studio</h3>
-                    <p className="section-subtext">Resep glasir mineral alam yang dikembangkan sendiri di lab studio CLAYÉ Bandung.</p>
-                  </div>
-                  <button onClick={() => showToast('Formulir racikan glasir baru siap dibuka.', 'info')} className="btn-admin-new-drop">
-                    Racik Glasir Baru
-                  </button>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem', marginTop: '1.25rem' }}>
-                  {glazeRecipes.map(recipe => (
-                    <div key={recipe.code} style={{
-                      backgroundColor: '#FFFFFF',
-                      border: '1px solid var(--color-border)',
-                      borderRadius: '6px',
-                      padding: '1.5rem',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'space-between'
-                    }}>
-                      <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                          <span style={{ fontSize: '0.7rem', fontWeight: '700', color: '#B87355', letterSpacing: '0.08em' }}>{recipe.code}</span>
-                          <span className="status-pill pill-completed" style={{ fontSize: '0.65rem' }}>Food-Safe</span>
-                        </div>
-                        <h4 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.25rem', marginBottom: '0.35rem' }}>{recipe.name}</h4>
-                        <div style={{ fontSize: '0.8rem', color: '#6E6962', marginBottom: '0.8rem', fontStyle: 'italic' }}>{recipe.finish}</div>
-                        <p style={{ fontSize: '0.85rem', color: '#4A4643', lineHeight: '1.5', marginBottom: '1rem' }}>{recipe.description}</p>
-                      </div>
-
-                      <div style={{ borderTop: '1px solid #EAE6DF', paddingTop: '0.8rem', fontSize: '0.78rem', color: '#8A857F' }}>
-                        <div><strong>Suhu Bakar:</strong> {recipe.cone}</div>
-                        <div><strong>Ketersediaan:</strong> {recipe.stockStatus}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* ===============================================================
               HALAMAN 5: KOLEKTOR & PELANGGAN (CUSTOMERS)
@@ -1443,13 +1649,13 @@ export default function AdminPage() {
                   </div>
                   <span className="purpose-badge-tag">Laporan dan Efisiensi Studio</span>
                 </div>
-                <h2 className="purpose-title" style={{ marginBottom: '0.25rem' }}>Analisis Metrik Penjualan, Efisiensi Firing dan Ekspor Laporan</h2>
+                <h2 className="purpose-title" style={{ marginBottom: '0.25rem' }}>Analisis Metrik Penjualan, Tren Produk dan Ekspor Laporan</h2>
                 <div className="purpose-quick-nav" style={{ marginTop: '0.85rem', paddingTop: '0.85rem' }}>
                   <button onClick={() => showToast('Laporan Keuangan Bulanan (.CSV) berhasil diunduh.', 'success')} className="purpose-action-btn primary">
                     unduh laporan keuangan
                   </button>
-                  <button onClick={() => showToast('Log Efisiensi Tungku Kiln (.CSV) berhasil diunduh.', 'info')} className="purpose-action-btn secondary">
-                    unduh log kiln
+                  <button onClick={() => showToast('Data Penjualan Produk (.CSV) berhasil diunduh.', 'info')} className="purpose-action-btn secondary">
+                    unduh data produk
                   </button>
                 </div>
               </div>
@@ -1457,9 +1663,9 @@ export default function AdminPage() {
               {/* 4 INDIKATOR EFISIENSI */}
               <div className="admin-metrics-row">
                 <div className="admin-metric-card">
-                  <span className="metric-title">RASIO KEBERHASILAN KILN (YIELD)</span>
-                  <div className="metric-primary-val">94.8%</div>
-                  <div className="metric-trend-positive">Hanya 5.2% retak alami dan didaur ulang</div>
+                  <span className="metric-title">KEPUASAN PELANGGAN (CSAT)</span>
+                  <div className="metric-primary-val">98.6%</div>
+                  <div className="metric-trend-positive">Berdasarkan ulasan pembeli terverifikasi</div>
                 </div>
                 <div className="admin-metric-card">
                   <span className="metric-title">RATA-RATA NILAI PESANAN (AOV)</span>
@@ -1754,10 +1960,10 @@ export default function AdminPage() {
               </div>
 
               <div className="form-group-claye">
-                <label>Deskripsi Pembuatan dan Catatan Kiln</label>
+                <label>Deskripsi Produk dan Bahan</label>
                 <textarea
                   rows="3"
-                  placeholder="Dibentuk di atas roda putar menggunakan tanah liat alami Sukabumi, dibakar pada suhu 1260°C..."
+                  placeholder="Dibentuk di atas roda putar menggunakan tanah liat alami stoneware, glasir food-safe ramah lingkungan..."
                   value={newProdDesc}
                   onChange={(e) => setNewProdDesc(e.target.value)}
                   style={{ width: '100%', padding: '0.65rem 0.9rem', borderRadius: '6px', border: '1px solid #EAE6DF' }}
@@ -1769,6 +1975,127 @@ export default function AdminPage() {
                   Publikasikan ke Katalog Toko
                 </button>
                 <button type="button" onClick={() => setIsAddModalOpen(false)} className="btn-modal-cancel">
+                  Batal
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ===================================================================
+          MODAL: EDIT KARYA KERAMIK (UNTUK INVENTARIS & KATALOG)
+          =================================================================== */}
+      {isEditModalOpen && editingProduct && (
+        <div className="claye-modal-overlay" onClick={() => setIsEditModalOpen(false)}>
+          <div className="claye-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <div>
+                <span className="modal-subtitle">PERBARUI DATA PRODUK KATALOG</span>
+                <h3 className="modal-title">✏️ Edit Karya Keramik</h3>
+              </div>
+              <button onClick={() => setIsEditModalOpen(false)} className="modal-close-btn" aria-label="Tutup">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+
+            <form onSubmit={handleEditProductSubmit} className="modal-body">
+              <div className="form-group-claye">
+                <label>Nama Karya / Produk Keramik *</label>
+                <input
+                  type="text"
+                  placeholder="contoh: Kyoto Pourer Vessel"
+                  value={editProdName}
+                  onChange={(e) => setEditProdName(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="form-group-claye">
+                <label>Keterangan Warna dan Tekstur Glasir *</label>
+                <input
+                  type="text"
+                  placeholder="contoh: Stoneware pasir alami dengan glasir abu kayu sage"
+                  value={editProdSubtitle}
+                  onChange={(e) => setEditProdSubtitle(e.target.value)}
+                />
+              </div>
+
+              <div className="checkout-form-row">
+                <div className="form-group-claye">
+                  <label>Kategori Produk</label>
+                  <select
+                    value={editProdCategory}
+                    onChange={(e) => setEditProdCategory(e.target.value)}
+                    style={{ width: '100%', padding: '0.65rem 0.9rem', borderRadius: '6px', border: '1px solid #EAE6DF' }}
+                  >
+                    <option value="Cangkir & Mug">Cangkir dan Mug</option>
+                    <option value="Mangkuk">Mangkuk</option>
+                    <option value="Peralatan Makan">Peralatan Makan</option>
+                    <option value="Vas">Vas</option>
+                    <option value="Kopi & Teh">Kopi dan Teh</option>
+                    <option value="Edisi Terbatas">Edisi Terbatas</option>
+                  </select>
+                </div>
+
+                <div className="form-group-claye">
+                  <label>Harga dalam Rupiah (Rp) *</label>
+                  <input
+                    type="number"
+                    placeholder="185000"
+                    value={editProdPrice}
+                    onChange={(e) => setEditProdPrice(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="checkout-form-row">
+                <div className="form-group-claye">
+                  <label>Stok Fisik di Studio (pcs)</label>
+                  <input
+                    type="number"
+                    placeholder="12"
+                    value={editProdStock}
+                    onChange={(e) => setEditProdStock(e.target.value)}
+                    min="0"
+                  />
+                </div>
+
+                <div className="form-group-claye">
+                  <label>Badge / Label Status</label>
+                  <select
+                    value={editProdBadge}
+                    onChange={(e) => setEditProdBadge(e.target.value)}
+                    style={{ width: '100%', padding: '0.65rem 0.9rem', borderRadius: '6px', border: '1px solid #EAE6DF' }}
+                  >
+                    <option value="Studio">Studio</option>
+                    <option value="terlaris">Terlaris</option>
+                    <option value="baru">Baru</option>
+                    <option value="edisi terbatas">Edisi Terbatas</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="form-group-claye">
+                <label>Deskripsi Produk dan Bahan</label>
+                <textarea
+                  rows="3"
+                  placeholder="Dibentuk di atas roda putar menggunakan tanah liat alami stoneware, glasir food-safe..."
+                  value={editProdDesc}
+                  onChange={(e) => setEditProdDesc(e.target.value)}
+                  style={{ width: '100%', padding: '0.65rem 0.9rem', borderRadius: '6px', border: '1px solid #EAE6DF' }}
+                />
+              </div>
+
+              <div className="modal-footer">
+                <button type="submit" className="btn-modal-action">
+                  Simpan Perubahan
+                </button>
+                <button type="button" onClick={() => setIsEditModalOpen(false)} className="btn-modal-cancel">
                   Batal
                 </button>
               </div>

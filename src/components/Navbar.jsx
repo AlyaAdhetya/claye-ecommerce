@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useShop } from '../context/ShopContext';
 
 export default function Navbar() {
-  const { cartCount, user, logout, currentRoute, navigate, openConcierge } = useShop();
+  const { cartCount, user, logout, currentRoute, navigate, openConcierge, openAdminStorefront } = useShop();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -58,7 +58,7 @@ export default function Navbar() {
 
           <div className="admin-topbar-right">
             <button
-              onClick={() => openConcierge('Notifikasi pesanan baru dan pembaruan pembakaran kiln')}
+              onClick={() => openConcierge('Notifikasi pesanan baru dan pembaruan inventaris')}
               className="admin-notification-bell"
               title="Notifikasi"
               aria-label="Notifikasi"
@@ -69,27 +69,63 @@ export default function Navbar() {
               </svg>
             </button>
 
-            <div className="admin-user-profile" title="Profil Admin">
+            {/* TOMBOL LIHAT TOKO KHUSUS ADMIN */}
+            <button
+              onClick={openAdminStorefront}
+              className="admin-view-store-btn"
+              title="Lihat Tampilan Toko / Etalase Katalog Produk"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.45rem',
+                backgroundColor: 'var(--color-terracotta)',
+                color: '#FFFFFF',
+                border: 'none',
+                padding: '6px 14px',
+                borderRadius: '6px',
+                fontSize: '0.78rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                letterSpacing: '0.02em',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.08)'
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              <span>Lihat Toko</span>
+            </button>
+
+            <button
+              onClick={() => handleNav('/dashboard')}
+              className="admin-user-profile"
+              title="Buka Halaman Akun Admin / Akun Saya"
+              style={{
+                background: 'none',
+                border: 'none',
+                padding: '4px 8px',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                textAlign: 'left',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.6rem'
+              }}
+            >
               <div className="admin-user-avatar">{user ? user.name.charAt(0).toUpperCase() : 'A'}</div>
               <div className="admin-user-details">
                 <span className="admin-user-name">{user ? user.name : 'Admin'}</span>
+                <span className="admin-user-role" style={{ fontSize: '0.68rem', color: '#8C8680', display: 'block' }}>Akun Admin</span>
               </div>
-            </div>
-
-            <button
-              onClick={() => handleNav('/')}
-              className="admin-storefront-switch"
-              title="Lihat Pratinjau Toko Pelanggan"
-            >
-              Lihat Toko
             </button>
 
             <button
               onClick={logout}
               style={{
                 background: 'none',
-                border: '1px solid rgba(255,255,255,0.2)',
-                color: '#FAF7F2',
+                border: '1px solid #D8D2C7',
+                color: '#555',
                 padding: '6px 12px',
                 borderRadius: '4px',
                 fontSize: '0.75rem',
@@ -106,6 +142,8 @@ export default function Navbar() {
     );
   }
 
+  const isAdminUser = user && user.role === 'admin';
+
   return (
     <>
       <header className={`claye-navbar ${scrolled ? 'is-scrolled' : ''}`}>
@@ -117,32 +155,44 @@ export default function Navbar() {
             </button>
           </div>
 
-          {/* MENU NAVIGASI BAHASA INDONESIA */}
+          {/* MENU NAVIGASI: KHUSUS PELANGGAN ATAU KHUSUS ADMIN */}
           <nav className="claye-navbar-links">
-            <button
-              onClick={() => handleNav('/')}
-              className={`nav-text-link ${currentRoute === '/' || currentRoute === '' ? 'active' : ''}`}
-            >
-              BERANDA
-            </button>
-            <button
-              onClick={() => handleNav('/katalog')}
-              className={`nav-text-link ${currentRoute === '/katalog' ? 'active' : ''}`}
-            >
-              KATALOG
-            </button>
-            <button
-              onClick={() => handleNav('/tentang')}
-              className={`nav-text-link ${currentRoute === '/tentang' ? 'active' : ''}`}
-            >
-              TENTANG KAMI
-            </button>
-            <button
-              onClick={() => handleNav(user ? '/dashboard' : '/login')}
-              className={`nav-text-link ${currentRoute === '/dashboard' || currentRoute === '/login' ? 'active' : ''}`}
-            >
-              AKUN SAYA
-            </button>
+            {isAdminUser ? (
+              <button
+                onClick={openAdminStorefront}
+                className="nav-text-link active"
+                style={{ fontWeight: 700, letterSpacing: '0.06em' }}
+              >
+                KELOLA INVENTARIS & KATALOG
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={() => handleNav('/')}
+                  className={`nav-text-link ${currentRoute === '/' || currentRoute === '' ? 'active' : ''}`}
+                >
+                  BERANDA
+                </button>
+                <button
+                  onClick={() => handleNav('/katalog')}
+                  className={`nav-text-link ${currentRoute === '/katalog' ? 'active' : ''}`}
+                >
+                  KATALOG
+                </button>
+                <button
+                  onClick={() => handleNav('/tentang')}
+                  className={`nav-text-link ${currentRoute === '/tentang' ? 'active' : ''}`}
+                >
+                  TENTANG KAMI
+                </button>
+                <button
+                  onClick={() => handleNav(user ? '/dashboard' : '/login')}
+                  className={`nav-text-link ${currentRoute === '/dashboard' || currentRoute === '/login' ? 'active' : ''}`}
+                >
+                  AKUN SAYA
+                </button>
+              </>
+            )}
           </nav>
 
           {/* AKSI KANAN (CLEAN SVG ICONS TANPA EMOJI) */}
@@ -160,25 +210,38 @@ export default function Navbar() {
               </svg>
             </button>
 
-            {/* KERANJANG BELANJA */}
-            <button
-              onClick={() => handleNav('/keranjang')}
-              className="nav-action-icon-btn bag-btn"
-              title="Keranjang Belanja"
-              aria-label="Keranjang Belanja"
-            >
-              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-                <line x1="3" y1="6" x2="21" y2="6"></line>
-                <path d="M16 10a4 4 0 0 1-8 0"></path>
-              </svg>
-              {cartCount > 0 && (
-                <span className="bag-count-badge">{cartCount}</span>
-              )}
-            </button>
+            {/* KERANJANG BELANJA - KHUSUS PELANGGAN (DISEMBUNYIKAN UNTUK ADMIN) */}
+            {!isAdminUser && (
+              <button
+                onClick={() => handleNav('/keranjang')}
+                className="nav-action-icon-btn bag-btn"
+                title="Keranjang Belanja"
+                aria-label="Keranjang Belanja"
+              >
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                  <line x1="3" y1="6" x2="21" y2="6"></line>
+                  <path d="M16 10a4 4 0 0 1-8 0"></path>
+                </svg>
+                {cartCount > 0 && (
+                  <span className="bag-count-badge">{cartCount}</span>
+                )}
+              </button>
+            )}
 
-            {/* AKUN / PROFIL PENGGUNA */}
-            {user ? (
+            {/* SATU TOMBOL KEMBALI KE DASHBOARD KHUSUS ADMIN / AKUN PELANGGAN */}
+            {isAdminUser ? (
+              <button
+                onClick={() => handleNav('/admin')}
+                className="nav-single-back-admin-btn"
+                title="Kembali ke Dashboard Admin"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+                <span>Kembali ke Dashboard</span>
+              </button>
+            ) : user ? (
               <button
                 onClick={() => handleNav('/dashboard')}
                 className="nav-avatar-btn"

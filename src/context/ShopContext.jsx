@@ -168,6 +168,8 @@ export function ShopProvider({ children }) {
     return window.location.hash.replace('#', '') || '/';
   });
   const [selectedProductId, setSelectedProductId] = useState(1);
+  const [adminActivePage, setAdminActivePage] = useState('overview');
+  const [adminInventoryView, setAdminInventoryView] = useState('storefront'); // 'storefront' | 'table'
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -412,6 +414,16 @@ export function ShopProvider({ children }) {
     showToast('Stok karya keramik berhasil disesuaikan.', 'success');
   };
 
+  const updateProduct = (id, updatedFields) => {
+    setProducts(prev => prev.map(p => {
+      if (p.id === id) {
+        return { ...p, ...updatedFields };
+      }
+      return p;
+    }));
+    showToast(`Data karya "${updatedFields.name || 'keramik'}" berhasil diperbarui.`, 'success');
+  };
+
   const viewProduct = (id) => {
     setSelectedProductId(id);
     navigate(`/detail/${id}`);
@@ -420,6 +432,12 @@ export function ShopProvider({ children }) {
   const openConcierge = (prompt = '') => {
     setChatInitialPrompt(prompt);
     setIsChatOpen(true);
+  };
+
+  const openAdminStorefront = () => {
+    setAdminActivePage('inventory');
+    setAdminInventoryView('storefront');
+    navigate('/admin');
   };
 
   return (
@@ -453,9 +471,15 @@ export function ShopProvider({ children }) {
       updateProfile,
       createOrder,
       addProduct,
+      updateProduct,
       deleteProduct,
       updateProductStock,
-      viewProduct
+      viewProduct,
+      adminActivePage,
+      setAdminActivePage,
+      adminInventoryView,
+      setAdminInventoryView,
+      openAdminStorefront
     }}>
       {children}
     </ShopContext.Provider>
