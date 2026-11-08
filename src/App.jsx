@@ -15,12 +15,22 @@ import DashboardPage from './pages/DashboardPage';
 import AdminPage from './pages/AdminPage';
 import AboutPage from './pages/AboutPage';
 
-
 export default function App() {
   const { currentRoute, user } = useShop();
 
-  const renderCurrentPage = () => {
+  // Jika belum login, pisahkan tampilan dari halaman lainnya dan tampilkan hanya halaman login
+  if (!user || currentRoute === '/login' || currentRoute === '/register' || currentRoute === '/admin/login') {
+    return (
+      <div className="app-layout auth-isolated-layout" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#FDFBF7' }}>
+        <main style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <LoginPage />
+        </main>
+        <Toast />
+      </div>
+    );
+  }
 
+  const renderCurrentPage = () => {
     if (currentRoute === '' || currentRoute === '/') {
       return <HomePage />;
     }
@@ -38,9 +48,6 @@ export default function App() {
     }
     if (currentRoute === '/checkout') {
       return <CheckoutPage />;
-    }
-    if (currentRoute === '/login' || currentRoute === '/register' || currentRoute === '/admin/login') {
-      return <LoginPage />;
     }
     if (currentRoute === '/dashboard' || currentRoute === '/account' || currentRoute === '/admin/akun' || currentRoute === '/admin/profile') {
       return <DashboardPage />;

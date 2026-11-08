@@ -35,14 +35,14 @@ export default function CartPage() {
             </div>
             <h2 className="empty-cart-title">Keranjang Belanja Anda Masih Kosong</h2>
             <p className="empty-cart-desc">
-              Anda belum memilih karya keramik buatan tangan. Temukan cangkir, mangkuk, atau vas cantik untuk melengkapi ruang tinggal Anda.
+              Anda belum memilih produk keramik pilihan. Temukan cangkir, mangkuk, atau vas cantik hasil kurasi untuk melengkapi ruang tinggal Anda.
             </p>
             <button
               onClick={() => navigate('/katalog')}
               className="claye-terracotta-btn"
               style={{ marginTop: '1.5rem' }}
             >
-              JELAJAHI KOLEKSI STUDIO →
+              JELAJAHI KOLEKSI KURASI →
             </button>
           </div>
         </div>
@@ -64,7 +64,7 @@ export default function CartPage() {
         <div className="cart-page-header">
           <div>
             <div className="studio-edition-badge">
-              <span className="badge-dot">•</span> KARYA SIAP DIKEMAS
+              <span className="badge-dot">•</span> PRODUK SIAP DIKEMAS
             </div>
             <h1 className="cart-main-title">Keranjang Belanja</h1>
           </div>
@@ -150,7 +150,7 @@ export default function CartPage() {
 
             <div className="cart-packaging-assurance">
               <div>
-                <strong>Gratis Kemasan Protektif Studio Termasuk</strong>
+                <strong>Gratis Kemasan Protektif CLAYÉ Termasuk</strong>
                 <p>Bantalan pulp daur ulang dan pelindung sarang lebah menjamin keramik Anda tiba tanpa risiko pecah.</p>
               </div>
             </div>
@@ -197,7 +197,7 @@ export default function CartPage() {
 
                 {discountAmount > 0 && (
                   <div className="cost-row" style={{ color: '#2B613B' }}>
-                    <span>Diskon Kupon Studio</span>
+                    <span>Diskon Kupon CLAYÉ</span>
                     <strong>-Rp {discountAmount.toLocaleString('id-ID')}</strong>
                   </div>
                 )}
@@ -208,7 +208,7 @@ export default function CartPage() {
                 </div>
 
                 <div className="cost-row">
-                  <span>Kemasan Protektif Studio</span>
+                  <span>Kemasan Protektif CLAYÉ</span>
                   <strong className="free-tag">Gratis</strong>
                 </div>
 
@@ -242,12 +242,12 @@ export default function CartPage() {
             </div>
 
             <div className="checkout-concierge-callout" style={{ marginTop: '1.5rem' }}>
-              Punya pertanyaan seputar warna glasir atau pesanan khusus?<br />
+              Punya pertanyaan seputar kurasi warna glasir atau pesanan khusus?<br />
               <button
-                onClick={() => openConcierge('Halo asisten studio, saya butuh bantuan konsultasi isi keranjang')}
+                onClick={() => openConcierge('Halo asisten CLAYÉ, saya butuh bantuan konsultasi isi keranjang')}
                 className="concierge-link-action"
               >
-                Hubungi tim asisten studio kami
+                Hubungi tim asisten kurasi kami
               </button>
             </div>
           </div>

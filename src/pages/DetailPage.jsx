@@ -40,9 +40,9 @@ export default function DetailPage() {
         {user && user.role === 'admin' && (
           <div className="detail-owner-admin-banner">
             <div className="owner-banner-left">
-              <span className="owner-crown-tag">👑 KARYA TOKO ANDA</span>
+              <span className="owner-crown-tag">👑 PRODUK KATALOG TOKO</span>
               <strong>{product.name}</strong>
-              <span className="stock-info-pill">Stok di Studio: {product.stock !== undefined ? product.stock : 10} unit</span>
+              <span className="stock-info-pill">Stok di Gudang: {product.stock !== undefined ? product.stock : 10} unit</span>
             </div>
             <div className="owner-banner-right">
               <button onClick={() => navigate('/katalog')} className="btn-return-store">
@@ -68,7 +68,7 @@ export default function DetailPage() {
           </div>
 
           <div className="studio-batch-header-badge">
-            <span className="batch-dot">•</span> {product.batchInfo || 'BATCH STUDIO NO. 14 / 40 BUATAN TANGAN'}
+            <span className="batch-dot">•</span> {product.batchInfo || 'BATCH KURASI PILIHAN'}
           </div>
         </div>
 
@@ -106,12 +106,12 @@ export default function DetailPage() {
               ))}
             </div>
 
-            {/* CALLOUT KEASLIAN BUATAN TANGAN */}
+            {/* CALLOUT KEASLIAN PRODUK KURASI */}
             <div className="hand-formed-callout">
               <span className="craft-indicator-bullet">•</span>
               <div className="craft-text">
-                <strong>Karakter Buatan Tangan Unik</strong>
-                <p>Setiap {product.name} memiliki sedikit perbedaan alami pada lengkungan, berat, dan bintik mineral glasir.</p>
+                <strong>Karakter Karya Pengrajin Asli</strong>
+                <p>Setiap {product.name} dikurasi langsung dari mitra pengrajin tembikar. Variasi alami pada lengkungan dan bintik mineral adalah bukti otentik karya tembikar buatan tangan.</p>
               </div>
             </div>
           </div>
@@ -119,7 +119,7 @@ export default function DetailPage() {
           {/* KOLOM KANAN: PANEL PEMBELIAN */}
           <div className="detail-info-column">
             <div className="origin-edition-pill">
-              {product.editionInfo || 'STUDIO BALI • EDISI NO. 14'}
+              {product.editionInfo || 'KURASI ARTISAN TERPILIH'}
             </div>
 
             <h1 className="product-editorial-title">{product.name}</h1>
@@ -177,7 +177,7 @@ export default function DetailPage() {
                 />
               </div>
               <p className="pers-footnote">
-                Dicetak manual pada tanah liat basah sebelum pembakaran pertama (bisque firing).
+                Dikerjakan langsung oleh mitra pengrajin tembikar sebelum finishing akhir.
               </p>
             </div>
 
@@ -226,18 +226,18 @@ export default function DetailPage() {
               </button>
             </div>
 
-            {/* 3 FITUR PRODUK (CLEAN TANPA EMOJI) */}
+            {/* 3 FITUR PRODUK */}
             <div className="detail-features-badges-row">
               <div className="feat-badge-item">
                 <div className="feat-texts">
-                  <strong>RODA PUTAR MANUAL</strong>
+                  <strong>KURASI ARTISAN TERPILIH</strong>
                   <span>Stoneware padat tahan panas</span>
                 </div>
               </div>
               <div className="feat-badge-item">
                 <div className="feat-texts">
                   <strong>AMAN MESIN CUCI PIRING</strong>
-                  <span>Standar food grade & microwave</span>
+                  <span>Standar food-grade & microwave</span>
                 </div>
               </div>
               <div className="feat-badge-item">
@@ -285,15 +285,15 @@ export default function DetailPage() {
                     </div>
                     <div className="spec-row">
                       <span className="spec-label">Teknik</span>
-                      <span className="spec-val">{product.specs?.technique || 'Roda Putar Tradisional'}</span>
+                      <span className="spec-val">{product.specs?.technique || 'Roda Putar Tradisional Mitra'}</span>
                     </div>
                     <div className="spec-row">
                       <span className="spec-label">Kapasitas Cairan</span>
                       <span className="spec-val">{product.specs?.liquidCapacity || '320 ml'}</span>
                     </div>
                     <div className="spec-row">
-                      <span className="spec-label">Asal Studio</span>
-                      <span className="spec-val">{product.specs?.origin || 'Bali, Indonesia'}</span>
+                      <span className="spec-label">Asal Pengrajin</span>
+                      <span className="spec-val">{product.specs?.origin || 'Mitra Pengrajin Bali, Indonesia'}</span>
                     </div>
                   </div>
                   <p className="spec-footer-note">
@@ -317,8 +317,8 @@ export default function DetailPage() {
                 <div className="accordion-content">
                   <p>{product.materialsCare}</p>
                   <ul className="care-bullet-points">
-                    <li>• Aman digunakan untuk penghangatan microwave harian dan siklus dishwasher rumah tangga.</li>
-                    <li>• Untuk dasar cangkir yang unglazed, cuci dengan spons lembut dan keringkan secara merata.</li>
+                    <li>• Aman digunakan untuk microwave harian dan siklus dishwasher rumah tangga.</li>
+                    <li>• Untuk dasar keramik yang unglazed, cuci dengan spons lembut dan keringkan secara merata.</li>
                     <li>• Dibakar pada suhu tinggi 1240°C menghasilkan ketahanan jangka panjang yang kokoh.</li>
                   </ul>
                 </div>
@@ -338,7 +338,7 @@ export default function DetailPage() {
               {activeAccordion === 'shipping' && (
                 <div className="accordion-content">
                   <p>{product.shippingInfo}</p>
-                  <p>Semua pesanan dikirim langsung dari studio Bandung dalam waktu 24 jam kerja dengan garansi 100% ganti baru jika mengalami kerusakan selama pengiriman.</p>
+                  <p>Semua pesanan dikemas dengan proteksi ekstra dari gudang pusat CLAYÉ dalam waktu 24 jam kerja dengan garansi 100% ganti baru jika mengalami kerusakan selama pengiriman.</p>
                 </div>
               )}
             </div>
@@ -350,10 +350,10 @@ export default function DetailPage() {
           <div className="pairings-section-header">
             <div>
               <span className="pairings-small-tag">REKOMENDASI KOMBINASI</span>
-              <h2 className="pairings-title">Lengkapi Ritual Pagi Anda</h2>
+              <h2 className="pairings-title">Lengkapi Ritual Harian Anda</h2>
             </div>
             <button onClick={() => navigate('/katalog')} className="view-all-objects-link">
-              LIHAT SEMUA KARYA →
+              LIHAT SEMUA PRODUK →
             </button>
           </div>
 
@@ -386,12 +386,12 @@ export default function DetailPage() {
           </div>
         </section>
 
-        {/* BANNER KOMITMEN */}
+        {/* BANNER KOMITMEN KURASI */}
         <div className="detail-bottom-promise">
-          <span className="detail-promise-label">KOMITMEN CLAYÉ</span>
-          <h2 className="detail-promise-title">Dibentuk Sepenuhnya oleh Tangan Manusia</h2>
+          <span className="detail-promise-label">KOMITMEN KURASI CLAYÉ</span>
+          <h2 className="detail-promise-title">Dikurasi Teliti dari Studio Pengrajin Berbakat</h2>
           <p className="detail-promise-body">
-            Kami menghindari proses produksi massal terburu-buru. Tidak ada dua Sunday Mug yang persis sama; bobot dalam jemari dan lengkungan bibir cangkir adalah pengingat tenang bahwa waktu, kesabaran, dan ketulusan menyatu di setiap karya Anda.
+            Kami memilih untuk tidak memproduksi sendiri secara massal. Sebaliknya, kami mencari, menyeleksi, dan bermitra langsung dengan pengrajin serta studio tembikar independen terbaik untuk menghadirkan karya keramik berkarakter otentik dan bermutu tinggi ke rumah Anda.
           </p>
         </div>
       </div>

@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { INITIAL_PRODUCTS } from '../data/products';
+import { supabaseService } from '../services/supabaseService';
+import { isSupabaseConfigured } from '../lib/supabaseClient';
 
 const ShopContext = createContext();
 
@@ -11,10 +13,10 @@ export const DEMO_USERS = {
     fullName: 'Arumi',
     email: 'arumi@example.com',
     phone: '+62 812-3456-7890',
-    address: 'Jl. Bukit Dago Utara No. 18, Coblong',
-    city: 'Bandung',
-    province: 'Jawa Barat',
-    postalCode: '40135',
+    address: 'Jl. Sejuta Kenangan No. 12',
+    city: 'Palembang',
+    province: 'Sumatera Selatan',
+    postalCode: '30138',
     country: 'Indonesia',
     patronSince: '2024',
     cohort: 'Pelanggan Tetap'
@@ -23,20 +25,20 @@ export const DEMO_USERS = {
     role: 'admin',
     roleName: 'Admin',
     name: 'Admin',
-    fullName: 'Admin',
+    fullName: 'Admin CLAYÉ',
     email: 'admin@claye.id',
     phone: '+62 811-2233-4455',
-    address: 'Studio CLAYÉ, Jl. Rancabentang No. 29, Ciumbuleuit',
-    city: 'Bandung',
-    province: 'Jawa Barat',
-    postalCode: '40142',
+    address: 'Jl. Sejuta Kenangan, Palembang, Sumatera Selatan',
+    city: 'Palembang',
+    province: 'Sumatera Selatan',
+    postalCode: '30138',
     country: 'Indonesia',
     patronSince: '2021',
     cohort: 'Admin CLAYÉ'
   }
 };
 
-const INITIAL_USER = DEMO_USERS.customer;
+const INITIAL_USER = null;
 
 const INITIAL_CART = [
   {
@@ -72,7 +74,7 @@ const INITIAL_ORDERS = [
     paymentStatus: 'LUNAS',
     paymentMethod: 'Transfer Bank (BCA)',
     courier: 'Pengiriman Reguler (Eco Shield)',
-    trackingNumber: 'CLY-EXP-89021-BDG',
+    trackingNumber: 'CLY-EXP-89021-PLM',
     image: '/assets/images/product_mug.jpg'
   },
   {
@@ -90,7 +92,7 @@ const INITIAL_ORDERS = [
     paymentStatus: 'LUNAS',
     paymentMethod: 'E-Wallet Instan (QRIS)',
     courier: 'Pengiriman Reguler (Eco Shield)',
-    trackingNumber: 'CLY-EXP-87944-BDG',
+    trackingNumber: 'CLY-EXP-87944-PLM',
     image: '/assets/images/product_plate.jpg'
   },
   {
@@ -108,7 +110,7 @@ const INITIAL_ORDERS = [
     paymentStatus: 'LUNAS',
     paymentMethod: 'Virtual Account (BCA)',
     courier: 'Pengiriman Reguler (Eco Shield)',
-    trackingNumber: 'CLY-EXP-86104-BDG',
+    trackingNumber: 'CLY-EXP-86104-PLM',
     image: '/assets/images/product_mug.jpg'
   }
 ];
@@ -116,8 +118,14 @@ const INITIAL_ORDERS = [
 export function ShopProvider({ children }) {
   const [products, setProducts] = useState(() => {
     try {
-      const saved = localStorage.getItem('claye_products_id_v1');
-      return saved ? JSON.parse(saved) : INITIAL_PRODUCTS;
+      const saved = localStorage.getItem('claye_products_id_v5');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        const existingIds = new Set(parsed.map(p => p.id));
+        const missingProducts = INITIAL_PRODUCTS.filter(p => !existingIds.has(p.id));
+        return [...parsed, ...missingProducts];
+      }
+      return INITIAL_PRODUCTS;
     } catch {
       return INITIAL_PRODUCTS;
     }
@@ -125,7 +133,7 @@ export function ShopProvider({ children }) {
 
   const [cart, setCart] = useState(() => {
     try {
-      const saved = localStorage.getItem('claye_cart_id_v1');
+      const saved = localStorage.getItem('claye_cart_id_v4');
       return saved ? JSON.parse(saved) : INITIAL_CART;
     } catch {
       return INITIAL_CART;
@@ -134,7 +142,7 @@ export function ShopProvider({ children }) {
 
   const [user, setUser] = useState(() => {
     try {
-      const saved = localStorage.getItem('claye_user_id_v1');
+      const saved = localStorage.getItem('claye_user_id_v3');
       return saved ? JSON.parse(saved) : INITIAL_USER;
     } catch {
       return INITIAL_USER;
@@ -143,7 +151,7 @@ export function ShopProvider({ children }) {
 
   const [orders, setOrders] = useState(() => {
     try {
-      const saved = localStorage.getItem('claye_orders_id_v1');
+      const saved = localStorage.getItem('claye_orders_id_v3');
       return saved ? JSON.parse(saved) : INITIAL_ORDERS;
     } catch {
       return INITIAL_ORDERS;
@@ -152,7 +160,7 @@ export function ShopProvider({ children }) {
 
   const [wishlist, setWishlist] = useState(() => {
     try {
-      const saved = localStorage.getItem('claye_wishlist_id_v1');
+      const saved = localStorage.getItem('claye_wishlist_id_v3');
       return saved ? JSON.parse(saved) : [2, 3];
     } catch {
       return [2, 3];
@@ -164,16 +172,30 @@ export function ShopProvider({ children }) {
   const [isCartDrawerOpen, setIsCartDrawerOpen] = useState(false);
   const [toasts, setToasts] = useState([]);
 
+  // Jika belum login, rute awal wajib /login
   const [currentRoute, setCurrentRoute] = useState(() => {
+    const savedUser = localStorage.getItem('claye_user_id_v3');
+    if (!savedUser) {
+      if (window.location.hash !== '#/login' && window.location.hash !== '#/register') {
+        window.location.hash = '/login';
+      }
+      return '/login';
+    }
     return window.location.hash.replace('#', '') || '/';
   });
+
   const [selectedProductId, setSelectedProductId] = useState(1);
   const [adminActivePage, setAdminActivePage] = useState('overview');
   const [adminInventoryView, setAdminInventoryView] = useState('storefront'); // 'storefront' | 'table'
 
   useEffect(() => {
     const handleHashChange = () => {
-      const hash = window.location.hash.replace('#', '') || '/';
+      let hash = window.location.hash.replace('#', '') || '/';
+      // Proteksi rute: jika belum login, kunci ke /login
+      if (!user && hash !== '/login' && hash !== '/register') {
+        window.location.hash = '/login';
+        hash = '/login';
+      }
       if (hash.startsWith('/detail/')) {
         const id = parseInt(hash.replace('/detail/', ''));
         if (!isNaN(id)) setSelectedProductId(id);
@@ -183,36 +205,69 @@ export function ShopProvider({ children }) {
     };
 
     window.addEventListener('hashchange', handleHashChange);
-    if (window.location.hash.startsWith('#/detail/')) {
-      const id = parseInt(window.location.hash.replace('#/detail/', ''));
-      if (!isNaN(id)) setSelectedProductId(id);
+    // Jalankan pengecekan pertama saat mount
+    if (!user && window.location.hash !== '#/login' && window.location.hash !== '#/register') {
+      window.location.hash = '/login';
+      setCurrentRoute('/login');
     }
     return () => window.removeEventListener('hashchange', handleHashChange);
-  }, []);
+  }, [user]);
+
+  // Pantau jika status logout terjadi
+  useEffect(() => {
+    if (!user && currentRoute !== '/login' && currentRoute !== '/register') {
+      window.location.hash = '/login';
+      setCurrentRoute('/login');
+    }
+  }, [user, currentRoute]);
 
   useEffect(() => {
-    localStorage.setItem('claye_cart_id_v1', JSON.stringify(cart));
+    localStorage.setItem('claye_cart_id_v4', JSON.stringify(cart));
   }, [cart]);
 
   useEffect(() => {
     if (user) {
-      localStorage.setItem('claye_user_id_v1', JSON.stringify(user));
+      localStorage.setItem('claye_user_id_v3', JSON.stringify(user));
     } else {
-      localStorage.removeItem('claye_user_id_v1');
+      localStorage.removeItem('claye_user_id_v3');
     }
   }, [user]);
 
   useEffect(() => {
-    localStorage.setItem('claye_orders_id_v1', JSON.stringify(orders));
+    localStorage.setItem('claye_orders_id_v3', JSON.stringify(orders));
   }, [orders]);
 
   useEffect(() => {
-    localStorage.setItem('claye_products_id_v1', JSON.stringify(products));
+    localStorage.setItem('claye_products_id_v5', JSON.stringify(products));
   }, [products]);
 
   useEffect(() => {
-    localStorage.setItem('claye_wishlist_id_v1', JSON.stringify(wishlist));
+    localStorage.setItem('claye_wishlist_id_v3', JSON.stringify(wishlist));
   }, [wishlist]);
+
+  // Sinkronisasi data awal dari PostgreSQL / Supabase jika kredensial sudah aktif
+  useEffect(() => {
+    async function initSupabaseData() {
+      if (!isSupabaseConfigured()) return;
+      try {
+        const dbProducts = await supabaseService.getProducts();
+        if (dbProducts && dbProducts.length > 0) {
+          setProducts(dbProducts.map(p => ({
+            ...p,
+            image: p.image_url || '/assets/images/product_mug.jpg',
+            category: p.categories?.name || p.category || 'Kurasi Pilihan',
+            artisanOrigin: p.artisan_partners?.region_origin || 'Sentra Lokal',
+            glazeOptions: p.product_glazes && p.product_glazes.length > 0
+              ? p.product_glazes.map(g => ({ id: g.id, name: g.glaze_name, hex: g.hex_preview || '#EBE5D8' }))
+              : [{ id: 'default', name: 'Alami', hex: '#EBE5D8' }]
+          })));
+        }
+      } catch (err) {
+        console.warn('Inisialisasi Supabase menggunakan fallback lokal:', err);
+      }
+    }
+    initSupabaseData();
+  }, []);
 
   const navigate = (path) => {
     window.location.hash = path;
@@ -301,7 +356,7 @@ export function ShopProvider({ children }) {
         email: email || DEMO_USERS.admin.email
       };
       setUser(adminUser);
-      showToast('Masuk berhasil sebagai Admin.', 'success');
+      showToast('Masuk berhasil sebagai Admin CLAYÉ.', 'success');
       navigate('/admin');
       return;
     }
@@ -316,12 +371,12 @@ export function ShopProvider({ children }) {
       roleName: 'Pelanggan'
     };
     setUser(customerUser);
-    showToast(`Masuk berhasil sebagai Pelanggan. Selamat datang, ${customerUser.name}.`, 'success');
-    navigate('/dashboard');
+    showToast(`Masuk berhasil sebagai Pelanggan. Selamat datang di CLAYÉ, ${customerUser.name}.`, 'success');
+    // Setelah login, arahkan ke Beranda di mana header Beranda, Katalog, Tentang Kami aktif
+    navigate('/');
   };
 
   const register = (registerData) => {
-    // Registrasi hanya untuk pembeli/pelanggan
     const newUser = {
       role: 'customer',
       roleName: 'Pelanggan',
@@ -329,17 +384,17 @@ export function ShopProvider({ children }) {
       fullName: registerData.fullName || 'Pelanggan Baru CLAYÉ',
       email: registerData.email,
       phone: registerData.phone || '+62 812-0000-0000',
-      address: registerData.address || 'Bandung, Jawa Barat',
-      city: registerData.city || 'Bandung',
-      province: 'Jawa Barat',
-      postalCode: registerData.postalCode || '40135',
+      address: registerData.address || 'Jl. Sejuta Kenangan, Palembang',
+      city: registerData.city || 'Palembang',
+      province: 'Sumatera Selatan',
+      postalCode: registerData.postalCode || '30138',
       country: 'Indonesia',
       patronSince: '2026',
       cohort: 'Angkatan Batch 05'
     };
     setUser(newUser);
     showToast(`Pendaftaran akun pembeli berhasil. Selamat bergabung, ${newUser.name}.`, 'success');
-    navigate('/dashboard');
+    navigate('/');
   };
 
   const logout = () => {
@@ -375,12 +430,20 @@ export function ShopProvider({ children }) {
       paymentStatus: 'LUNAS',
       paymentMethod: orderData.paymentMethod || 'Transfer Bank (BCA)',
       courier: orderData.courier || 'Pengiriman Reguler (Eco Shield)',
-      trackingNumber: `CLY-EXP-${randNum}-BDG`,
+      trackingNumber: `CLY-EXP-${randNum}-PLM`,
       image: cart[0]?.image || '/assets/images/product_mug.jpg',
-      shippingAddress: orderData.shippingAddress || (user ? `${user.address}, ${user.city}` : 'Bandung, Jawa Barat')
+      shippingAddress: orderData.shippingAddress || (user ? `${user.address}, ${user.city}` : 'Jl. Sejuta Kenangan, Palembang, Sumatera Selatan')
     };
     setOrders(prev => [newOrder, ...prev]);
     clearCart();
+
+    // Simpan ke Supabase jika terhubung
+    if (isSupabaseConfigured()) {
+      supabaseService.createOrder(newOrder, cart).catch(err => {
+        console.warn('Gagal menyimpan pesanan ke Supabase:', err);
+      });
+    }
+
     return newOrder;
   };
 
@@ -395,7 +458,14 @@ export function ShopProvider({ children }) {
       thumbnails: [newProd.image || '/assets/images/product_mug.jpg']
     };
     setProducts(prev => [item, ...prev]);
-    showToast(`Produk "${item.name}" berhasil ditambahkan ke katalog studio.`, 'success');
+    showToast(`Produk "${item.name}" berhasil ditambahkan ke katalog kurasi.`, 'success');
+
+    // Simpan ke Supabase jika terhubung
+    if (isSupabaseConfigured()) {
+      supabaseService.addProduct(item).catch(err => {
+        console.warn('Gagal menambah produk ke Supabase:', err);
+      });
+    }
   };
 
   const deleteProduct = (id) => {
@@ -407,6 +477,9 @@ export function ShopProvider({ children }) {
     setProducts(prev => prev.map(p => {
       if (p.id === id) {
         const nextStock = Math.max(0, (p.stock || 0) + delta);
+        if (isSupabaseConfigured()) {
+          supabaseService.updateStock(id, nextStock);
+        }
         return { ...p, stock: nextStock };
       }
       return p;

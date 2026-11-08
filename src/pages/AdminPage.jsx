@@ -43,6 +43,7 @@ export default function AdminPage() {
   const [newProdStock, setNewProdStock] = useState('12');
   const [newProdSubtitle, setNewProdSubtitle] = useState('');
   const [newProdDesc, setNewProdDesc] = useState('');
+  const [newProdImage, setNewProdImage] = useState('/assets/images/product_neko_mug.jpg');
 
   // Form input for edit ceramic product
   const [editProdName, setEditProdName] = useState('');
@@ -51,7 +52,44 @@ export default function AdminPage() {
   const [editProdStock, setEditProdStock] = useState('12');
   const [editProdSubtitle, setEditProdSubtitle] = useState('');
   const [editProdDesc, setEditProdDesc] = useState('');
-  const [editProdBadge, setEditProdBadge] = useState('Studio');
+  const [editProdBadge, setEditProdBadge] = useState('Kurasi');
+  const [editProdImage, setEditProdImage] = useState('/assets/images/product_neko_mug.jpg');
+
+  // Pilihan galeri foto keramik CLAYÉ yang siap pakai
+  const AVAILABLE_IMAGES = [
+    { label: 'Cangkir Neko Wave', url: '/assets/images/product_neko_mug.jpg' },
+    { label: 'Cangkir Dusk Horizon', url: '/assets/images/product_dusk_mug.jpg' },
+    { label: 'Cangkir Bintik Batu', url: '/assets/images/product_mug.jpg' },
+    { label: 'Mangkuk Neko Lifestyle', url: '/assets/images/product_neko_bowl.jpg' },
+    { label: 'Mangkuk Neko Studio', url: '/assets/images/product_neko_bowl_studio.jpg' },
+    { label: 'Mangkuk Tanah Liat', url: '/assets/images/product_bowl.jpg' },
+    { label: 'Mangkuk Tropis Monstera', url: '/assets/images/product_monstera_bowl.jpg' },
+    { label: 'Mangkuk Nebula Chawan', url: '/assets/images/product_nebula_chawan.jpg' },
+    { label: 'Vas Bunga Neko Wave', url: '/assets/images/product_neko_vase.jpg' },
+    { label: 'Vas Terracotta Wabi', url: '/assets/images/product_vase.jpg' },
+    { label: 'Piring Raw Edge', url: '/assets/images/product_plate.jpg' },
+    { label: 'Teko Bambu Stillness', url: '/assets/images/product_teapot.jpg' },
+    { label: 'Teko Harvest Sandstone', url: '/assets/images/product_harvest_teapot.jpg' },
+    { label: 'Set Teko Royal Silver', url: '/assets/images/product_silver_teaset.jpg' },
+    { label: 'Pot Tanaman Komorebi', url: '/assets/images/product_planter.jpg' },
+    { label: 'Pot Fluted Wave Planter', url: '/assets/images/product_wave_planter.jpg' }
+  ];
+
+  const handleImageFileUpload = (e, setImageState) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        showToast('Ukuran file foto maksimal 5MB.', 'error');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setImageState(event.target.result);
+        showToast('Foto karya keramik berhasil diunggah.', 'success');
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   // Filter states
   const [orderStatusFilter, setOrderStatusFilter] = useState('Semua');
@@ -61,12 +99,12 @@ export default function AdminPage() {
 
   // Settings form state
   const [studioSettings, setStudioSettings] = useState({
-    studioName: 'CLAYÉ Ceramics Atelier',
-    location: 'Jl. Rancabentang No. 29, Dago Pakar, Ciumbuleuit, Bandung, Jawa Barat 40142',
+    studioName: 'CLAYÉ Curated Ceramics',
+    location: 'Jl. Sejuta Kenangan, Palembang, Sumatera Selatan',
     phone: '+62 811-2233-4455',
-    email: 'atelier@claye.id',
-    openingHours: 'Selasa – Minggu: 10:00 – 17:00 WIB',
-    workshopCapacity: 'Kapasitas Studio 250 Karya per Bulan',
+    email: 'admin@claye.id',
+    openingHours: 'Senin – Sabtu: 08:00 – 19:00 WIB',
+    workshopCapacity: 'Kapasitas Pergudangan & Kurasi 500+ Produk per Bulan',
     shippingProtection: true,
     qrisActive: true,
     bcaActive: true
@@ -105,7 +143,7 @@ export default function AdminPage() {
       paymentStatus: 'Lunas',
       paymentMethod: 'QRIS Instan',
       fulfillment: 'Selesai',
-      courier: 'Kurir Instan Studio (Same Day)',
+      courier: 'Kurir Pengiriman Ekstra Proteksi (Same Day)',
       trackingNumber: 'CLY-EXP-99202-BDG'
     },
     {
@@ -164,7 +202,7 @@ export default function AdminPage() {
       email: 'rania.p@outlook.com',
       phone: '+62 813-2211-4455',
       city: 'Bandung Barat',
-      tier: 'Kolektor Studio',
+      tier: 'Pelanggan Setia',
       totalOrders: 4,
       totalSpent: 920000,
       joinedYear: '2024',
@@ -188,7 +226,7 @@ export default function AdminPage() {
       email: 'dinda.m@gmail.com',
       phone: '+62 821-5566-7788',
       city: 'Denpasar, Bali',
-      tier: 'Kolektor Studio',
+      tier: 'Pelanggan Setia',
       totalOrders: 3,
       totalSpent: 680000,
       joinedYear: '2025',
@@ -217,7 +255,7 @@ export default function AdminPage() {
       finish: 'Matte Halus Berserat Mikro',
       cone: 'Cone 10 (1260°C Reduksi)',
       foodSafe: true,
-      stockStatus: 'Tersedia di Studio (45 Kg)',
+      stockStatus: 'Tersedia di Gudang (45 Kg)',
       description: 'Menghasilkan warna hijau lumut pudar khas keramik klasik Korea dan Jepang. Sangat aman untuk minuman asam/panas.'
     },
     {
@@ -227,7 +265,7 @@ export default function AdminPage() {
       finish: 'Cokelat Gelap Mengilap dengan Kristal Karat',
       cone: 'Cone 10 (1260°C)',
       foodSafe: true,
-      stockStatus: 'Tersedia di Studio (30 Kg)',
+      stockStatus: 'Tersedia di Gudang (30 Kg)',
       description: 'Formulasi pekat yang bereaksi dengan api reduksi tungku, menghasilkan kilau kristal besi eksotis di tepian bibir cangkir.'
     },
     {
@@ -237,7 +275,7 @@ export default function AdminPage() {
       finish: 'Tekstur Pasir Kasar Hangat',
       cone: 'Cone 10 (1240°C - 1260°C)',
       foodSafe: true,
-      stockStatus: 'Tersedia di Studio (60 Kg)',
+      stockStatus: 'Tersedia di Gudang (60 Kg)',
       description: 'Teknik slip tradisional tanpa glasir kaca mengilap. Bagian luar dibiarkan kasar alami untuk cengkeraman tangan mantap.'
     },
     {
@@ -262,13 +300,13 @@ export default function AdminPage() {
 
     addProduct({
       name: newProdName,
-      subtitle: newProdSubtitle || 'Karya keramik stoneware buatan tangan',
+      subtitle: newProdSubtitle || 'Produk keramik stoneware kurasi pilihan',
       category: newProdCategory,
       price: parseInt(newProdPrice),
       stock: parseInt(newProdStock) || 12,
-      description: newProdDesc || 'Dibentuk di atas roda putar menggunakan glasir mineral alami dan dibakar pada suhu 1260°C di studio Bandung kami.',
+      description: newProdDesc || 'Karya keramik kurasi pilihan dengan glasir mineral alami, diproduksi oleh pengrajin mitra dan lolos kurasi mutu ketat CLAYÉ.',
       badge: 'baru',
-      image: '/assets/images/product_mug.jpg'
+      image: newProdImage || '/assets/images/product_neko_mug.jpg'
     });
 
     setIsAddModalOpen(false);
@@ -277,6 +315,7 @@ export default function AdminPage() {
     setNewProdStock('12');
     setNewProdSubtitle('');
     setNewProdDesc('');
+    setNewProdImage('/assets/images/product_neko_mug.jpg');
     showToast(`Produk "${newProdName}" berhasil didaftarkan ke inventaris!`, 'success');
   };
 
@@ -288,7 +327,8 @@ export default function AdminPage() {
     setEditProdStock(prod.stock !== undefined ? prod.stock.toString() : '0');
     setEditProdSubtitle(prod.subtitle || '');
     setEditProdDesc(prod.description || '');
-    setEditProdBadge(prod.badge || 'Studio');
+    setEditProdBadge(prod.badge || 'Kurasi');
+    setEditProdImage(prod.image || '/assets/images/product_neko_mug.jpg');
     setIsEditModalOpen(true);
   };
 
@@ -307,7 +347,8 @@ export default function AdminPage() {
       stock: parseInt(editProdStock) || 0,
       subtitle: editProdSubtitle,
       description: editProdDesc,
-      badge: editProdBadge
+      badge: editProdBadge,
+      image: editProdImage || editingProduct.image || '/assets/images/product_neko_mug.jpg'
     });
 
     setIsEditModalOpen(false);
@@ -379,7 +420,7 @@ export default function AdminPage() {
 
             <p className="auth-lead-sub" style={{ fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '1.75rem' }}>
               {user ? (
-                <>Anda saat ini masuk sebagai <strong>{user.name}</strong> ({user.roleName || 'Pelanggan'}). Halaman ini memerlukan hak akses Admin Atelier.</>
+                <>Anda saat ini masuk sebagai <strong>{user.name}</strong> ({user.roleName || 'Pelanggan'}). Halaman ini memerlukan hak akses Admin Toko.</>
               ) : (
                 <>Panel kontrol ini memuat manajemen inventaris keramik, pesanan pelanggan, dan logistik pengiriman. Silakan masuk dengan akun Admin.</>
               )}
@@ -391,7 +432,7 @@ export default function AdminPage() {
                 className="claye-terracotta-btn"
                 style={{ width: '100%', padding: '14px', fontSize: '0.95rem' }}
               >
-                Masuk sebagai Admin Studio
+                Masuk sebagai Admin Toko
               </button>
 
               <button
@@ -544,38 +585,6 @@ export default function AdminPage() {
             ))}
           </div>
 
-          {/* TOMBOL PINTAS LIHAT TOKO / KATALOG PELANGGAN */}
-          <div style={{ padding: '0 0.85rem', marginBottom: '0.85rem' }}>
-            <button
-              onClick={openAdminStorefront}
-              className="sidebar-view-store-btn"
-              title="Lihat Tampilan Etalase Toko / Katalog Produk Langsung"
-              style={{
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.5rem',
-                backgroundColor: 'rgba(184, 115, 85, 0.08)',
-                color: 'var(--color-terracotta)',
-                border: '1px solid rgba(184, 115, 85, 0.3)',
-                padding: '0.65rem 0.85rem',
-                borderRadius: '6px',
-                fontSize: '0.8rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                letterSpacing: '0.02em'
-              }}
-            >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                <circle cx="12" cy="12" r="3"></circle>
-              </svg>
-              <span>Lihat Tampilan Toko</span>
-            </button>
-          </div>
-
           {/* AKSI BAWAH: KELUAR */}
           <div className="sidebar-footer-actions">
             <button
@@ -598,7 +607,7 @@ export default function AdminPage() {
             =================================================================== */}
         <main className="admin-main-viewport">
           {/* ===============================================================
-              HALAMAN 1: RINGKASAN STUDIO (OVERVIEW)
+              HALAMAN 1: RINGKASAN TOKO KURASI (OVERVIEW)
               =============================================================== */}
           {activePage === 'overview' && (
             <div className="admin-page-view">
@@ -611,11 +620,11 @@ export default function AdminPage() {
                       <line x1="12" y1="16" x2="12" y2="12"></line>
                       <line x1="12" y1="8" x2="12.01" y2="8"></line>
                     </svg>
-                    <span>KEGUNAAN HALAMAN RINGKASAN STUDIO</span>
+                    <span>KEGUNAAN HALAMAN RINGKASAN TOKO KURASI</span>
                   </div>
                   <span className="purpose-badge-tag">Pusat Pantauan Utama</span>
                 </div>
-                <h2 className="purpose-title" style={{ marginBottom: '0.25rem' }}>Ikhtisar Operasional Atelier dan Kesehatan Bisnis</h2>
+                <h2 className="purpose-title" style={{ marginBottom: '0.25rem' }}>Ikhtisar Operasional Toko Kurasi dan Kesehatan Bisnis</h2>
                 <div className="purpose-quick-nav" style={{ marginTop: '0.85rem', paddingTop: '0.85rem' }}>
                   <button onClick={() => setIsAddModalOpen(true)} className="purpose-action-btn primary">
                     tambah produk
@@ -657,7 +666,7 @@ export default function AdminPage() {
                   </div>
                   <div className="metric-primary-val">{products.length} <span className="val-unit">karya</span></div>
                   <div className="metric-alert-pill low-stock">
-                    {lowStockCount} stok kritis di studio
+                    {lowStockCount} stok kritis di gudang
                   </div>
                 </div>
 
@@ -678,9 +687,9 @@ export default function AdminPage() {
                 <div className="admin-chart-panel">
                   <div className="chart-panel-header">
                     <div>
-                      <span className="chart-panel-tag">PERFORMA PENJUALAN STUDIO</span>
+                      <span className="chart-panel-tag">PERFORMA PENJUALAN TOKO KURASI</span>
                       <h3 className="chart-panel-title">Tren Pendapatan dan Pengiriman</h3>
-                      <p className="chart-panel-sub">Arus transaksi harian produk stoneware langsung dari studio Bandung</p>
+                      <p className="chart-panel-sub">Arus transaksi harian produk stoneware kurasi dari berbagai mitra pengrajin</p>
                     </div>
                     <div className="chart-range-toggle">
                       <button
@@ -754,10 +763,10 @@ export default function AdminPage() {
                   </div>
                 </div>
 
-                {/* KANAN: KARYA UNGGULAN ATELIER */}
+                {/* KANAN: PRODUK UNGGULAN TERKURASI */}
                 <div className="admin-kiln-focus-card">
                   <div className="focus-card-header">
-                    <span className="focus-tag">KARYA UNGGULAN ATELIER</span>
+                    <span className="focus-tag">PRODUK UNGGULAN TERKURASI</span>
                     <span className="limited-series-pill">EDISI TERBATAS</span>
                   </div>
 
@@ -806,7 +815,7 @@ export default function AdminPage() {
                 <div className="admin-section-top" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.25rem' }}>
                   <div>
                     <h3 className="section-serif-heading">Antrean Pengiriman Mendesak ({adminOrders.filter(o => o.fulfillment !== 'Selesai').length} Paket)</h3>
-                    <p className="section-subtext">Pesanan yang harus dikemas menggunakan bubble wrap ramah lingkungan dan segel studio hari ini.</p>
+                    <p className="section-subtext">Pesanan yang harus dikemas menggunakan bubble wrap ramah lingkungan dan segel pengiriman CLAYÉ hari ini.</p>
                   </div>
                   <button
                     onClick={() => setActivePage('orders')}
@@ -878,7 +887,7 @@ export default function AdminPage() {
                   </div>
                   <span className="purpose-badge-tag">Logistik dan Transaksi</span>
                 </div>
-                <h2 className="purpose-title" style={{ marginBottom: '0.25rem' }}>Manajemen Pemrosesan Pesanan dan Pengiriman Studio</h2>
+                <h2 className="purpose-title" style={{ marginBottom: '0.25rem' }}>Manajemen Pemrosesan Pesanan dan Pengiriman Gudang</h2>
                 <div className="purpose-quick-nav" style={{ marginTop: '0.85rem', paddingTop: '0.85rem' }}>
                   <button onClick={() => showToast('Daftar pesanan berhasil disinkronisasi dengan server.', 'success')} className="purpose-action-btn secondary">
                     sinkronkan data
@@ -1033,29 +1042,7 @@ export default function AdminPage() {
                   </div>
                   <span className="purpose-badge-tag">Katalog dan Stok Keramik</span>
                 </div>
-                <h2 className="purpose-title" style={{ marginBottom: '0.25rem' }}>Manajemen Stok Fisik Studio dan Katalog E-Commerce</h2>
-                <div className="purpose-quick-nav" style={{ marginTop: '0.85rem', paddingTop: '0.85rem' }}>
-                  <button onClick={() => setIsAddModalOpen(true)} className="purpose-action-btn primary">
-                    + Tambah Produk
-                  </button>
-                  <button
-                    onClick={() => setInventoryViewMode(inventoryViewMode === 'storefront' ? 'table' : 'storefront')}
-                    className="purpose-action-btn secondary"
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-                    title="Ganti Tampilan Etalase Toko / Tabel Stok"
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="3" y="3" width="7" height="7"></rect>
-                      <rect x="14" y="3" width="7" height="7"></rect>
-                      <rect x="14" y="14" width="7" height="7"></rect>
-                      <rect x="3" y="14" width="7" height="7"></rect>
-                    </svg>
-                    {inventoryViewMode === 'storefront' ? 'Buka Tabel Stok' : 'Lihat Tampilan Toko'}
-                  </button>
-                  <button onClick={() => showToast('Stok seluruh katalog telah diperbarui sesuai kondisi rak studio.', 'success')} className="purpose-action-btn secondary">
-                    sinkronkan stok
-                  </button>
-                </div>
+                <h2 className="purpose-title" style={{ marginBottom: '0.25rem' }}>Manajemen Stok Gudang dan Katalog Toko Kurasi</h2>
               </div>
 
               {/* MINI STAT ROW INVENTORY */}
@@ -1067,7 +1054,7 @@ export default function AdminPage() {
                   </div>
                 </div>
                 <div className="admin-metric-card" style={{ padding: '1rem 1.25rem' }}>
-                  <span className="metric-title">TOTAL STOK FISIK DI STUDIO</span>
+                  <span className="metric-title">TOTAL STOK FISIK DI GUDANG</span>
                   <div className="metric-primary-val" style={{ fontSize: '1.6rem', marginTop: '0.25rem' }}>
                     {totalPhysicalStock} <span className="val-unit">buah</span>
                   </div>
@@ -1575,7 +1562,7 @@ export default function AdminPage() {
                 <div className="admin-section-top">
                   <div>
                     <h3 className="section-serif-heading">Daftar Kolektor dan Pembeli Terdaftar</h3>
-                    <p className="section-subtext">Pelanggan yang mengoleksi edisi cangkir, mangkuk, dan vas buatan studio CLAYÉ.</p>
+                    <p className="section-subtext">Pelanggan yang mengoleksi edisi cangkir, mangkuk, dan vas keramik kurasi CLAYÉ.</p>
                   </div>
                 </div>
 
@@ -1616,7 +1603,7 @@ export default function AdminPage() {
                           <td style={{ color: '#6E6962' }}>{c.favoriteGlaze}</td>
                           <td style={{ textAlign: 'right' }}>
                             <button
-                              onClick={() => openConcierge(`Hubungi ${c.name} mengenai pemesanan custom keramik studio CLAYÉ`)}
+                              onClick={() => openConcierge(`Hubungi ${c.name} mengenai pemesanan keramik kurasi CLAYÉ`)}
                               className="admin-inspect-btn"
                             >
                               Hubungi
@@ -1725,7 +1712,7 @@ export default function AdminPage() {
           )}
 
           {/* ===============================================================
-              HALAMAN 7: PENGATURAN STUDIO (SETTINGS)
+              HALAMAN 7: PENGATURAN TOKO (SETTINGS)
               =============================================================== */}
           {activePage === 'settings' && (
             <div className="admin-page-view">
@@ -1739,27 +1726,27 @@ export default function AdminPage() {
                     </svg>
                     <span>KEGUNAAN HALAMAN PENGATURAN</span>
                   </div>
-                  <span className="purpose-badge-tag">Konfigurasi Toko dan Atelier</span>
+                  <span className="purpose-badge-tag">Konfigurasi Toko dan Pergudangan</span>
                 </div>
-                <h2 className="purpose-title" style={{ marginBottom: '0.25rem' }}>Konfigurasi Profil Atelier, Pengemasan dan Jalur Pembayaran</h2>
+                <h2 className="purpose-title" style={{ marginBottom: '0.25rem' }}>Konfigurasi Profil Toko Kurasi, Pengemasan dan Jalur Pembayaran</h2>
               </div>
 
               {/* FORM PENGATURAN STUDIO */}
               <div className="admin-section-container" style={{ maxWidth: '850px' }}>
                 <form onSubmit={(e) => {
                   e.preventDefault();
-                  showToast('Pengaturan studio atelier berhasil disimpan dan diperbarui.', 'success');
+                  showToast('Pengaturan toko kurasi berhasil disimpan dan diperbarui.', 'success');
                 }}>
                   <div style={{ marginBottom: '2rem' }}>
                     <h3 className="section-serif-heading" style={{ fontSize: '1.35rem', marginBottom: '0.4rem' }}>
-                      1. Identitas Studio dan Lokasi Atelier
+                      1. Identitas Toko Kurasi dan Lokasi Showroom
                     </h3>
                     <p className="section-subtext" style={{ marginBottom: '1.25rem' }}>
-                      Informasi yang ditampilkan di invoice pelanggan dan profil publik studio CLAYÉ.
+                      Informasi yang ditampilkan di invoice pelanggan dan profil publik toko CLAYÉ.
                     </p>
 
                     <div className="form-group-claye">
-                      <label>Nama Brand / Atelier *</label>
+                      <label>Nama Brand / Toko *</label>
                       <input
                         type="text"
                         value={studioSettings.studioName}
@@ -1769,7 +1756,7 @@ export default function AdminPage() {
                     </div>
 
                     <div className="form-group-claye">
-                      <label>Alamat Fisik Studio di Bandung *</label>
+                      <label>Alamat Fisik Gudang & Showroom di Palembang *</label>
                       <textarea
                         rows="2"
                         value={studioSettings.location}
@@ -1789,7 +1776,7 @@ export default function AdminPage() {
                         />
                       </div>
                       <div className="form-group-claye">
-                        <label>Email Resmi Admin Studio</label>
+                        <label>Email Resmi Admin Toko</label>
                         <input
                           type="email"
                           value={studioSettings.email}
@@ -1799,7 +1786,7 @@ export default function AdminPage() {
                     </div>
 
                     <div className="form-group-claye">
-                      <label>Jam Kunjungan dan Operasional Atelier</label>
+                      <label>Jam Operasional Showroom & Layanan Pelanggan</label>
                       <input
                         type="text"
                         value={studioSettings.openingHours}
@@ -1854,7 +1841,7 @@ export default function AdminPage() {
                           onChange={(e) => setStudioSettings({ ...studioSettings, bcaActive: e.target.checked })}
                           style={{ width: '18px', height: '18px' }}
                         />
-                        <span style={{ fontSize: '0.9rem' }}>Transfer Bank Manual (BCA dan Mandiri Studio Account)</span>
+                        <span style={{ fontSize: '0.9rem' }}>Transfer Bank Manual (BCA dan Mandiri Rekening Resmi)</span>
                       </label>
                     </div>
                   </div>
@@ -1886,7 +1873,7 @@ export default function AdminPage() {
           <div className="claye-modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <div>
-                <span className="modal-subtitle">REGISTRASI PRODUK STUDIO</span>
+                <span className="modal-subtitle">REGISTRASI PRODUK KATALOG</span>
                 <h3 className="modal-title">+ Tambah Karya Keramik Baru</h3>
               </div>
               <button onClick={() => setIsAddModalOpen(false)} className="modal-close-btn" aria-label="Tutup">
@@ -1949,7 +1936,7 @@ export default function AdminPage() {
               </div>
 
               <div className="form-group-claye">
-                <label>Stok Fisik Awal di Studio (pcs)</label>
+                <label>Stok Fisik Awal di Gudang (pcs)</label>
                 <input
                   type="number"
                   placeholder="12"
@@ -1968,6 +1955,86 @@ export default function AdminPage() {
                   onChange={(e) => setNewProdDesc(e.target.value)}
                   style={{ width: '100%', padding: '0.65rem 0.9rem', borderRadius: '6px', border: '1px solid #EAE6DF' }}
                 />
+              </div>
+
+              {/* INPUT FOTO PRODUK */}
+              <div className="form-group-claye">
+                <label>Foto Produk Keramik *</label>
+                <div style={{
+                  display: 'flex',
+                  gap: '1rem',
+                  alignItems: 'center',
+                  backgroundColor: '#FAF8F5',
+                  padding: '0.85rem',
+                  borderRadius: '8px',
+                  border: '1px solid #EAE6DF',
+                  marginBottom: '0.5rem',
+                  flexWrap: 'wrap'
+                }}>
+                  <img
+                    src={newProdImage}
+                    alt="Preview Karya"
+                    style={{
+                      width: '84px',
+                      height: '84px',
+                      objectFit: 'cover',
+                      borderRadius: '6px',
+                      border: '1px solid #D8D2C7',
+                      backgroundColor: '#FFFFFF',
+                      flexShrink: 0
+                    }}
+                    onError={(e) => { e.target.src = '/assets/images/product_neko_mug.jpg'; }}
+                  />
+                  <div style={{ flex: 1, minWidth: '200px' }}>
+                    <div style={{ fontSize: '0.78rem', color: '#6E6962', marginBottom: '0.35rem', fontWeight: 500 }}>
+                      Pilih dari galeri foto keramik CLAYÉ atau unggah file foto:
+                    </div>
+                    <select
+                      value={newProdImage}
+                      onChange={(e) => setNewProdImage(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '0.55rem 0.8rem',
+                        borderRadius: '6px',
+                        border: '1px solid #D8D2C7',
+                        fontSize: '0.82rem',
+                        marginBottom: '0.45rem',
+                        backgroundColor: '#FFFFFF'
+                      }}
+                    >
+                      {AVAILABLE_IMAGES.map((img) => (
+                        <option key={img.url} value={img.url}>{img.label}</option>
+                      ))}
+                    </select>
+
+                    <label style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.4rem',
+                      fontSize: '0.78rem',
+                      fontWeight: 600,
+                      color: 'var(--color-terracotta)',
+                      cursor: 'pointer',
+                      padding: '4px 8px',
+                      backgroundColor: '#FFFFFF',
+                      border: '1px solid #E4D0C5',
+                      borderRadius: '4px'
+                    }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                      </svg>
+                      <span>Unggah Foto dari Perangkat (Maks. 5MB)</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        onChange={(e) => handleImageFileUpload(e, setNewProdImage)}
+                      />
+                    </label>
+                  </div>
+                </div>
               </div>
 
               <div className="modal-footer">
@@ -2055,7 +2122,7 @@ export default function AdminPage() {
 
               <div className="checkout-form-row">
                 <div className="form-group-claye">
-                  <label>Stok Fisik di Studio (pcs)</label>
+                  <label>Stok Fisik di Gudang (pcs)</label>
                   <input
                     type="number"
                     placeholder="12"
@@ -2072,7 +2139,7 @@ export default function AdminPage() {
                     onChange={(e) => setEditProdBadge(e.target.value)}
                     style={{ width: '100%', padding: '0.65rem 0.9rem', borderRadius: '6px', border: '1px solid #EAE6DF' }}
                   >
-                    <option value="Studio">Studio</option>
+                    <option value="Kurasi">Kurasi</option>
                     <option value="terlaris">Terlaris</option>
                     <option value="baru">Baru</option>
                     <option value="edisi terbatas">Edisi Terbatas</option>
@@ -2089,6 +2156,86 @@ export default function AdminPage() {
                   onChange={(e) => setEditProdDesc(e.target.value)}
                   style={{ width: '100%', padding: '0.65rem 0.9rem', borderRadius: '6px', border: '1px solid #EAE6DF' }}
                 />
+              </div>
+
+              {/* INPUT FOTO PRODUK */}
+              <div className="form-group-claye">
+                <label>Foto Produk Keramik *</label>
+                <div style={{
+                  display: 'flex',
+                  gap: '1rem',
+                  alignItems: 'center',
+                  backgroundColor: '#FAF8F5',
+                  padding: '0.85rem',
+                  borderRadius: '8px',
+                  border: '1px solid #EAE6DF',
+                  marginBottom: '0.5rem',
+                  flexWrap: 'wrap'
+                }}>
+                  <img
+                    src={editProdImage}
+                    alt="Preview Karya"
+                    style={{
+                      width: '84px',
+                      height: '84px',
+                      objectFit: 'cover',
+                      borderRadius: '6px',
+                      border: '1px solid #D8D2C7',
+                      backgroundColor: '#FFFFFF',
+                      flexShrink: 0
+                    }}
+                    onError={(e) => { e.target.src = '/assets/images/product_neko_mug.jpg'; }}
+                  />
+                  <div style={{ flex: 1, minWidth: '200px' }}>
+                    <div style={{ fontSize: '0.78rem', color: '#6E6962', marginBottom: '0.35rem', fontWeight: 500 }}>
+                      Pilih dari galeri foto keramik CLAYÉ atau unggah file foto:
+                    </div>
+                    <select
+                      value={editProdImage}
+                      onChange={(e) => setEditProdImage(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '0.55rem 0.8rem',
+                        borderRadius: '6px',
+                        border: '1px solid #D8D2C7',
+                        fontSize: '0.82rem',
+                        marginBottom: '0.45rem',
+                        backgroundColor: '#FFFFFF'
+                      }}
+                    >
+                      {AVAILABLE_IMAGES.map((img) => (
+                        <option key={img.url} value={img.url}>{img.label}</option>
+                      ))}
+                    </select>
+
+                    <label style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.4rem',
+                      fontSize: '0.78rem',
+                      fontWeight: 600,
+                      color: 'var(--color-terracotta)',
+                      cursor: 'pointer',
+                      padding: '4px 8px',
+                      backgroundColor: '#FFFFFF',
+                      border: '1px solid #E4D0C5',
+                      borderRadius: '4px'
+                    }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                      </svg>
+                      <span>Unggah Foto dari Perangkat (Maks. 5MB)</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        onChange={(e) => handleImageFileUpload(e, setEditProdImage)}
+                      />
+                    </label>
+                  </div>
+                </div>
               </div>
 
               <div className="modal-footer">
@@ -2154,7 +2301,7 @@ export default function AdminPage() {
                   KARYA KERAMIK DALAM PAKET
                 </span>
                 <div style={{ marginTop: '0.5rem', padding: '0.75rem', border: '1px solid #EAE6DF', borderRadius: '4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span>{inspectOrderData.itemsSummary || 'Karya Keramik Studio CLAYÉ'}</span>
+                  <span>{inspectOrderData.itemsSummary || 'Karya Keramik Kurasi CLAYÉ'}</span>
                   <strong>Rp {inspectOrderData.total.toLocaleString('id-ID')}</strong>
                 </div>
               </div>
@@ -2198,3 +2345,4 @@ export default function AdminPage() {
     </div>
   );
 }
+

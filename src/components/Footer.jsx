@@ -8,8 +8,8 @@ export default function Footer() {
     return (
       <footer className="admin-footer-bar">
         <div className="container admin-footer-content">
-          <div>CLAYÉ ATELIER MANAGEMENT V2.4 • STUDIO BANDUNG</div>
-          <div>Administrasi Kerajinan Keramik dan Inventaris Batch Kecil</div>
+          <div>CLAYÉ CURATION MANAGEMENT V2.4 • TOKO & RESELLER RESMI</div>
+          <div>Sistem Manajemen Kurasi Produk Keramik & Pengelolaan Reseller</div>
         </div>
       </footer>
     );
@@ -18,12 +18,12 @@ export default function Footer() {
   return (
     <footer className="claye-footer">
       <div className="container claye-footer-inner">
-        {/* LOGO STUDIO */}
+        {/* LOGO BRAND */}
         <div className="footer-small-logo">CLAYÉ</div>
 
-        {/* FILOSOFI WABI-SABI BAHASA INDONESIA */}
+        {/* DESKRIPSI KURASI */}
         <p className="footer-wabi-sabi-quote">
-          Keramik buatan tangan yang dibentuk dengan kesabaran, merayakan keindahan wabi-sabi dari tanah liat alami dan ketenangan hidup sehari-hari.
+          Koleksi keramik stoneware pilihan yang dikurasi dari sentra pengrajin terbaik, menghadirkan estetika wabi-sabi dan ketenangan hidup ke ruang hunian Anda.
         </p>
 
         {/* LINK NAVIGASI HORIZONTAL */}
@@ -50,7 +50,7 @@ export default function Footer() {
             PERAWATAN KERAMIK
           </button>
           <button onClick={() => navigate('/tentang')} className="footer-hlink">
-            STUDIO KAMI
+            GALERI KAMI
           </button>
           <button
             onClick={() => openConcierge('Hubungi tim concierge untuk pertanyaan pemesanan atau kado')}
@@ -68,7 +68,7 @@ export default function Footer() {
 
         {/* HAK CIPTA */}
         <div className="footer-copyright-line">
-          © 2025 CLAYÉ Ceramics Studio. Hak cipta dilindungi.
+          © 2025 CLAYÉ Curated Ceramics. Hak cipta dilindungi.
         </div>
       </div>
     </footer>

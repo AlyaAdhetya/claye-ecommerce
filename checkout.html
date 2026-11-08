@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Checkout — Clayé Ceramic</title>
+  <title>Checkout — CLAYÉ Ceramic</title>
   <link rel="stylesheet" href="assets/css/style.css">
   <style>
     .checkout-layout { display: grid; grid-template-columns: 1fr 380px; gap: 2rem; align-items: start; }
@@ -43,7 +43,7 @@
 
 <nav class="navbar">
   <div class="container navbar-inner">
-    <a href="index.html" class="navbar-logo"><span class="logo-name">Clayé</span><span class="logo-tagline">Ceramic Studio</span></a>
+    <a href="index.html" class="navbar-logo"><span class="logo-name">CLAYÉ</span><span class="logo-tagline">Curated Ceramics</span></a>
     <div class="navbar-nav">
       <a href="index.html">Beranda</a><a href="katalog.html">Katalog</a>
     </div>
@@ -54,7 +54,7 @@
     </div>
   </div>
 </nav>
-<div class="mobile-menu"><div class="mobile-menu-overlay"></div><div class="mobile-menu-panel"><div class="mobile-menu-header"><a href="index.html" class="navbar-logo"><span class="logo-name">Clayé</span></a><button class="mobile-menu-close">✕</button></div><nav class="mobile-nav"><a href="index.html">🏠 Beranda</a><a href="katalog.html">🏺 Katalog</a></nav></div></div>
+<div class="mobile-menu"><div class="mobile-menu-overlay"></div><div class="mobile-menu-panel"><div class="mobile-menu-header"><a href="index.html" class="navbar-logo"><span class="logo-name">CLAYÉ</span></a><button class="mobile-menu-close">✕</button></div><nav class="mobile-nav"><a href="index.html">ðŸ  Beranda</a><a href="katalog.html">ðŸº Katalog</a></nav></div></div>
 
 <div class="page-header">
   <div class="container">
@@ -82,7 +82,7 @@
         <!-- STEP 1: Address -->
         <div class="checkout-step active" id="checkout-step-1">
           <div class="card" style="margin-bottom:1.5rem">
-            <div class="card-header"><h3 style="margin:0;font-size:1.1rem">📍 Alamat Pengiriman</h3></div>
+            <div class="card-header"><h3 style="margin:0;font-size:1.1rem">ðŸ“ Alamat Pengiriman</h3></div>
             <div class="card-body">
               <div class="form-row">
                 <div class="form-group"><label class="form-label">Nama Depan <span class="required">*</span></label><input type="text" class="form-control" id="first-name" placeholder="Andi" required></div>
@@ -104,7 +104,7 @@
               <label class="form-check"><input type="checkbox" id="save-address"><span class="form-check-label">Simpan alamat ini untuk pembelian berikutnya</span></label>
             </div>
           </div>
-          <button class="btn btn-primary btn-full btn-lg" onclick="goToStep(2)">Lanjut ke Pengiriman →</button>
+          <button class="btn btn-primary btn-full btn-lg" onclick="goToStep(2)">Lanjut ke Pengiriman â†’</button>
         </div>
 
         <!-- STEP 2: Shipping -->
@@ -125,36 +125,36 @@
                 <div style="font-weight:700;color:var(--color-primary)">Rp 35.000</div>
               </div>
               <div class="shipping-option" onclick="selectShipping(this,'0','Gratis Ongkir')">
-                <div style="display:flex;gap:1rem;align-items:center"><input type="radio" name="shipping"><div><div style="font-weight:600;font-size:0.9rem">Gratis Ongkir ✨</div><div style="font-size:0.78rem;color:var(--color-text-muted)">Pembelian ≥ Rp 300.000 · 3–5 hari</div></div></div>
+                <div style="display:flex;gap:1rem;align-items:center"><input type="radio" name="shipping"><div><div style="font-weight:600;font-size:0.9rem">Gratis Ongkir ✨</div><div style="font-size:0.78rem;color:var(--color-text-muted)">Pembelian â‰¥ Rp 300.000 · 3–5 hari</div></div></div>
                 <div style="font-weight:700;color:var(--color-accent)">GRATIS</div>
               </div>
             </div>
           </div>
           <div style="display:flex;gap:1rem">
-            <button class="btn btn-ghost" onclick="goToStep(1)">← Kembali</button>
-            <button class="btn btn-primary" style="flex:1" onclick="goToStep(3)">Lanjut ke Pembayaran →</button>
+            <button class="btn btn-ghost" onclick="goToStep(1)">â† Kembali</button>
+            <button class="btn btn-primary" style="flex:1" onclick="goToStep(3)">Lanjut ke Pembayaran â†’</button>
           </div>
         </div>
 
         <!-- STEP 3: Payment -->
         <div class="checkout-step" id="checkout-step-3">
           <div class="card" style="margin-bottom:1.5rem">
-            <div class="card-header"><h3 style="margin:0;font-size:1.1rem">💳 Metode Pembayaran</h3></div>
+            <div class="card-header"><h3 style="margin:0;font-size:1.1rem">ðŸ’³ Metode Pembayaran</h3></div>
             <div class="card-body">
               <div class="payment-option selected" onclick="selectPayment(this,'transfer')">
-                <div class="pay-icon">🏦</div><div><div class="pay-name">Transfer Bank</div><div class="pay-desc">BCA, BNI, BRI, Mandiri, BSI</div></div>
+                <div class="pay-icon">ðŸ¦</div><div><div class="pay-name">Transfer Bank</div><div class="pay-desc">BCA, BNI, BRI, Mandiri, BSI</div></div>
                 <input type="radio" name="payment" checked style="margin-left:auto">
               </div>
               <div class="payment-option" onclick="selectPayment(this,'ewallet')">
-                <div class="pay-icon">📱</div><div><div class="pay-name">E-Wallet</div><div class="pay-desc">GoPay, OVO, DANA, ShopeePay, LinkAja</div></div>
+                <div class="pay-icon">ðŸ“±</div><div><div class="pay-name">E-Wallet</div><div class="pay-desc">GoPay, OVO, DANA, ShopeePay, LinkAja</div></div>
                 <input type="radio" name="payment" style="margin-left:auto">
               </div>
               <div class="payment-option" onclick="selectPayment(this,'qris')">
-                <div class="pay-icon">📲</div><div><div class="pay-name">QRIS</div><div class="pay-desc">Scan & bayar dengan semua e-wallet</div></div>
+                <div class="pay-icon">ðŸ“²</div><div><div class="pay-name">QRIS</div><div class="pay-desc">Scan & bayar dengan semua e-wallet</div></div>
                 <input type="radio" name="payment" style="margin-left:auto">
               </div>
               <div class="payment-option" onclick="selectPayment(this,'cod')">
-                <div class="pay-icon">💵</div><div><div class="pay-name">COD (Bayar di Tempat)</div><div class="pay-desc">Tersedia untuk area tertentu</div></div>
+                <div class="pay-icon">ðŸ’µ</div><div><div class="pay-name">COD (Bayar di Tempat)</div><div class="pay-desc">Tersedia untuk area tertentu</div></div>
                 <input type="radio" name="payment" style="margin-left:auto">
               </div>
               <!-- Card detail (shown when transfer selected) -->
@@ -170,8 +170,8 @@
             </div>
           </div>
           <div style="display:flex;gap:1rem">
-            <button class="btn btn-ghost" onclick="goToStep(2)">← Kembali</button>
-            <button class="btn btn-primary" style="flex:1" onclick="goToStep(4)">Periksa Pesanan →</button>
+            <button class="btn btn-ghost" onclick="goToStep(2)">â† Kembali</button>
+            <button class="btn btn-primary" style="flex:1" onclick="goToStep(4)">Periksa Pesanan â†’</button>
           </div>
         </div>
 
@@ -179,20 +179,20 @@
         <div class="checkout-step" id="checkout-step-4">
           <div class="card" style="margin-bottom:1.5rem">
             <div class="card-header flex-between">
-              <h3 style="margin:0;font-size:1.1rem">📋 Ringkasan Pesanan</h3>
-              <button class="btn btn-ghost btn-sm" onclick="goToStep(1)">✏ Edit</button>
+              <h3 style="margin:0;font-size:1.1rem">ðŸ“‹ Ringkasan Pesanan</h3>
+              <button class="btn btn-ghost btn-sm" onclick="goToStep(1)">âœ Edit</button>
             </div>
             <div class="card-body">
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem">
-                <div><div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--color-text-muted);margin-bottom:0.5rem">📍 Alamat</div><div id="confirm-address" style="font-size:0.85rem;color:var(--color-text);line-height:1.6"></div></div>
+                <div><div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--color-text-muted);margin-bottom:0.5rem">ðŸ“ Alamat</div><div id="confirm-address" style="font-size:0.85rem;color:var(--color-text);line-height:1.6"></div></div>
                 <div><div style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--color-text-muted);margin-bottom:0.5rem">🚚 Pengiriman</div><div id="confirm-shipping" style="font-size:0.85rem;color:var(--color-text)"></div></div>
               </div>
               <div id="confirm-items"></div>
             </div>
           </div>
           <div style="display:flex;gap:1rem">
-            <button class="btn btn-ghost" onclick="goToStep(3)">← Kembali</button>
-            <button class="btn btn-primary btn-lg" style="flex:1" onclick="placeOrder()">✅ Konfirmasi & Bayar</button>
+            <button class="btn btn-ghost" onclick="goToStep(3)">â† Kembali</button>
+            <button class="btn btn-primary btn-lg" style="flex:1" onclick="placeOrder()">âœ… Konfirmasi & Bayar</button>
           </div>
         </div>
 
@@ -200,8 +200,8 @@
         <div class="checkout-step" id="checkout-step-success">
           <div class="card">
             <div class="card-body success-screen">
-              <div class="success-icon">✓</div>
-              <h2 style="margin-bottom:0.5rem">Pesanan Berhasil Dibuat! 🎉</h2>
+              <div class="success-icon">âœ“</div>
+              <h2 style="margin-bottom:0.5rem">Pesanan Berhasil Dibuat! ðŸŽ‰</h2>
               <p>Terima kasih! Pesanan Anda sedang diproses. Kami akan segera mengirimkan konfirmasi ke email Anda.</p>
               <div style="background:var(--color-bg);border-radius:var(--radius-md);padding:1.25rem;margin:1.5rem 0;font-size:0.9rem">
                 <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem"><span style="color:var(--color-text-muted)">Nomor Pesanan</span><strong id="order-number">#CLY-00001</strong></div>
@@ -231,7 +231,7 @@
 </section>
 
 <footer class="footer">
-  <div class="container"><div class="footer-bottom"><p>© 2024 Clayé Ceramic Studio.</p></div></div>
+  <div class="container"><div class="footer-bottom"><p>© 2024 CLAYÉ Curated Ceramics.</p></div></div>
 </footer>
 
 <script src="assets/js/main.js"></script>
@@ -252,7 +252,7 @@
       document.getElementById('confirm-address').innerHTML = `${fn} ${document.getElementById('last-name').value}<br>${document.getElementById('address').value}<br>${city}, ${document.getElementById('postal').value}`;
       document.getElementById('confirm-shipping').innerHTML = `${selectedShipping.name}<br><strong>${selectedShipping.cost === 0 ? 'GRATIS' : formatRupiah(selectedShipping.cost)}</strong>`;
       const items = getCart();
-      document.getElementById('confirm-items').innerHTML = items.map(i => `<div class="order-item"><img src="${i.image}" alt="${i.name}"><div class="order-item-name">${i.name} <span style="color:var(--color-text-muted)">×${i.quantity}</span></div><div class="order-item-price">${formatRupiah(i.price*i.quantity)}</div></div>`).join('');
+      document.getElementById('confirm-items').innerHTML = items.map(i => `<div class="order-item"><img src="${i.image}" alt="${i.name}"><div class="order-item-name">${i.name} <span style="color:var(--color-text-muted)">Ã—${i.quantity}</span></div><div class="order-item-price">${formatRupiah(i.price*i.quantity)}</div></div>`).join('');
     }
     document.querySelectorAll('.checkout-step').forEach(s => s.classList.remove('active'));
     document.getElementById('checkout-step-' + n).classList.add('active');
@@ -290,7 +290,7 @@
     document.getElementById('co-shipping').textContent = ship === 0 ? 'GRATIS' : formatRupiah(ship);
     document.getElementById('co-total').textContent = formatRupiah(sub + ship);
     const items = getCart();
-    document.getElementById('checkout-order-items').innerHTML = items.map(i => `<div class="order-item"><img src="${i.image}" alt="${i.name}"><div class="order-item-name">${i.name} ×${i.quantity}</div><div class="order-item-price">${formatRupiah(i.price*i.quantity)}</div></div>`).join('');
+    document.getElementById('checkout-order-items').innerHTML = items.map(i => `<div class="order-item"><img src="${i.image}" alt="${i.name}"><div class="order-item-name">${i.name} Ã—${i.quantity}</div><div class="order-item-price">${formatRupiah(i.price*i.quantity)}</div></div>`).join('');
   }
 
   function placeOrder() {
@@ -317,10 +317,11 @@
       stepEl.classList.add('done');
       if (i < 4) document.getElementById('line-' + i).classList.add('done');
     }
-    showToast('Pesanan berhasil dibuat! 🎉', 'success', 5000);
+    showToast('Pesanan berhasil dibuat! ðŸŽ‰', 'success', 5000);
   }
 
   document.addEventListener('DOMContentLoaded', updateCheckoutSummary);
 </script>
 </body>
 </html>
+

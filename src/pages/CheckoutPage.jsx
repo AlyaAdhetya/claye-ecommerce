@@ -6,11 +6,11 @@ export default function CheckoutPage() {
 
   const [formData, setFormData] = useState({
     fullName: user ? (user.fullName || user.name) : 'Raden Ayu Paramitha',
-    email: user ? user.email : 'paramitha.studio@example.com',
+    email: user ? user.email : 'paramitha@example.com',
     phone: user ? user.phone : '+62 812 3456 7890',
-    address: user ? user.address : 'Jl. Bukit Dago Utara No. 18, Coblong',
-    city: user ? user.city : 'Bandung',
-    postalCode: user ? user.postalCode : '40135',
+    address: user ? user.address : 'Jl. Sejuta Kenangan No. 12',
+    city: user ? user.city : 'Palembang',
+    postalCode: user ? user.postalCode : '30138',
     instructions: 'Titipkan di pos keamanan atau hubungi interkom rumah.'
   });
 
@@ -27,7 +27,7 @@ export default function CheckoutPage() {
   const handleCopyAccount = () => {
     navigator.clipboard?.writeText('8092 1190 44');
     setCopiedBank(true);
-    showToast('Nomor rekening BCA studio berhasil disalin.', 'success');
+    showToast('Nomor rekening BCA CLAYÉ berhasil disalin.', 'success');
     setTimeout(() => setCopiedBank(false), 2500);
   };
 
@@ -63,7 +63,7 @@ export default function CheckoutPage() {
     });
 
     setOrderCompleteData(newOrder);
-    showToast('Pesanan berhasil dibuat. Tim studio bersiap mengemas karya Anda.', 'success');
+    showToast('Pesanan berhasil dibuat. Tim kurasi bersiap mengemas produk Anda.', 'success');
   };
 
   if (orderCompleteData) {
@@ -74,10 +74,10 @@ export default function CheckoutPage() {
             <div className="success-icon-badge">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
             </div>
-            <span className="order-received-tag">PENGIRIMAN STUDIO DIKONFIRMASI</span>
+            <span className="order-received-tag">PESANAN KURASI DIKONFIRMASI</span>
             <h1 className="success-title">Terima Kasih Atas Pesanan Anda</h1>
             <p className="success-body">
-              Pesanan keramik Anda telah terdaftar dengan nomor referensi <strong>{orderCompleteData.id}</strong>. Tim artisan kami di Bandung sedang menyiapkan karya pilihan Anda dengan perlindungan kemasan ramah lingkungan.
+              Pesanan keramik Anda telah terdaftar dengan nomor referensi <strong>{orderCompleteData.id}</strong>. Tim logistik CLAYÉ sedang menyiapkan produk kurasi pilihan Anda dengan perlindungan kemasan ramah lingkungan.
             </p>
 
             <div className="success-summary-box">
@@ -110,7 +110,7 @@ export default function CheckoutPage() {
                 onClick={() => navigate('/katalog')}
                 className="btn-success-secondary"
               >
-                Kembali Jelajahi Koleksi Studio
+                Kembali Jelajahi Koleksi Kurasi
               </button>
             </div>
           </div>
@@ -136,11 +136,11 @@ export default function CheckoutPage() {
         {/* HEADER PEMBAYARAN */}
         <div className="checkout-page-header">
           <div>
-            <div className="checkout-dispatch-tag">PENGIRIMAN STUDIO — BATCH 08</div>
+            <div className="checkout-dispatch-tag">PENGIRIMAN GUDANG PUSAT CLAYÉ</div>
             <h1 className="checkout-main-title">Pembayaran</h1>
           </div>
           <div className="checkout-header-right-note">
-            Satu langkah lagi menuju pesanan keramik pilihan Anda yang dikemas dengan rapi dan aman dari studio Bandung kami.
+            Satu langkah lagi menuju produk keramik kurasi pilihan Anda yang dikemas dengan rapi dan bergaransi aman.
           </div>
         </div>
 
@@ -177,7 +177,7 @@ export default function CheckoutPage() {
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      placeholder="paramitha.studio@example.com"
+                      placeholder="paramitha@example.com"
                       required
                     />
                   </div>
@@ -195,47 +195,46 @@ export default function CheckoutPage() {
                 </div>
 
                 <div className="checkout-form-group">
-                  <label>ALAMAT LENGKAP PENGIRIMAN *</label>
-                  <input
-                    type="text"
+                  <label>ALAMAT LENGKAP RUMAH / TUJUAN *</label>
+                  <textarea
+                    rows="3"
                     value={formData.address}
                     onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                    placeholder="Jl. Bukit Dago Utara No. 18, Coblong"
+                    placeholder="Nama Jalan, Nomor Rumah, RT/RW, Kecamatan"
                     required
                   />
                 </div>
 
                 <div className="checkout-form-row">
                   <div className="checkout-form-group">
-                    <label>KOTA *</label>
+                    <label>KOTA / KABUPATEN *</label>
                     <input
                       type="text"
                       value={formData.city}
                       onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                      placeholder="Bandung"
+                      placeholder="Palembang"
                       required
                     />
                   </div>
 
                   <div className="checkout-form-group">
-                    <label>KODE POS *</label>
+                    <label>KODE POS</label>
                     <input
                       type="text"
                       value={formData.postalCode}
                       onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
-                      placeholder="40135"
-                      required
+                      placeholder="30138"
                     />
                   </div>
                 </div>
 
                 <div className="checkout-form-group">
-                  <label>CATATAN PENGIRIMAN (OPSIONAL)</label>
+                  <label>CATATAN KHUSUS PENGIRIMAN (OPSIONAL)</label>
                   <input
                     type="text"
                     value={formData.instructions}
                     onChange={(e) => setFormData({ ...formData, instructions: e.target.value })}
-                    placeholder="Titipkan di pos keamanan atau hubungi interkom rumah."
+                    placeholder="Contoh: Titipkan di pos satpam / hubungi via WA"
                   />
                 </div>
               </div>
@@ -246,12 +245,12 @@ export default function CheckoutPage() {
               <div className="step-card-header">
                 <div className="step-title-group">
                   <span className="step-number-pill">2</span>
-                  <h2 className="step-title-text">Metode Pengiriman</h2>
+                  <h2 className="step-title-text">Opsi Pengiriman</h2>
                 </div>
               </div>
 
-              <div className="shipping-methods-container">
-                {/* PENGIRIMAN REGULER */}
+              <div className="shipping-options-list">
+                {/* Opsi 1: Reguler */}
                 <label
                   className={`shipping-option-card ${shippingMethod === 'regular' ? 'selected' : ''}`}
                   onClick={() => setShippingMethod('regular')}
@@ -265,18 +264,18 @@ export default function CheckoutPage() {
                     />
                     <div className="shipping-desc-wrap">
                       <div className="shipping-name-row">
-                        <strong>Pengiriman Reguler</strong>
-                        <span className="method-pill eco-pill">ECO SHIELD</span>
+                        <strong>Pengiriman Standar</strong>
+                        <span className="method-pill standard-pill">STANDAR</span>
                       </div>
                       <p className="shipping-subtext">
-                        Estimasi 2–3 hari kerja. Dilindungi kertas sarang lebah ramah lingkungan & bantalan pulp anti-benturan.
+                        Kardus berdinding ganda dengan pelindung sarang lebah (honeycomb) ramah lingkungan.
                       </p>
                     </div>
                   </div>
                   <div className="shipping-price-tag">Rp15.000</div>
                 </label>
 
-                {/* PENGIRIMAN KILAT */}
+                {/* Opsi 2: Prioritas */}
                 <label
                   className={`shipping-option-card ${shippingMethod === 'express' ? 'selected' : ''}`}
                   onClick={() => setShippingMethod('express')}
@@ -294,7 +293,7 @@ export default function CheckoutPage() {
                         <span className="method-pill priority-pill">PRIORITAS</span>
                       </div>
                       <p className="shipping-subtext">
-                        Pengiriman prioritas langsung dari atelier studio ke alamat tujuan Anda.
+                        Pengiriman prioritas langsung dari gudang distribusi pusat CLAYÉ ke alamat tujuan Anda.
                       </p>
                     </div>
                   </div>
@@ -326,7 +325,7 @@ export default function CheckoutPage() {
                         checked={paymentMethod === 'bank'}
                         onChange={() => setPaymentMethod('bank')}
                       />
-                      <strong>Transfer Bank (Verifikasi Manual Studio)</strong>
+                      <strong>Transfer Bank (Verifikasi Manual Admin)</strong>
                     </div>
                     <div className="bank-badges-row">
                       <span className="bank-tag">BCA</span>
@@ -335,13 +334,13 @@ export default function CheckoutPage() {
                     </div>
                   </div>
                   <p className="payment-desc-text">
-                    Transfer langsung ke rekening resmi studio CLAYÉ. Verifikasi bukti pembayaran dalam 2 jam kerja.
+                    Transfer langsung ke rekening resmi CLAYÉ. Verifikasi bukti pembayaran dalam 2 jam kerja.
                   </p>
 
                   {paymentMethod === 'bank' && (
                     <div className="copyable-account-box" onClick={(e) => e.stopPropagation()}>
                       <div className="account-details-text">
-                        <span>Rekening BCA Studio:</span> <strong>8092 1190 44</strong> <span>(a.n. CLAYÉ Studio)</span>
+                        <span>Rekening BCA CLAYÉ:</span> <strong>8092 1190 44</strong> <span>(a.n. CLAYÉ Kurasi Keramik)</span>
                       </div>
                       <button
                         type="button"
@@ -360,7 +359,7 @@ export default function CheckoutPage() {
                   )}
                 </div>
 
-                {/* 2. E-WALLET INSTAN & QRIS */}
+                {/* 2. QRIS / E-WALLET */}
                 <div
                   className={`payment-option-card ${paymentMethod === 'qris' ? 'selected' : ''}`}
                   onClick={() => setPaymentMethod('qris')}
@@ -373,7 +372,7 @@ export default function CheckoutPage() {
                         checked={paymentMethod === 'qris'}
                         onChange={() => setPaymentMethod('qris')}
                       />
-                      <strong>E-Wallet Instan & QRIS</strong>
+                      <strong>E-Wallet & QRIS Instan</strong>
                     </div>
                     <div className="bank-badges-row">
                       <span className="bank-tag">QRIS</span>
@@ -389,7 +388,7 @@ export default function CheckoutPage() {
                   {paymentMethod === 'qris' && (
                     <div className="qris-preview-box" onClick={(e) => e.stopPropagation()}>
                       <div className="qris-barcode-dummy">
-                        <span>Kode Pembayaran QRIS Studio Otomatis</span>
+                        <span>Kode Pembayaran QRIS CLAYÉ Otomatis</span>
                       </div>
                     </div>
                   )}
@@ -424,44 +423,29 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          {/* KOLOM KANAN: RINGKASAN PESANAN & JAMINAN */}
+          {/* KOLOM KANAN: RINGKASAN PESANAN */}
           <div className="checkout-summary-column">
-            {/* KARTU RINGKASAN */}
-            <div className="order-summary-card">
-              <div className="order-summary-header">
-                <h2 className="summary-title">Ringkasan Pesanan</h2>
-                <span className="summary-pieces-count">{totalPieces} PRODUK</span>
+            <div className="checkout-order-summary-card">
+              <div className="summary-card-header">
+                <h3 className="summary-title">Ringkasan Pesanan</h3>
+                <span className="summary-count-badge">{totalPieces} Barang</span>
               </div>
 
-              {/* DAFTAR ITEM */}
+              {/* LIST PRODUK MINI */}
               <div className="summary-items-list">
                 {cart.map((item, idx) => (
-                  <div key={idx} className="summary-item-card">
-                    <div className="summary-item-thumb">
-                      <img src={item.image} alt={item.name} />
-                    </div>
+                  <div key={idx} className="summary-item-row">
+                    <img src={item.image} alt={item.name} className="summary-item-img" />
                     <div className="summary-item-info">
-                      <h3 className="summary-item-name">{item.name}</h3>
-                      <div className="summary-item-variant">
-                        <span
-                          className="summary-color-dot"
-                          style={{
-                            backgroundColor: item.selectedGlaze === 'Hijau Sage' ? '#BDC7B9' : '#EBE5D8'
-                          }}
-                        />
-                        <span>Warna: {item.selectedGlaze || 'Alami'}</span>
-                      </div>
+                      <strong className="summary-name">{item.name}</strong>
+                      <span className="summary-variant">Glasir: {item.selectedGlaze || 'Alami'}</span>
                       {item.stamp && (
-                        <div className="summary-item-stamp">
-                          Grafir: "{item.stamp}"
-                        </div>
+                        <span className="summary-stamp">Grafir: "{item.stamp}"</span>
                       )}
-                      <div className="summary-item-qty">
-                        Jumlah: {item.quantity}
+                      <div className="summary-qty-price">
+                        <span>Jml: {item.quantity}</span>
+                        <strong>Rp {(item.price * item.quantity).toLocaleString('id-ID')}</strong>
                       </div>
-                    </div>
-                    <div className="summary-item-price">
-                      Rp {(item.price * item.quantity).toLocaleString('id-ID')}
                     </div>
                   </div>
                 ))}
@@ -478,7 +462,7 @@ export default function CheckoutPage() {
                   <strong>Rp {shippingCost.toLocaleString('id-ID')}</strong>
                 </div>
                 <div className="cost-row">
-                  <span>Kemasan Protektif Studio</span>
+                  <span>Kemasan Protektif CLAYÉ</span>
                   <strong className="free-tag">Gratis</strong>
                 </div>
 
@@ -506,7 +490,7 @@ export default function CheckoutPage() {
               </p>
             </div>
 
-            {/* JAMINAN KUALITAS & KEAMANAN (CLEAN TANPA EMOJI) */}
+            {/* JAMINAN KUALITAS & KEAMANAN */}
             <div className="studio-trust-badges-card">
               <div className="trust-badge-item">
                 <div>
@@ -524,20 +508,20 @@ export default function CheckoutPage() {
 
               <div className="trust-badge-item">
                 <div>
-                  <strong>JAMINAN KERAJINAN ASLI BANDUNG</strong>
-                  <p>Setiap produk keramik dibentuk di atas roda putar, diglasir, dan diinspeksi kualitasnya sebelum dikirim.</p>
+                  <strong>JAMINAN KERAJINAN ASLI PENGRAJIN</strong>
+                  <p>Setiap produk keramik dikurasi langsung dari mitra pengrajin tembikar, diuji food-safe, dan diinspeksi kualitasnya sebelum dikemas.</p>
                 </div>
               </div>
             </div>
 
-            {/* BANTUAN ASISTEN STUDIO */}
+            {/* BANTUAN ASISTEN KURASI */}
             <div className="checkout-concierge-callout">
               Butuh bantuan penataan atau pesanan kado khusus?<br />
               <button
                 onClick={() => openConcierge('Halo, saya sedang berada di halaman checkout dan butuh bantuan pemesanan')}
                 className="concierge-link-action"
               >
-                Hubungi tim asisten studio kami
+                Hubungi tim asisten kurasi kami
               </button>
             </div>
           </div>

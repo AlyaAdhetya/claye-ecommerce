@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login & Daftar — Clayé Ceramic</title>
+  <title>Login & Daftar — CLAYÉ Ceramic</title>
   <link rel="stylesheet" href="assets/css/style.css">
   <style>
     .auth-page { min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; }
@@ -39,17 +39,17 @@
   <div class="auth-visual">
     <div class="auth-visual-content">
       <a href="index.html" style="display:inline-block;margin-bottom:2rem">
-        <div style="font-family:var(--font-heading);font-size:2rem;font-weight:700;color:var(--color-secondary)">Clayé</div>
-        <div style="font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.5)">Ceramic Studio</div>
+        <div style="font-family:var(--font-heading);font-size:2rem;font-weight:700;color:var(--color-secondary)">CLAYÉ</div>
+        <div style="font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,0.5)">Curated Ceramics</div>
       </a>
       <h2>Bergabunglah dengan Komunitas Pecinta Keramik Kami</h2>
       <p>Dapatkan akses eksklusif ke koleksi terbaru, penawaran anggota, dan inspirasi desain keramik artisan.</p>
       <div class="auth-benefits">
-        <div class="auth-benefit"><span>🎁</span><span>Diskon 15% untuk pembelian pertama</span></div>
+        <div class="auth-benefit"><span>ðŸŽ</span><span>Diskon 15% untuk pembelian pertama</span></div>
         <div class="auth-benefit"><span>📦</span><span>Lacak pesanan secara real-time</span></div>
-        <div class="auth-benefit"><span>❤️</span><span>Simpan produk favorit di wishlist</span></div>
-        <div class="auth-benefit"><span>⭐</span><span>Kumpulkan poin untuk reward menarik</span></div>
-        <div class="auth-benefit"><span>🔔</span><span>Notifikasi stok & koleksi eksklusif</span></div>
+        <div class="auth-benefit"><span>â¤ï¸</span><span>Simpan produk favorit di wishlist</span></div>
+        <div class="auth-benefit"><span>â­</span><span>Kumpulkan poin untuk reward menarik</span></div>
+        <div class="auth-benefit"><span>ðŸ””</span><span>Notifikasi stok & koleksi eksklusif</span></div>
       </div>
     </div>
   </div>
@@ -58,8 +58,8 @@
   <div class="auth-form-section">
     <div class="auth-form-wrap">
       <div class="auth-logo">
-        <div class="logo-name">Clayé</div>
-        <div class="logo-tagline">Ceramic Studio</div>
+        <div class="logo-name">CLAYÉ</div>
+        <div class="logo-tagline">Curated Ceramics</div>
       </div>
 
       <!-- Tabs -->
@@ -70,14 +70,14 @@
 
       <!-- LOGIN FORM -->
       <div class="auth-form active" id="form-login">
-        <h2 style="margin-bottom:0.5rem;font-size:1.6rem">Selamat Datang Kembali 👋</h2>
+        <h2 style="margin-bottom:0.5rem;font-size:1.6rem">Selamat Datang Kembali ðŸ‘‹</h2>
         <p style="margin-bottom:1.75rem">Masuk ke akun Anda untuk melanjutkan</p>
 
         <button class="social-btn" onclick="socialLogin('Google')">
-          <span style="font-size:1.2rem">🔴</span> Lanjutkan dengan Google
+          <span style="font-size:1.2rem">ðŸ”´</span> Lanjutkan dengan Google
         </button>
         <button class="social-btn" onclick="socialLogin('Facebook')">
-          <span style="font-size:1.2rem">🔵</span> Lanjutkan dengan Facebook
+          <span style="font-size:1.2rem">ðŸ”µ</span> Lanjutkan dengan Facebook
         </button>
 
         <div class="divider-text">atau masuk dengan email</div>
@@ -94,7 +94,7 @@
             </label>
             <div class="password-field">
               <input type="password" class="form-control" id="login-password" placeholder="••••••••" required>
-              <button type="button" class="password-toggle" onclick="togglePassword('login-password',this)">👁</button>
+              <button type="button" class="password-toggle" onclick="togglePassword('login-password',this)">ðŸ‘</button>
             </div>
           </div>
           <label class="form-check" style="margin-bottom:1.25rem">
@@ -114,7 +114,7 @@
         <p style="margin-bottom:1.75rem">Daftar gratis dan mulai koleksi keramik Anda</p>
 
         <button class="social-btn" onclick="socialLogin('Google')">
-          <span style="font-size:1.2rem">🔴</span> Daftar dengan Google
+          <span style="font-size:1.2rem">ðŸ”´</span> Daftar dengan Google
         </button>
 
         <div class="divider-text">atau daftar dengan email</div>
@@ -130,7 +130,7 @@
             <label class="form-label">Password <span class="required">*</span></label>
             <div class="password-field">
               <input type="password" class="form-control" id="reg-password" placeholder="Min. 8 karakter" required minlength="8" oninput="checkPasswordStrength(this.value)">
-              <button type="button" class="password-toggle" onclick="togglePassword('reg-password',this)">👁</button>
+              <button type="button" class="password-toggle" onclick="togglePassword('reg-password',this)">ðŸ‘</button>
             </div>
             <div id="pwd-strength" style="margin-top:0.5rem;height:4px;border-radius:2px;background:var(--color-border);overflow:hidden;display:none">
               <div id="pwd-bar" style="height:100%;width:0;transition:width 0.3s,background 0.3s;border-radius:2px"></div>
@@ -141,7 +141,7 @@
             <label class="form-label">Konfirmasi Password <span class="required">*</span></label>
             <div class="password-field">
               <input type="password" class="form-control" id="reg-confirm" placeholder="Ulangi password" required minlength="8">
-              <button type="button" class="password-toggle" onclick="togglePassword('reg-confirm',this)">👁</button>
+              <button type="button" class="password-toggle" onclick="togglePassword('reg-confirm',this)">ðŸ‘</button>
             </div>
           </div>
           <label class="form-check" style="margin-bottom:0.75rem"><input type="checkbox" required><span class="form-check-label">Saya setuju dengan <a href="#" style="color:var(--color-primary)">Syarat & Ketentuan</a> dan <a href="#" style="color:var(--color-primary)">Kebijakan Privasi</a></span></label>
@@ -172,7 +172,7 @@
     const input = document.getElementById(id);
     const isText = input.type === 'text';
     input.type = isText ? 'password' : 'text';
-    btn.textContent = isText ? '👁' : '🙈';
+    btn.textContent = isText ? 'ðŸ‘' : 'ðŸ™ˆ';
   }
 
   function checkPasswordStrength(val) {
@@ -203,7 +203,7 @@
       // Simple demo login
       const user = { name: email.split('@')[0], email, role: 'customer', joinDate: new Date().toLocaleDateString('id-ID') };
       saveUser(user);
-      showToast(`Selamat datang kembali, ${user.name}! 🎉`, 'success');
+      showToast(`Selamat datang kembali, ${user.name}! ðŸŽ‰`, 'success');
       setTimeout(() => window.location.href = 'dashboard-pelanggan.html', 1200);
     }, 1200);
   }
@@ -218,16 +218,17 @@
     const email = document.getElementById('reg-email').value;
     const user = { name: fn + (ln ? ' ' + ln : ''), email, role: 'customer', joinDate: new Date().toLocaleDateString('id-ID') };
     saveUser(user);
-    showToast(`Akun berhasil dibuat! Selamat bergabung, ${fn}! 🎉`, 'success');
+    showToast(`Akun berhasil dibuat! Selamat bergabung, ${fn}! ðŸŽ‰`, 'success');
     setTimeout(() => window.location.href = 'dashboard-pelanggan.html', 1200);
   }
 
   function socialLogin(provider) {
     const user = { name: 'Demo User', email: 'demo@claye.id', role: 'customer', joinDate: new Date().toLocaleDateString('id-ID') };
     saveUser(user);
-    showToast(`Login dengan ${provider} berhasil! 🎉`, 'success');
+    showToast(`Login dengan ${provider} berhasil! ðŸŽ‰`, 'success');
     setTimeout(() => window.location.href = 'dashboard-pelanggan.html', 1200);
   }
 </script>
 </body>
 </html>
+

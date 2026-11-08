@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Keranjang Belanja — Clayé Ceramic</title>
+  <title>Keranjang Belanja — CLAYÉ Ceramic</title>
   <link rel="stylesheet" href="assets/css/style.css">
   <style>
     .cart-layout { display: grid; grid-template-columns: 1fr 380px; gap: 2rem; align-items: start; }
@@ -40,7 +40,7 @@
 
 <nav class="navbar">
   <div class="container navbar-inner">
-    <a href="index.html" class="navbar-logo"><span class="logo-name">Clayé</span><span class="logo-tagline">Ceramic Studio</span></a>
+    <a href="index.html" class="navbar-logo"><span class="logo-name">CLAYÉ</span><span class="logo-tagline">Curated Ceramics</span></a>
     <div class="navbar-nav">
       <a href="index.html">Beranda</a><a href="katalog.html">Katalog</a><a href="index.html#tentang">Tentang</a>
     </div>
@@ -51,7 +51,7 @@
     </div>
   </div>
 </nav>
-<div class="mobile-menu"><div class="mobile-menu-overlay"></div><div class="mobile-menu-panel"><div class="mobile-menu-header"><a href="index.html" class="navbar-logo"><span class="logo-name">Clayé</span></a><button class="mobile-menu-close">✕</button></div><nav class="mobile-nav"><a href="index.html">🏠 Beranda</a><a href="katalog.html">🏺 Katalog</a><a href="login.html">👤 Login</a></nav></div></div>
+<div class="mobile-menu"><div class="mobile-menu-overlay"></div><div class="mobile-menu-panel"><div class="mobile-menu-header"><a href="index.html" class="navbar-logo"><span class="logo-name">CLAYÉ</span></a><button class="mobile-menu-close">✕</button></div><nav class="mobile-nav"><a href="index.html">ðŸ  Beranda</a><a href="katalog.html">ðŸº Katalog</a><a href="login.html">👤 Login</a></nav></div></div>
 
 <div class="page-header">
   <div class="container">
@@ -76,11 +76,11 @@
       <div class="card" style="overflow:hidden">
         <div class="card-header flex-between">
           <h3 style="margin:0;font-size:1.1rem">Item dalam Keranjang <span id="cart-item-count" style="color:var(--color-text-muted);font-weight:400;font-size:0.9rem"></span></h3>
-          <button class="btn btn-ghost btn-sm" onclick="clearCart()">🗑 Hapus Semua</button>
+          <button class="btn btn-ghost btn-sm" onclick="clearCart()">ðŸ—‘ Hapus Semua</button>
         </div>
         <div id="cart-items-list"></div>
         <div class="card-footer flex-between">
-          <a href="katalog.html" class="btn btn-ghost btn-sm">← Lanjut Belanja</a>
+          <a href="katalog.html" class="btn btn-ghost btn-sm">â† Lanjut Belanja</a>
           <span style="font-size:0.82rem;color:var(--color-text-muted)">Produk akan disimpan selama 24 jam</span>
         </div>
       </div>
@@ -97,16 +97,16 @@
           <input type="text" class="promo-input" placeholder="Kode promo" id="promo-code">
           <button class="promo-btn" onclick="applyPromo()">Gunakan</button>
         </div>
-        <div id="promo-msg" style="font-size:0.78rem;color:var(--color-accent);margin-bottom:0.5rem;display:none">✓ Promo berhasil diterapkan!</div>
+        <div id="promo-msg" style="font-size:0.78rem;color:var(--color-accent);margin-bottom:0.5rem;display:none">âœ“ Promo berhasil diterapkan!</div>
 
         <a href="checkout.html" class="btn btn-primary btn-full btn-lg" style="margin-top:0.5rem">
-          Lanjut ke Checkout →
+          Lanjut ke Checkout â†’
         </a>
 
         <div class="trust-badges">
-          <div class="trust-badge-item">🔒 Pembayaran aman & terenkripsi</div>
+          <div class="trust-badge-item">ðŸ”’ Pembayaran aman & terenkripsi</div>
           <div class="trust-badge-item">🚚 Pengiriman ke seluruh Indonesia</div>
-          <div class="trust-badge-item">↩️ Garansi retur 30 hari</div>
+          <div class="trust-badge-item">â†©ï¸ Garansi retur 30 hari</div>
         </div>
       </div>
     </div>
@@ -121,7 +121,7 @@
 
 <footer class="footer">
   <div class="container">
-    <div class="footer-bottom"><p>© 2024 Clayé Ceramic Studio.</p></div>
+    <div class="footer-bottom"><p>© 2024 CLAYÉ Curated Ceramics.</p></div>
   </div>
 </footer>
 
@@ -156,11 +156,11 @@
         <div class="cart-item-actions">
           <div class="cart-item-total">${formatRupiah(item.price * item.quantity)}</div>
           <div class="qty-control">
-            <button class="qty-btn" onclick="updateQty(${item.id},-1)">−</button>
+            <button class="qty-btn" onclick="updateQty(${item.id},-1)">âˆ’</button>
             <input type="number" class="qty-num" value="${item.quantity}" min="1" onchange="setQty(${item.id},this.value)">
             <button class="qty-btn" onclick="updateQty(${item.id},1)">+</button>
           </div>
-          <button class="cart-remove-btn" onclick="removeItem(${item.id})">🗑 Hapus</button>
+          <button class="cart-remove-btn" onclick="removeItem(${item.id})">ðŸ—‘ Hapus</button>
         </div>
       </div>
     `).join('');
@@ -179,7 +179,7 @@
     const discount = Math.floor(subtotal * discountPercent / 100);
     const total = subtotal + shipping - discount;
     document.getElementById('summary-subtotal').textContent = formatRupiah(subtotal);
-    document.getElementById('summary-shipping').textContent = shipping === 0 ? 'GRATIS 🎉' : formatRupiah(shipping);
+    document.getElementById('summary-shipping').textContent = shipping === 0 ? 'GRATIS ðŸŽ‰' : formatRupiah(shipping);
     document.getElementById('summary-discount').textContent = `- ${formatRupiah(discount)}`;
     document.getElementById('summary-total').textContent = formatRupiah(total);
   }
@@ -213,8 +213,8 @@
     if (pct) {
       promoApplied = true;
       document.getElementById('promo-msg').style.display = 'block';
-      document.getElementById('promo-msg').textContent = `✓ Promo "${code}" diterapkan! Diskon ${pct}%`;
-      showToast(`Kode promo berhasil! Diskon ${pct}% diterapkan 🎉`, 'success');
+      document.getElementById('promo-msg').textContent = `âœ“ Promo "${code}" diterapkan! Diskon ${pct}%`;
+      showToast(`Kode promo berhasil! Diskon ${pct}% diterapkan ðŸŽ‰`, 'success');
     } else {
       showToast('Kode promo tidak valid atau sudah kadaluarsa', 'error');
     }
@@ -225,3 +225,4 @@
 </script>
 </body>
 </html>
+

@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Pelanggan — Clayé Ceramic</title>
+  <title>Dashboard Pelanggan — CLAYÉ Ceramic</title>
   <link rel="stylesheet" href="assets/css/style.css">
   <style>
     .dashboard-layout { display: grid; grid-template-columns: 260px 1fr; gap: 2rem; min-height: 60vh; }
@@ -43,7 +43,7 @@
 
 <nav class="navbar">
   <div class="container navbar-inner">
-    <a href="index.html" class="navbar-logo"><span class="logo-name">Clayé</span><span class="logo-tagline">Ceramic Studio</span></a>
+    <a href="index.html" class="navbar-logo"><span class="logo-name">CLAYÉ</span><span class="logo-tagline">Curated Ceramics</span></a>
     <div class="navbar-nav">
       <a href="index.html">Beranda</a><a href="katalog.html">Katalog</a>
     </div>
@@ -54,7 +54,7 @@
     </div>
   </div>
 </nav>
-<div class="mobile-menu"><div class="mobile-menu-overlay"></div><div class="mobile-menu-panel"><div class="mobile-menu-header"><a href="index.html" class="navbar-logo"><span class="logo-name">Clayé</span></a><button class="mobile-menu-close">✕</button></div><nav class="mobile-nav"><a href="index.html">🏠 Beranda</a><a href="katalog.html">🏺 Katalog</a><a href="keranjang.html">🛒 Keranjang</a></nav></div></div>
+<div class="mobile-menu"><div class="mobile-menu-overlay"></div><div class="mobile-menu-panel"><div class="mobile-menu-header"><a href="index.html" class="navbar-logo"><span class="logo-name">CLAYÉ</span></a><button class="mobile-menu-close">✕</button></div><nav class="mobile-nav"><a href="index.html">ðŸ  Beranda</a><a href="katalog.html">ðŸº Katalog</a><a href="keranjang.html">🛒 Keranjang</a></nav></div></div>
 
 <div class="page-header">
   <div class="container">
@@ -72,16 +72,16 @@
           <div class="user-avatar" id="user-initial">U</div>
           <div class="user-name" id="dash-user-name">Pengguna</div>
           <div class="user-email" id="dash-user-email">email@contoh.com</div>
-          <div class="user-member-badge">⭐ Member Reguler</div>
+          <div class="user-member-badge">â­ Member Reguler</div>
         </div>
         <div class="sidebar-nav">
-          <div class="sidebar-nav-item active" onclick="switchPanel('overview',this)"><span class="nav-icon">🏠</span> Ringkasan</div>
+          <div class="sidebar-nav-item active" onclick="switchPanel('overview',this)"><span class="nav-icon">ðŸ </span> Ringkasan</div>
           <div class="sidebar-nav-item" onclick="switchPanel('orders',this)"><span class="nav-icon">📦</span> Pesanan Saya</div>
-          <div class="sidebar-nav-item" onclick="switchPanel('wishlist',this)"><span class="nav-icon">❤️</span> Wishlist</div>
-          <div class="sidebar-nav-item" onclick="switchPanel('addresses',this)"><span class="nav-icon">📍</span> Alamat</div>
-          <div class="sidebar-nav-item" onclick="switchPanel('points',this)"><span class="nav-icon">⭐</span> Poin & Reward</div>
+          <div class="sidebar-nav-item" onclick="switchPanel('wishlist',this)"><span class="nav-icon">â¤ï¸</span> Wishlist</div>
+          <div class="sidebar-nav-item" onclick="switchPanel('addresses',this)"><span class="nav-icon">ðŸ“</span> Alamat</div>
+          <div class="sidebar-nav-item" onclick="switchPanel('points',this)"><span class="nav-icon">â­</span> Poin & Reward</div>
           <div class="sidebar-nav-item" onclick="switchPanel('profile',this)"><span class="nav-icon">👤</span> Edit Profil</div>
-          <div class="sidebar-nav-item" style="color:var(--color-error)" onclick="handleLogout()"><span class="nav-icon">🚪</span> Keluar</div>
+          <div class="sidebar-nav-item" style="color:var(--color-error)" onclick="handleLogout()"><span class="nav-icon">ðŸšª</span> Keluar</div>
         </div>
       </div>
 
@@ -91,9 +91,9 @@
         <div class="dashboard-panel active" id="panel-overview">
           <div class="stats-grid">
             <div class="stat-card animate-on-scroll"><div class="stat-icon">📦</div><div class="stat-val" id="stat-orders">0</div><div class="stat-lbl">Total Pesanan</div></div>
-            <div class="stat-card animate-on-scroll animate-delay-1"><div class="stat-icon">⭐</div><div class="stat-val">1.250</div><div class="stat-lbl">Poin Terkumpul</div></div>
-            <div class="stat-card animate-on-scroll animate-delay-2"><div class="stat-icon">❤️</div><div class="stat-val">8</div><div class="stat-lbl">Item Wishlist</div></div>
-            <div class="stat-card animate-on-scroll animate-delay-3"><div class="stat-icon">🎁</div><div class="stat-val">15%</div><div class="stat-lbl">Voucher Aktif</div></div>
+            <div class="stat-card animate-on-scroll animate-delay-1"><div class="stat-icon">â­</div><div class="stat-val">1.250</div><div class="stat-lbl">Poin Terkumpul</div></div>
+            <div class="stat-card animate-on-scroll animate-delay-2"><div class="stat-icon">â¤ï¸</div><div class="stat-val">8</div><div class="stat-lbl">Item Wishlist</div></div>
+            <div class="stat-card animate-on-scroll animate-delay-3"><div class="stat-icon">ðŸŽ</div><div class="stat-val">15%</div><div class="stat-lbl">Voucher Aktif</div></div>
           </div>
           <!-- Recent Orders -->
           <div class="card animate-on-scroll">
@@ -126,7 +126,7 @@
         <!-- WISHLIST -->
         <div class="dashboard-panel" id="panel-wishlist">
           <div class="card">
-            <div class="card-header"><h3 style="margin:0;font-size:1.1rem">❤️ Wishlist Saya</h3></div>
+            <div class="card-header"><h3 style="margin:0;font-size:1.1rem">â¤ï¸ Wishlist Saya</h3></div>
             <div class="card-body">
               <div class="products-grid" style="grid-template-columns:repeat(3,1fr)">
                 <div class="product-card"><div class="product-card-image"><img src="assets/images/product_bowl.jpg" alt=""><span class="product-card-badge badge-new">Baru</span></div><div class="product-card-body"><div class="product-category">Mangkuk</div><div class="product-name">Terra Bowl Klasik</div><div class="product-price-row"><div class="product-price">Rp 185.000</div><button class="product-add-btn" onclick="addToCart(1)">+</button></div></div></div>
@@ -141,7 +141,7 @@
         <div class="dashboard-panel" id="panel-addresses">
           <div class="card">
             <div class="card-header flex-between">
-              <h3 style="margin:0;font-size:1.1rem">📍 Alamat Tersimpan</h3>
+              <h3 style="margin:0;font-size:1.1rem">ðŸ“ Alamat Tersimpan</h3>
               <button class="btn btn-primary btn-sm" onclick="showToast('Fitur tambah alamat segera hadir!','info')">+ Tambah Alamat</button>
             </div>
             <div class="card-body">
@@ -149,10 +149,10 @@
                 <div class="address-card primary">
                   <div class="address-primary-badge">Utama</div>
                   <h5 style="margin-bottom:0.5rem">Rumah</h5>
-                  <p style="font-size:0.85rem;color:var(--color-text);margin:0;line-height:1.7" id="addr-primary">Jl. Malioboro No. 1<br>Kec. Gedongtengen, Yogyakarta<br>DI Yogyakarta 55271<br>📞 0812-3456-7890</p>
+                  <p style="font-size:0.85rem;color:var(--color-text);margin:0;line-height:1.7" id="addr-primary">Jl. Malioboro No. 1<br>Kec. Gedongtengen, Yogyakarta<br>DI Yogyakarta 55271<br>ðŸ“ž 0812-3456-7890</p>
                   <div style="display:flex;gap:0.5rem;margin-top:1rem">
-                    <button class="btn btn-ghost btn-sm" onclick="showToast('Fitur edit segera hadir!','info')">✏ Edit</button>
-                    <button class="btn btn-ghost btn-sm" onclick="showToast('Tidak dapat menghapus alamat utama','error')">🗑 Hapus</button>
+                    <button class="btn btn-ghost btn-sm" onclick="showToast('Fitur edit segera hadir!','info')">âœ Edit</button>
+                    <button class="btn btn-ghost btn-sm" onclick="showToast('Tidak dapat menghapus alamat utama','error')">ðŸ—‘ Hapus</button>
                   </div>
                 </div>
                 <div class="address-card" style="border-style:dashed;display:flex;align-items:center;justify-content:center;cursor:pointer;min-height:160px" onclick="showToast('Fitur tambah alamat segera hadir!','info')">
@@ -171,7 +171,7 @@
           <div class="card mb-lg">
             <div class="card-body" style="background:linear-gradient(135deg,var(--color-primary),var(--color-primary-dark));border-radius:inherit;text-align:center;padding:2.5rem">
               <div style="font-size:3.5rem;font-family:var(--font-heading);font-weight:700;color:white">1.250</div>
-              <div style="color:rgba(255,255,255,0.7);font-size:0.9rem;margin-top:0.25rem">Poin Clayé Anda</div>
+              <div style="color:rgba(255,255,255,0.7);font-size:0.9rem;margin-top:0.25rem">Poin CLAYÉ Anda</div>
               <div style="margin-top:1.5rem">
                 <div style="font-size:0.78rem;color:rgba(255,255,255,0.7);margin-bottom:0.5rem">Menuju Member Gold · 750 poin lagi</div>
                 <div class="points-bar"><div class="points-fill" style="width:62%"></div></div>
@@ -179,10 +179,10 @@
             </div>
           </div>
           <div class="card">
-            <div class="card-header"><h3 style="margin:0;font-size:1.1rem">🎁 Tukar Poin</h3></div>
+            <div class="card-header"><h3 style="margin:0;font-size:1.1rem">ðŸŽ Tukar Poin</h3></div>
             <div class="card-body">
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
-                <div style="border:1.5px solid var(--color-border);border-radius:var(--radius-md);padding:1.25rem;text-align:center"><div style="font-size:1.5rem;margin-bottom:0.5rem">💰</div><div style="font-weight:700;margin-bottom:0.25rem">500 Poin</div><div style="font-size:0.78rem;color:var(--color-text-muted);margin-bottom:0.75rem">= Diskon Rp 25.000</div><button class="btn btn-primary btn-sm btn-full" onclick="redeemPoints(500)">Tukar</button></div>
+                <div style="border:1.5px solid var(--color-border);border-radius:var(--radius-md);padding:1.25rem;text-align:center"><div style="font-size:1.5rem;margin-bottom:0.5rem">ðŸ’°</div><div style="font-weight:700;margin-bottom:0.25rem">500 Poin</div><div style="font-size:0.78rem;color:var(--color-text-muted);margin-bottom:0.75rem">= Diskon Rp 25.000</div><button class="btn btn-primary btn-sm btn-full" onclick="redeemPoints(500)">Tukar</button></div>
                 <div style="border:1.5px solid var(--color-border);border-radius:var(--radius-md);padding:1.25rem;text-align:center"><div style="font-size:1.5rem;margin-bottom:0.5rem">🚚</div><div style="font-weight:700;margin-bottom:0.25rem">300 Poin</div><div style="font-size:0.78rem;color:var(--color-text-muted);margin-bottom:0.75rem">= Gratis Ongkir</div><button class="btn btn-primary btn-sm btn-full" onclick="redeemPoints(300)">Tukar</button></div>
               </div>
             </div>
@@ -197,7 +197,7 @@
               <div style="display:flex;align-items:center;gap:1.5rem;margin-bottom:2rem">
                 <div style="width:80px;height:80px;border-radius:50%;background:var(--color-cream-dark);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-size:2rem;font-weight:700;color:var(--color-primary)" id="prof-avatar">U</div>
                 <div>
-                  <button class="btn btn-secondary btn-sm" onclick="showToast('Fitur upload foto segera hadir!','info')">📷 Ubah Foto</button>
+                  <button class="btn btn-secondary btn-sm" onclick="showToast('Fitur upload foto segera hadir!','info')">ðŸ“· Ubah Foto</button>
                   <div style="font-size:0.75rem;color:var(--color-text-muted);margin-top:0.35rem">JPG, PNG max 2MB</div>
                 </div>
               </div>
@@ -216,7 +216,7 @@
                   <div class="form-group"><label class="form-label">Password Baru</label><input type="password" class="form-control" placeholder="Min. 8 karakter"></div>
                   <div class="form-group"><label class="form-label">Konfirmasi Password</label><input type="password" class="form-control" placeholder="Ulangi password baru"></div>
                 </div>
-                <button type="submit" class="btn btn-primary">💾 Simpan Perubahan</button>
+                <button type="submit" class="btn btn-primary">ðŸ’¾ Simpan Perubahan</button>
               </form>
             </div>
           </div>
@@ -227,7 +227,7 @@
 </section>
 
 <footer class="footer">
-  <div class="container"><div class="footer-bottom"><p>© 2024 Clayé Ceramic Studio.</p></div></div>
+  <div class="container"><div class="footer-bottom"><p>© 2024 CLAYÉ Curated Ceramics.</p></div></div>
 </footer>
 
 <script src="assets/js/main.js"></script>
@@ -248,7 +248,7 @@
   function handleLogout() {
     if (confirm('Yakin ingin keluar dari akun?')) {
       logoutUser();
-      showToast('Berhasil keluar. Sampai jumpa! 👋', 'success');
+      showToast('Berhasil keluar. Sampai jumpa! ðŸ‘‹', 'success');
       setTimeout(() => window.location.href = 'index.html', 1200);
     }
   }
@@ -294,11 +294,11 @@
     const ln = document.getElementById('prof-ln').value;
     const updatedUser = { ...user, name: fn + (ln ? ' ' + ln : '') };
     saveUser(updatedUser);
-    showToast('Profil berhasil diperbarui! ✅', 'success');
+    showToast('Profil berhasil diperbarui! âœ…', 'success');
   }
 
   function redeemPoints(pts) {
-    showToast(`${pts} poin berhasil ditukar! Voucher tersimpan di akun Anda 🎁`, 'success');
+    showToast(`${pts} poin berhasil ditukar! Voucher tersimpan di akun Anda ðŸŽ`, 'success');
   }
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -315,3 +315,4 @@
 </script>
 </body>
 </html>
+

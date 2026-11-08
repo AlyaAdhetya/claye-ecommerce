@@ -66,7 +66,7 @@ export default function LoginPage() {
           {/* Logo */}
           <div className="auth-brand-logo" style={{ textAlign: 'center', marginBottom: '0.25rem' }}>CLAYÉ</div>
           <p style={{ textAlign: 'center', fontSize: '0.8rem', letterSpacing: '0.1em', color: '#8C8680', marginBottom: '2rem' }}>
-            STUDIO KERAMIK BANDUNG
+            TOKO & KURASI KERAMIK NUSANTARA
           </p>
 
           {/* Tab Masuk / Daftar */}

@@ -4,60 +4,60 @@ import { useShop } from '../context/ShopContext';
 export default function AboutPage() {
   const { navigate, openConcierge } = useShop();
 
-  const artisans = [
+  const curators = [
     {
-      name: 'Rian Wicaksono',
-      role: 'Master Ceramist dan Pendiri Studio',
-      experience: '12 Tahun Praktik Keramik',
-      bio: 'Lulusan Seni Rupa ITB yang mendedikasikan hidupnya pada teknik pembentukan roda putar manual. Terinspirasi oleh filosofi kesederhanaan Jepang dan tanah liat pegunungan Jawa Barat.',
+      name: 'Azwina Clayora',
+      role: 'Pendiri & Lead Curator',
+      experience: '12 Tahun Eksplorasi Seni Keramik',
+      bio: 'Menjelajahi sentra-sentra tembikar tradisional di Jawa Barat, Yogyakarta, hingga Bali untuk membangun kemitraan langsung dengan para pengrajin lokal berbakat dan memilih karya terbaik mereka.',
       image: '/assets/images/hero_bg.jpg'
     },
     {
-      name: 'Maya Larasati',
-      role: 'Kepala Formulasi Glasir Mineral',
-      experience: '8 Tahun Riset Material',
-      bio: 'Meracik seluruh glasir studio menggunakan mineral alam Indonesia, abu kayu pinus, dan pasir silika tanpa bahan kimia sintetis atau logam berat beracun.',
+      name: 'Alsywila Adhira',
+      role: 'Kepala Kontrol Kualitas & Standar Food-Safe',
+      experience: '8 Tahun Riset Material & Glasir',
+      bio: 'Memeriksa setiap batch produk yang masuk dari pengrajin mitra. Memastikan standar pembakaran suhu tinggi, uji ketahanan microwave/dishwasher, serta 100% bebas timbal dan racun.',
       image: '/assets/images/product_vase.jpg'
     },
     {
-      name: 'Danu Setiawan',
-      role: 'Master Craftsman dan Kontrol Kualitas',
-      experience: '9 Tahun Pengrajin Keramik',
-      bio: 'Bertanggung jawab penuh atas kualitas fisik dan estetika setiap karya. Memastikan ketahanan keramik stoneware yang kokoh, berbobot pas, dan nyaman digunakan sehari-hari.',
+      name: 'Altaz R.',
+      role: 'Kepala Logistik & Standar Kemasan Aman',
+      experience: '9 Tahun Spesialis Barang Pecah Belah',
+      bio: 'Merancang sistem pengemasan protektif sarang lebah (honeycomb) ramah lingkungan dan memastikan setiap produk pesanan sampai dengan selamat di tangan pelanggan ke seluruh Indonesia.',
       image: '/assets/images/product_bowl.jpg'
     }
   ];
 
-  const craftSteps = [
+  const curationSteps = [
     {
       step: '01',
-      title: 'Pemilihan dan Penempaan Tanah Liat',
-      subtitle: 'Stoneware Alami Jawa Barat',
-      desc: 'Kami memilih tanah liat stoneware berkualitas dari Sukabumi dan Purwakarta. Tanah liat diuleni dan ditempa (wedging) manual untuk membuang seluruh gelembung udara mikro, memastikan kekenyalan optimal dan menghindari retak saat pembakaran.'
+      title: 'Riset & Kemitraan Pengrajin',
+      subtitle: 'Menjalin Relasi Langsung dengan Sentra Tembikar',
+      desc: 'Kami berkeliling dan bermitra langsung dengan studio tembikar independen serta pengrajin lokal di berbagai daerah seperti Kasongan, Sukabumi, Bandung, dan Bali tanpa perantara spekulatif.'
     },
     {
       step: '02',
-      title: 'Pembentukan di Roda Putar',
-      subtitle: 'Wheel Throwing Satu Per Satu',
-      desc: 'Setiap cangkir, mangkuk, dan teko dibentuk perlahan di atas roda putar oleh tangan pengrajin. Kami membiarkan bekas sentuhan jemari alami tetap terlihat sebagai tanda otentikasi karya buatan tangan yang hidup.'
+      title: 'Kurasi & Seleksi Desain',
+      subtitle: 'Hanya Karya Bernilai Estetika Tinggi',
+      desc: 'Kami memilih produk yang memiliki keseimbangan fungsi dan estetika wabi-sabi: nyaman digenggam, proporsi seimbang, serta menampilkan karakter alami tanah liat dan glasir mineral.'
     },
     {
       step: '03',
-      title: 'Pengeringan dan Pembakaran Bisque',
-      subtitle: 'Suhu 900°C Selama 10 Jam',
-      desc: 'Karya setengah kering dipangkas (trimming) bagian bawahnya dan dibiarkan mengering secara alami selama 7 hari di ruang studio bersuhu sejuk sebelum masuk pembakaran awal bisque 900°C agar cukup kuat menyerap glasir.'
+      title: 'Uji Kualitas & Standar Food-Safe',
+      subtitle: 'Pemeriksaan Teliti Satu Per Satu',
+      desc: 'Setiap karya keramik diperiksa kelayakan fisiknya—memastikan tidak ada retak rambut tersembunyi, dasar produk dihaluskan agar tidak menggores meja, dan glasir 100% aman untuk makanan panas.'
     },
     {
       step: '04',
-      title: 'Formulasi dan Pencelupan Glasir Alami',
-      subtitle: '100% Food-Safe dan Tanpa Timbal',
-      desc: 'Formula glasir khas CLAYÉ dibuat dari abu kayu, feldspar, dan lempung vulkanik. Keramik dicelup atau disapu tangan satu per satu untuk menciptakan gradasi warna wabi-sabi yang unik dan tahan gores.'
+      title: 'Pergudangan & Katalogisasi Transparan',
+      subtitle: 'Penyimpanan Terpusat di Palembang',
+      desc: 'Produk yang lolos seleksi disimpan di fasilitas gudang terpusat kami dengan kontrol kelembapan ideal, lalu difoto dan didokumentasikan spesifikasinya secara transparan di katalog online CLAYÉ.'
     },
     {
       step: '05',
-      title: 'Proses Pematangan Keramik (High-Fire)',
-      subtitle: 'Stoneware Padat Tahan Lama',
-      desc: 'Karya melewati proses pematangan bersuhu tinggi agar partikel tanah memadat sempurna menjadi keramik non-porous yang kokoh, higienis, serta aman untuk microwave, dishwasher, dan penggunaan harian.'
+      title: 'Pengemasan Aman & Garansi Pengiriman',
+      subtitle: 'Garansi 100% Ganti Baru Jika Pecah',
+      desc: 'Pesanan dikemas menggunakan bantalan pulp daur ulang dan honeycomb wrap tebal. Kami memberikan garansi penggantian baru tanpa biaya jika barang rusak dalam perjalanan ekspedisi.'
     }
   ];
 
@@ -69,8 +69,8 @@ export default function AboutPage() {
           <polyline points="9 12 11 14 15 10"></polyline>
         </svg>
       ),
-      title: '100% Aman untuk Makanan (Food-Safe)',
-      desc: 'Seluruh karya keramik CLAYÉ bebas dari timbal (lead-free), kadmium, dan racun kimia sintetis. Aman untuk minuman hangat dan makanan panas.'
+      title: '100% Food-Safe & Lolos Uji Keamanan',
+      desc: 'Seluruh produk keramik yang kami kurasi diverifikasi bebas timbal (lead-free), kadmium, dan bahan kimia beracun sehingga aman untuk hidangan makanan serta minuman harian.'
     },
     {
       icon: (
@@ -80,8 +80,8 @@ export default function AboutPage() {
           <line x1="12" y1="22.08" x2="12" y2="12"></line>
         </svg>
       ),
-      title: 'Kekuatan Stoneware Tahan Lama',
-      desc: 'Melalui pembakaran 1260°C, material memiliki ketahanan tinggi terhadap benturan ringan, aman dimasukkan ke mesin pencuci piring (dishwasher) dan microwave.'
+      title: 'Standar Keramik Stoneware Kokoh',
+      desc: 'Kami hanya menyeleksi produk berbahan stoneware hasil pembakaran suhu tinggi (high-fire 1200°C–1260°C) yang padat, tahan retak, serta aman untuk microwave dan mesin cuci piring.'
     },
     {
       icon: (
@@ -90,8 +90,8 @@ export default function AboutPage() {
           <path d="M12 6v6l4 2"></path>
         </svg>
       ),
-      title: 'Slow Living dan Keberlanjutan',
-      desc: 'Kami mempraktikkan daur ulang tanah liat sisa produksi tanpa limbah (zero clay waste), menggunakan kemasan kardus daur ulang, dan menolak produksi massal instan.'
+      title: 'Pengemasan Ramah Lingkungan & Anti-Pecah',
+      desc: 'Menggunakan kertas sarang lebah (honeycomb paper) dan kardus daur ulang protektif berlapis tanpa styrofoam, dengan garansi 100% ganti baru jika pecah dalam pengiriman.'
     },
     {
       icon: (
@@ -103,7 +103,7 @@ export default function AboutPage() {
         </svg>
       ),
       title: 'Pemberdayaan Pengrajin Lokal',
-      desc: 'Setiap karya mendukung studio independen di Bandung dan rantai pasokan bahan baku lokal perajin tanah liat tradisional Indonesia.'
+      desc: 'Kami membeli produk langsung dari pengrajin dengan harga yang adil, membantu studio tembikar lokal memperluas jangkauan pasar ke pelanggan modern di seluruh Indonesia.'
     }
   ];
 
@@ -114,26 +114,24 @@ export default function AboutPage() {
         <div className="container">
           <div className="about-hero-inner">
             <div className="studio-edition-badge" style={{ marginBottom: '1rem' }}>
-              STUDIO DAN FILOSOFI CLAYÉ
+              TENTANG KAMI • PLATFORM KURASI KERAMIK
             </div>
             <h1 className="about-hero-title">
-              Menghidupkan Jiwa Tanah Liat dan Ketenangan Wabi-Sabi
+              Menghubungkan Karya Pengrajin Keramik Lokal dengan Ruang Hidup Anda
             </h1>
             <p className="about-hero-lead">
-              CLAYÉ lahir di perbukitan Dago, Bandung, dari kecintaan pada keindahan yang bersahaja.
-              Kami menciptakan keramik stoneware fungsional yang dibentuk manual dengan kesabaran,
-              merayakan ketidaksempurnaan alami dari tanah liat dan sentuhan tangan manusia.
+              CLAYÉ adalah platform toko kurasi keramik dan stoneware estetik. Kami tidak memproduksi barang sendiri, melainkan mencari, menyeleksi, dan mengambil karya tembikar terbaik langsung dari pengrajin lokal dan studio independen terpercaya di berbagai daerah Indonesia untuk dijual kembali kepada Anda dengan jaminan mutu, keamanan kemasan, dan transparansi penuh.
             </p>
             <div className="about-hero-actions">
               <button onClick={() => navigate('/katalog')} className="claye-terracotta-btn">
-                Jelajahi Karya Kami
+                Jelajahi Koleksi Kurasi
               </button>
               <button
-                onClick={() => openConcierge('Halo tim studio CLAYÉ, saya ingin bertanya tentang jadwal kunjungan studio dan pemesanan khusus')}
+                onClick={() => openConcierge('Halo tim CLAYÉ, saya ingin bertanya tentang cara kurasi produk dan kemitraan pengrajin')}
                 className="btn-modal-cancel"
                 style={{ padding: '14px 24px', backgroundColor: 'transparent', borderColor: 'var(--color-charcoal)', color: 'var(--color-charcoal)' }}
               >
-                Konsultasi dan Kunjungan Studio
+                Konsultasi Produk & Galeri
               </button>
             </div>
           </div>
@@ -146,55 +144,50 @@ export default function AboutPage() {
           <div className="about-stats-grid">
             <div className="about-stat-item">
               <strong className="stat-number">100%</strong>
-              <span className="stat-caption">Buatan Tangan (Handmade Stoneware)</span>
+              <span className="stat-caption">Produk Terkurasi & Lolos Kontrol Kualitas</span>
             </div>
             <div className="about-stat-item">
-              <strong className="stat-number">5+</strong>
-              <span className="stat-caption">Tahun Dedikasi Kerajinan Seni</span>
+              <strong className="stat-number">15+</strong>
+              <span className="stat-caption">Mitra Pengrajin & Studio Lokal</span>
             </div>
             <div className="about-stat-item">
               <strong className="stat-number">2021</strong>
-              <span className="stat-caption">Didirikan di Dago Pakar, Bandung</span>
+              <span className="stat-caption">Berdiri sebagai Toko Kurasi di Palembang</span>
             </div>
             <div className="about-stat-item">
               <strong className="stat-number">0%</strong>
-              <span className="stat-caption">Bahan Kimia Beracun dan Timbal</span>
+              <span className="stat-caption">Bahan Kimia Beracun (100% Food-Safe)</span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 3. CERITA DAN FILOSOFI WABI-SABI */}
+      {/* 3. CERITA DAN MISI KURASI */}
       <section className="about-story-section">
         <div className="container">
           <div className="about-story-grid">
             <div className="about-story-content">
-              <span className="story-kicker">FILOSOFI ATELIER</span>
+              <span className="story-kicker">CERITA DAN MISI KAMI</span>
               <h2 className="story-serif-heading">
-                Keindahan dalam Kesederhanaan yang Tidak Sempurna
+                Mengapa Kami Memilih Model Kurasi & Reseller?
               </h2>
               <div className="story-body-text">
                 <p>
-                  Di era di mana segala sesuatu diproduksi secara massal dan serba cepat, CLAYÉ memilih jalur yang melambat.
-                  Kami memeluk konsep estetika <em>Wabi-Sabi</em> — sebuah cara pandang yang menghargai keindahan dalam ketidakteraturan,
-                  kesederhanaan, dan siklus alami waktu.
+                  Indonesia kaya akan sentra keramik dan tembikar tradisional—mulai dari Kasongan di Yogyakarta, Plered di Purwakarta, Sukabumi, hingga studio-studio artisan di Bali. Di tempat-tempat ini, tangan-tangan terampil menghasilkan keramik dengan estetika organik dan kehangatan yang tiada duanya.
                 </p>
                 <p>
-                  Setiap karya keramik yang kami keluarkan dari tungku pembakaran membawa sedikit variasi tekstur, perbedaan lekukan glasir,
-                  serta bintik-bintik mineral pasir besi alami. Hal tersebut bukanlah cacat, melainkan tanda kehidupan dan sentuhan tulus
-                  dari jemari sang pembuat karya.
+                  Namun, banyak pengrajin berbakat menghadapi tantangan dalam pemasaran digital, standardisasi kontrol kualitas barang pecah belah, dan pengemasan jarak jauh yang aman. Di situlah CLAYÉ hadir sebagai jembatan.
                 </p>
                 <p>
-                  Cangkir kopi yang pas dalam genggaman, mangkuk sup dengan kehangatan stoneware yang menenangkan, atau piring saji yang
-                  membuat santapan harian terasa istimewa — itulah esensi dari apa yang kami ciptakan setiap hari di studio.
+                  Kami tidak membuka pabrik pembuatan sendiri. Kami memilih peran sebagai kurator dan penjual kembali (reseller resmi) yang selektif. Kami mengambil produk unggulan langsung dari para pengrajin, membelinya secara adil, melakukan pemeriksaan mutu ketat, lalu menyediakannya di etalase e-commerce ini agar Anda dapat memilikinya dengan mudah dan aman.
                 </p>
               </div>
 
               <div className="story-quote-box">
                 <p className="quote-text">
-                  "Tanah liat mengajarkan kerendahan hati: jika dipaksa terburu-buru, ia akan retak. Namun jika diiringi kesabaran dan kehangatan api, ia menjadi karya abadi yang menemani keseharian manusia."
+                  "Misi kami sederhana: menghargai keahlian perajin lokal dengan membawa karya terbaik mereka masuk ke ruang-ruang tinggal modern, terlindung dengan standar pengemasan terbaik dan kontrol kualitas terpercaya."
                 </p>
-                <span className="quote-author">— Rian Wicaksono, Pendiri CLAYÉ</span>
+                <span className="quote-author">— Azwina Clayora, Pendiri CLAYÉ</span>
               </div>
             </div>
 
@@ -202,12 +195,12 @@ export default function AboutPage() {
               <div className="story-image-card">
                 <img
                   src="/assets/images/products_collection.jpg"
-                  alt="Koleksi Keramik Studio CLAYÉ"
+                  alt="Koleksi Keramik Kurasi CLAYÉ"
                   className="story-main-img"
                 />
                 <div className="story-image-caption">
-                  <span>Atelier Dago Pakar, Bandung</span>
-                  <span>Batch Edisi Studio 2025</span>
+                  <span>Showroom & Pusat Distribusi Palembang</span>
+                  <span>Koleksi Terkurasi 2025</span>
                 </div>
               </div>
             </div>
@@ -215,21 +208,21 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* 4. PROSES PEMBUATAN 5 TAHAP */}
+      {/* 4. PROSES KURASI 5 TAHAP */}
       <section className="about-process-section">
         <div className="container">
           <div className="section-header-centered">
             <div className="studio-edition-badge">
-              DARI TANAH MENJADI KARYA
+              DARI SENTRA PENGRAJIN KE RUMAH ANDA
             </div>
-            <h2 className="section-serif-title">5 Tahap Proses Pembuatan Keramik Kami</h2>
+            <h2 className="section-serif-title">5 Tahap Proses Kurasi & Penjualan Kami</h2>
             <p className="section-sub-desc">
-              Setiap cangkir dan wadah keramik CLAYÉ membutuhkan waktu proses 2 hingga 3 minggu dari awal hingga siap digunakan.
+              Bagaimana kami memastikan setiap produk keramik yang Anda terima memiliki mutu tinggi dan selamat sampai di tujuan.
             </p>
           </div>
 
           <div className="process-timeline-grid">
-            {craftSteps.map((step) => (
+            {curationSteps.map((step) => (
               <div key={step.step} className="process-card">
                 <div className="process-step-badge">{step.step}</div>
                 <h3 className="process-card-title">{step.title}</h3>
@@ -241,30 +234,30 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* 5. PROFIL PENGRAJIN / ARTISAN */}
+      {/* 5. PROFIL TIM KURASI */}
       <section className="about-artisans-section">
         <div className="container">
           <div className="section-header-centered">
             <div className="studio-edition-badge">
-              TANGAN DI BALIK CLAYÉ
+              TIM DI BALIK CLAYÉ
             </div>
-            <h2 className="section-serif-title">Perajin dan Pengelola Studio</h2>
+            <h2 className="section-serif-title">Kurator dan Pengelola Kualitas</h2>
             <p className="section-sub-desc">
-              Orang-orang yang menuangkan dedikasi, waktu, dan rasa ke dalam setiap inci tanah liat yang dibentuk.
+              Tim yang berdedikasi mencari, menyeleksi, dan memastikan produk keramik terbaik sampai ke tangan Anda.
             </p>
           </div>
 
           <div className="artisans-grid">
-            {artisans.map((artisan, idx) => (
+            {curators.map((curator, idx) => (
               <div key={idx} className="artisan-card">
                 <div className="artisan-img-wrap">
-                  <img src={artisan.image} alt={artisan.name} />
-                  <span className="artisan-exp-tag">{artisan.experience}</span>
+                  <img src={curator.image} alt={curator.name} />
+                  <span className="artisan-exp-tag">{curator.experience}</span>
                 </div>
                 <div className="artisan-info">
-                  <h3 className="artisan-name">{artisan.name}</h3>
-                  <span className="artisan-role">{artisan.role}</span>
-                  <p className="artisan-bio">{artisan.bio}</p>
+                  <h3 className="artisan-name">{curator.name}</h3>
+                  <span className="artisan-role">{curator.role}</span>
+                  <p className="artisan-bio">{curator.bio}</p>
                 </div>
               </div>
             ))}
@@ -279,9 +272,9 @@ export default function AboutPage() {
             <div className="studio-edition-badge">
               KOMITMEN KUALITAS
             </div>
-            <h2 className="section-serif-title">Nilai dan Standar Kerajinan Kami</h2>
+            <h2 className="section-serif-title">Nilai dan Standar Kurasi Kami</h2>
             <p className="section-sub-desc">
-              Integritas material dan rasa tanggung jawab lingkungan adalah pilar utama dari setiap karya yang meninggalkan studio kami.
+              Integritas material, transparansi asal-usul produk, dan rasa tanggung jawab adalah komitmen utama kami kepada Anda.
             </p>
           </div>
 
@@ -299,38 +292,37 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* 7. KUNJUNGAN STUDIO DAN WORKSHOP */}
+      {/* 7. KUNJUNGAN SHOWROOM */}
       <section className="about-visit-section">
         <div className="container">
           <div className="visit-inner-banner">
             <div className="visit-content-col">
-              <span className="visit-badge">KUNJUNGI ATELIER KAMI</span>
-              <h2 className="visit-title">Rasakan Suasana Studio di Dago Pakar, Bandung</h2>
+              <span className="visit-badge">GALERI & SHOWROOM KURASI</span>
+              <h2 className="visit-title">Kunjungi Galeri Kurasi Kami di Palembang</h2>
               <p className="visit-desc">
-                Studio kami terbuka bagi para penikmat keramik yang ingin melihat langsung proses pembentukan di roda putar,
-                merasakan tekstur tanah liat, atau memilih karya keramik langsung dari rak pembakaran.
+                Ingin melihat langsung tekstur, bobot, dan keindahan warna glasir berbagai keramik pilihan kami? Galeri dan showroom CLAYÉ di Palembang terbuka bagi Anda yang ingin memilih produk secara langsung sebelum membeli.
               </p>
               <div className="visit-details-list">
                 <div className="vdetail-item">
-                  <strong>Lokasi Studio:</strong>
-                  <span>Jl. Rancabentang No. 29, Dago Pakar, Ciumbuleuit, Bandung, Jawa Barat 40142</span>
+                  <strong>Lokasi Showroom & Gudang:</strong>
+                  <span>Jl. Sejuta Kenangan, Palembang, Sumatera Selatan</span>
                 </div>
                 <div className="vdetail-item">
-                  <strong>Jam Kunjungan:</strong>
-                  <span>Selasa – Minggu: 10:00 – 17:00 WIB (Senin Tutup untuk Pemeliharaan Studio)</span>
+                  <strong>Jam Operasional Galeri:</strong>
+                  <span>Senin – Sabtu: 08:00 – 19:00 WIB (Minggu Tutup)</span>
                 </div>
                 <div className="vdetail-item">
-                  <strong>Sesi Workshop Keramik:</strong>
-                  <span>Tersedia kelas privat roda putar (Wheel Throwing) setiap akhir pekan melalui reservasi.</span>
+                  <strong>Layanan Konsultasi Meja Makan:</strong>
+                  <span>Tersedia sesi konsultasi gratis untuk padu padan peralatan makan dan dekorasi interior.</span>
                 </div>
               </div>
 
               <div className="visit-cta-row">
                 <button
-                  onClick={() => openConcierge('Halo tim CLAYÉ, saya ingin reservasi kunjungan studio atau privat workshop keramik')}
+                  onClick={() => openConcierge('Halo tim CLAYÉ, saya ingin reservasi jadwal kunjungan ke galeri kurasi di Palembang')}
                   className="claye-terracotta-btn"
                 >
-                  Reservasi Kunjungan Studio
+                  Jadwalkan Kunjungan Galeri
                 </button>
                 <button
                   onClick={() => navigate('/katalog')}
@@ -346,11 +338,11 @@ export default function AboutPage() {
               <div className="visit-visual-frame">
                 <img
                   src="/assets/images/hero_bg.jpg"
-                  alt="Suasana Studio CLAYÉ Bandung"
+                  alt="Suasana Galeri Kurasi CLAYÉ Palembang"
                   className="visit-main-img"
                 />
                 <div className="visit-floating-tag">
-                  <span>Studio & Galeri Aktif</span>
+                  <span>Galeri & Showroom Aktif</span>
                 </div>
               </div>
             </div>

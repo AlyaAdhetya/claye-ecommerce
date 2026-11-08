@@ -8,7 +8,7 @@ export default function Chatbot() {
     {
       id: 1,
       sender: 'bot',
-      text: 'Halo, selamat datang di CLAYÉ Studio. Saya adalah asisten concierge studio Anda. Ada yang bisa kami bantu seputar koleksi keramik, panduan perawatan, atau status pesanan Anda?',
+      text: 'Halo, selamat datang di CLAYÉ. Saya adalah asisten kurasi keramik Anda. Ada yang bisa kami bantu seputar koleksi kurasi produk keramik, info mitra pengrajin, panduan perawatan, atau status pesanan Anda?',
       time: '12:00'
     }
   ]);
@@ -31,8 +31,8 @@ export default function Chatbot() {
   const quickPrompts = [
     { label: 'Rekomendasi Cangkir & Mug', query: 'Bisa berikan rekomendasi cangkir keramik terbaik untuk seduh kopi pagi?' },
     { label: 'Cara Perawatan Keramik', query: 'Bagaimana petunjuk perawatan untuk keramik stoneware dan penggunaan microwave?' },
-    { label: 'Status & Garansi Pengiriman', query: 'Bagaimana garansi pengemasan aman dan pengiriman dari studio Bandung?' },
-    { label: 'Pesanan Khusus / Kado', query: 'Apakah CLAYÉ menerima pesanan custom inisial nama atau kado pernikahan?' }
+    { label: 'Status & Garansi Pengiriman', query: 'Bagaimana garansi pengemasan aman dan pengiriman produk kurasi?' },
+    { label: 'Pesanan Khusus / Kado', query: 'Apakah CLAYÉ menerima pesanan suvenir atau kado hampers?' }
   ];
 
   const handleUserSend = (textToSend) => {
@@ -70,7 +70,7 @@ export default function Chatbot() {
     if (q.includes('mug') || q.includes('cangkir') || q.includes('kopi') || q.includes('sunday')) {
       const sundayMug = products.find(p => p.id === 1);
       return {
-        text: 'Produk terfavorit kami untuk ritual kopi harian adalah "The Sunday Mug" (Rp125.000). Dibuat secara manual di atas roda putar dari tanah liat berkualitas, dilapisi glasir mineral dengan tekstur halus. Tersedia varian warna Gading, Hijau Sage, dan Merah Muda Pucat.',
+        text: 'Produk terfavorit kami untuk ritual kopi harian adalah "The Sunday Mug" (Rp125.000). Karya kurasi langsung dari pengrajin tembikar di Bali, dibuat dengan roda putar dari tanah liat stoneware berkualitas kaya mineral, dilapisi glasir matte halus. Tersedia varian warna Gading, Hijau Sage, dan Merah Muda Pucat.',
         productMatch: sundayMug,
         suggestions: ['Lihat The Sunday Mug', 'Tambah ke Keranjang', 'Koleksi Peralatan Makan Lain']
       };
@@ -78,27 +78,41 @@ export default function Chatbot() {
 
     if (q.includes('rawat') || q.includes('cuci') || q.includes('microwave') || q.includes('pecah') || q.includes('oven')) {
       return {
-        text: 'Panduan Perawatan Keramik CLAYÉ:\n1. Seluruh stoneware dibakar pada suhu tinggi 1240°C sehingga padat, tahan panas, dan 100% aman untuk makanan & minuman (food grade).\n2. Aman digunakan pada microwave dan mesin pencuci piring (dishwasher).\n3. Untuk menjaga keindahan glasir, pencucian menggunakan spons lembut dan sabun pencuci ramah lingkungan sangat dianjurkan.\n4. Keringkan bagian dasar unglazed sebelum disimpan di rak lemari.',
+        text: 'Panduan Perawatan Keramik CLAYÉ:\n1. Seluruh stoneware yang kami kurasi dibakar pada suhu tinggi 1240°C sehingga padat, tahan panas, dan 100% aman untuk makanan & minuman (food-grade).\n2. Aman digunakan pada microwave dan mesin pencuci piring (dishwasher).\n3. Untuk menjaga keindahan glasir, pencucian menggunakan spons lembut dan sabun ramah lingkungan sangat dianjurkan.\n4. Keringkan bagian dasar unglazed sebelum disimpan di rak lemari.',
         suggestions: ['Lihat Semua Katalog', 'Tanya Pengemasan Anti-Pecah']
       };
     }
 
     if (q.includes('status') || q.includes('kirim') || q.includes('ongkir') || q.includes('packing') || q.includes('garansi') || q.includes('resi')) {
       return {
-        text: 'Standar Pengiriman Studio CLAYÉ:\n• Setiap pesanan dikemas menggunakan pembungkus sarang lebah (honeycomb) ramah lingkungan dan bantalan pulp alami tanpa plastik.\n• Garansi 100% penggantian baru jika terjadi kerusakan selama perjalanan ekspedisi dari studio kami di Bandung.\n• Estimasi pengiriman reguler berkisar 2-3 hari kerja.',
+        text: 'Standar Pengiriman CLAYÉ:\n• Setiap pesanan produk kurasi dikemas dari gudang pusat kami menggunakan pembungkus sarang lebah (honeycomb) ramah lingkungan dan bantalan pulp protektif.\n• Garansi 100% penggantian baru jika terjadi kerusakan selama perjalanan ekspedisi ke seluruh Indonesia.\n• Estimasi pengiriman reguler berkisar 2-3 hari kerja.',
         suggestions: ['Buka Halaman Pembayaran', 'Lihat Akun Saya']
       };
     }
 
     if (q.includes('kado') || q.includes('wedding') || q.includes('custom') || q.includes('hampers') || q.includes('inisial') || q.includes('stempel')) {
       return {
-        text: 'Kami menyediakan opsi stempel grafir nama/inisial (+Rp25.000) yang dicetak manual pada tanah liat basah sebelum pembakaran pertama. Untuk pesanan suvenir atau kado dalam jumlah tertentu, tim studio kami siap membantu menyiapkan kemasan khusus.',
+        text: 'Kami menyediakan opsi stempel grafir nama/inisial (+Rp25.000) yang dikerjakan langsung oleh mitra pengrajin kami sebelum finishing. Untuk pesanan suvenir acara atau kado hampers dalam jumlah tertentu, tim kami siap membantu menyiapkan kemasan khusus.',
         suggestions: ['Lihat The Sunday Mug', 'Jelajahi Katalog']
       };
     }
 
+    if (q.includes('alamat') || q.includes('lokasi') || q.includes('toko') || q.includes('showroom') || q.includes('galeri') || q.includes('jam') || q.includes('buka') || q.includes('operasional') || q.includes('palembang')) {
+      return {
+        text: 'CLAYÉ berlokasi di Jl. Sejuta Kenangan, Palembang, Sumatera Selatan.\n\nJam operasional toko & showroom:\n• Senin – Sabtu: 08.00 – 19.00 WIB\n• Minggu: Tutup\n\nAnda dapat berkunjung langsung ke showroom kami atau memesan karya keramik kurasi secara online melalui website ini.',
+        suggestions: ['Tentang Kami & Cerita Kurasi', 'Lihat Semua Katalog']
+      };
+    }
+
+    if (q.includes('mitra') || q.includes('asal') || q.includes('buat') || q.includes('kurasi') || q.includes('reseller') || q.includes('pengrajin')) {
+      return {
+        text: 'CLAYÉ adalah platform toko kurasi & reseller keramik resmi. Kami tidak memproduksi barang sendiri, melainkan mengambil karya tembikar terbaik dari sentra pengrajin lokal (Bali, Bandung, Kasongan, Sukabumi) lalu menjualnya kembali dengan standar kontrol kualitas ketat dan garansi pengiriman aman.',
+        suggestions: ['Lihat Semua Katalog', 'Tentang Kami & Cerita Kurasi']
+      };
+    }
+
     return {
-      text: 'Terima kasih telah menghubungi CLAYÉ Studio. Kami mengutamakan keaslian bahan alam dan ketenangan hidup. Apakah Anda sedang mencari produk tertentu untuk meja makan, vas dekorasi, atau perlengkapan seduh teh/kopi?',
+      text: 'Terima kasih telah menghubungi CLAYÉ. Kami menghadirkan kurasi keramik pilihan berkualitas dari pengrajin terpercaya. Apakah Anda sedang mencari produk tertentu untuk meja makan, vas dekorasi, atau perlengkapan seduh teh/kopi?',
       suggestions: ['The Sunday Mug', 'Solace Ceramic Bowl', 'Alba Bud Vase', 'Lihat Semua Katalog']
     };
   };
@@ -111,6 +125,9 @@ export default function Chatbot() {
       addToCart(1, 1, { glaze: 'Hijau Sage' });
     } else if (sug === 'Koleksi Peralatan Makan Lain' || sug === 'Lihat Semua Katalog' || sug === 'Jelajahi Katalog') {
       navigate('/katalog');
+      setIsChatOpen(false);
+    } else if (sug === 'Tentang Kami & Cerita Kurasi') {
+      navigate('/tentang');
       setIsChatOpen(false);
     } else if (sug === 'Buka Halaman Pembayaran') {
       navigate('/checkout');
@@ -125,17 +142,17 @@ export default function Chatbot() {
 
   return (
     <>
-      {/* TOMBOL MELAYANG (CLEAN SVG CHAT ICON) */}
+      {/* TOMBOL MELAYANG */}
       <button
         onClick={() => setIsChatOpen(!isChatOpen)}
         className="claye-concierge-trigger"
-        aria-label="Buka Asisten Studio"
-        title="Bantuan & Asisten Studio"
+        aria-label="Buka Asisten Kurasi CLAYÉ"
+        title="Bantuan & Asisten Kurasi"
       >
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
         </svg>
-        <span className="concierge-trigger-text">Bantuan Studio</span>
+        <span className="concierge-trigger-text">Bantuan Pelanggan</span>
         <span className="concierge-trigger-dot" />
       </button>
 
@@ -149,10 +166,10 @@ export default function Chatbot() {
                 <div className="chat-avatar-badge">CL</div>
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-                    <h3 className="chat-header-title">Asisten Studio CLAYÉ</h3>
+                    <h3 className="chat-header-title">Asisten Kurasi CLAYÉ</h3>
                     <span className="chat-online-indicator" />
                   </div>
-                  <p className="chat-header-sub">Studio Bandung • Siap Membantu</p>
+                  <p className="chat-header-sub">Toko & Reseller Keramik • Siap Membantu</p>
                 </div>
               </div>
               <button

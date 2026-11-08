@@ -12,9 +12,9 @@ export default function DashboardPage() {
     fullName: user ? user.fullName : 'Arumi',
     email: user ? user.email : 'arumi@example.com',
     phone: user ? user.phone : '+62 812-3456-7890',
-    address: user ? user.address : 'Jl. Bukit Dago Utara No. 18, Coblong',
-    city: user ? user.city : 'Bandung',
-    postalCode: user ? user.postalCode : '40135'
+    address: user ? user.address : 'Jl. Sejuta Kenangan No. 12',
+    city: user ? user.city : 'Palembang',
+    postalCode: user ? user.postalCode : '30138'
   });
 
   const [isAddressModal, setIsAddressModal] = useState(false);
@@ -25,9 +25,9 @@ export default function DashboardPage() {
     fullName: 'Arumi',
     email: 'arumi@example.com',
     phone: '+62 812-3456-7890',
-    address: 'Jl. Bukit Dago Utara No. 18, Coblong',
-    city: 'Bandung',
-    postalCode: '40135',
+    address: 'Jl. Sejuta Kenangan No. 12',
+    city: 'Palembang',
+    postalCode: '30138',
     patronSince: '2024',
     cohort: 'Pelanggan Tetap'
   };
@@ -44,14 +44,14 @@ export default function DashboardPage() {
   const [adminTab, setAdminTab] = useState('profile');
   const [adminProfileData, setAdminProfileData] = useState({
     name: user ? user.name : 'Admin',
-    fullName: user ? (user.fullName || 'Admin CLAYÉ Atelier') : 'Admin CLAYÉ Atelier',
+    fullName: user ? (user.fullName || 'Admin CLAYÉ') : 'Admin CLAYÉ',
     email: user ? user.email : 'admin@claye.id',
     phone: user ? (user.phone || '+62 811-2233-4455') : '+62 811-2233-4455',
-    address: user ? (user.address || 'Studio CLAYÉ, Jl. Rancabentang No. 29, Ciumbuleuit') : 'Studio CLAYÉ, Jl. Rancabentang No. 29, Ciumbuleuit',
-    city: user ? (user.city || 'Bandung') : 'Bandung',
-    province: 'Jawa Barat',
-    postalCode: '40142',
-    roleTitle: 'Master Ceramist & Studio Administrator',
+    address: user ? (user.address || 'Jl. Sejuta Kenangan, Palembang, Sumatera Selatan') : 'Jl. Sejuta Kenangan, Palembang, Sumatera Selatan',
+    city: user ? (user.city || 'Palembang') : 'Palembang',
+    province: 'Sumatera Selatan',
+    postalCode: '30138',
+    roleTitle: 'Head Curator & Store Administrator',
     joinedYear: '2021'
   });
 
@@ -76,7 +76,7 @@ export default function DashboardPage() {
               </div>
               <div className="patron-name-wrap">
                 <h2 className="patron-display-name">{adminProfileData.name}</h2>
-                <span className="patron-since-text">ADMINISTRATOR ATELIER</span>
+                <span className="patron-since-text">ADMINISTRATOR TOKO KURASI</span>
               </div>
             </div>
 
@@ -107,7 +107,7 @@ export default function DashboardPage() {
                   <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                   <polyline points="9 22 9 12 15 12 15 22"></polyline>
                 </svg>
-                <span>Data Studio & Atelier</span>
+                <span>Data Toko & Gudang</span>
               </button>
 
               <button
@@ -154,11 +154,11 @@ export default function DashboardPage() {
             <div className="dashboard-account-header">
               <div>
                 <div className="studio-patron-pill" style={{ backgroundColor: '#FAF2EC', color: 'var(--color-terracotta)', border: '1px solid #E9D5C8' }}>
-                  <span className="patron-dot" style={{ backgroundColor: 'var(--color-terracotta)' }}>•</span> AKUN ADMINISTRATOR & ATELIER
+                  <span className="patron-dot" style={{ backgroundColor: 'var(--color-terracotta)' }}>•</span> AKUN ADMINISTRATOR & KURASI
                 </div>
                 <h1 className="account-main-title">Akun Admin Saya</h1>
                 <p className="account-welcome-sub">
-                  Selamat datang di panel akun Administrator Studio CLAYÉ. Kelola informasi profil pengelola, kontak workshop, dan preferensi operasional atelier.
+                  Selamat datang di panel akun Administrator Toko CLAYÉ. Kelola informasi profil pengelola, kontak showroom, dan preferensi operasional.
                 </p>
               </div>
 
@@ -185,7 +185,7 @@ export default function DashboardPage() {
                     <div>
                       <h2 className="patron-section-heading">Informasi Profil Administrator</h2>
                       <p className="patron-section-sub">
-                        Data identitas ini digunakan untuk otentikasi login, tanda tangan resi pesanan, dan penanggung jawab atelier.
+                        Data identitas ini digunakan untuk otentikasi login, tanda tangan resi pesanan, dan penanggung jawab kurasi.
                       </p>
                     </div>
                   </div>
@@ -234,7 +234,7 @@ export default function DashboardPage() {
                     </div>
 
                     <div className="checkout-form-group">
-                      <label>PERAN / SPESIALISASI ATELIER</label>
+                      <label>PERAN / SPESIALISASI KURASI</label>
                       <input
                         type="text"
                         value={adminProfileData.roleTitle}
@@ -243,7 +243,7 @@ export default function DashboardPage() {
                     </div>
 
                     <div className="checkout-form-group">
-                      <label>ALAMAT WORKSHOP STUDIO DI BANDUNG</label>
+                      <label>ALAMAT TOKO & SHOWROOM DI PALEMBANG</label>
                       <textarea
                         rows="2"
                         value={adminProfileData.address}
@@ -274,9 +274,9 @@ export default function DashboardPage() {
                 <div>
                   <div className="patron-section-title-row">
                     <div>
-                      <h2 className="patron-section-heading">Data Studio & Workshop CLAYÉ</h2>
+                      <h2 className="patron-section-heading">Data Toko & Showroom CLAYÉ</h2>
                       <p className="patron-section-sub">
-                        Informasi operasional studio resmi yang terhubung dengan sistem pesanan pelanggan.
+                        Informasi operasional toko dan pusat kurasi resmi yang terhubung dengan sistem pesanan pelanggan.
                       </p>
                     </div>
                   </div>
@@ -287,7 +287,7 @@ export default function DashboardPage() {
                         📍 Lokasi Workshop & Atelier
                       </strong>
                       <p style={{ margin: 0, fontSize: '0.85rem', color: '#6A645D', lineHeight: '1.5' }}>
-                        Studio CLAYÉ, Jl. Rancabentang No. 29, Dago Pakar, Ciumbuleuit, Bandung, Jawa Barat 40142.
+                        CLAYÉ, Jl. Sejuta Kenangan, Palembang, Sumatera Selatan 30138.
                       </p>
                     </div>
 
@@ -296,7 +296,7 @@ export default function DashboardPage() {
                         🏺 Studio Galeri & Atelier
                       </strong>
                       <p style={{ margin: 0, fontSize: '0.85rem', color: '#6A645D', lineHeight: '1.5' }}>
-                        Studio pembuatan keramik handmade stoneware dengan kurasi material mineral alami dan glasir food-safe.
+                        Galeri kurasi keramik dan stoneware dari pengrajin mitra dengan standar material alami dan glasir food-safe.
                       </p>
                     </div>
 
@@ -329,16 +329,16 @@ export default function DashboardPage() {
                     <div>
                       <h2 className="patron-section-heading">Ringkasan Aktivitas Toko</h2>
                       <p className="patron-section-sub">
-                        Status kesehatan operasional atelier saat ini.
+                        Status operasional toko kurasi saat ini.
                       </p>
                     </div>
                   </div>
 
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem', marginTop: '1.5rem' }}>
                     <div style={{ background: '#FAF7F2', padding: '1.25rem', borderRadius: '6px', border: '1px solid #EAE4DC' }}>
-                      <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#8C847B', letterSpacing: '0.06em' }}>KARYA DI ETALASE</span>
+                      <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#8C847B', letterSpacing: '0.06em' }}>PRODUK DI ETALASE</span>
                       <div style={{ fontSize: '1.6rem', fontFamily: 'var(--font-serif)', fontWeight: 700, color: 'var(--color-charcoal)', margin: '0.3rem 0' }}>
-                        {products.length} Karya
+                        {products.length} Produk Kurasi
                       </div>
                       <span style={{ fontSize: '0.75rem', color: '#5E7958' }}>✓ 100% Siap Dikirim</span>
                     </div>
@@ -553,9 +553,9 @@ export default function DashboardPage() {
 
           {/* WIDGET BANTUAN */}
           <div className="patron-sidebar-help-widget" style={{ marginTop: '1.25rem' }}>
-            <div className="phelp-badge">Studio Concierge</div>
+            <div className="phelp-badge">Asisten Kurasi CLAYÉ</div>
             <span className="phelp-title">Butuh bantuan pesanan?</span>
-            <p className="phelp-desc">Tim concierge studio siap membantu Anda melacak resi dan pertanyaan lainnya.</p>
+            <p className="phelp-desc">Tim asisten kurasi kami siap membantu Anda melacak resi dan pertanyaan seputar produk.</p>
             <button className="phelp-btn" onClick={() => openConcierge('Halo, saya butuh bantuan terkait pesanan keramik saya')}>Tanya Concierge Studio →</button>
           </div>
         </aside>
@@ -604,7 +604,7 @@ export default function DashboardPage() {
                       <span className="pstat-label">TOTAL PRODUK DIPESAN</span>
                     </div>
                     <div className="pstat-big-num">5</div>
-                    <div className="pstat-subtext">Di berbagai batch pembakaran studio</div>
+                    <div className="pstat-subtext">Dari berbagai kurasi mitra pengrajin</div>
                   </div>
 
                   <div className="patron-stat-card">
@@ -633,7 +633,7 @@ export default function DashboardPage() {
                   <div className="dash-block-header">
                     <div>
                       <h2 className="dash-block-title">Riwayat Pesanan Terbaru</h2>
-                      <p className="dash-block-sub">Pantau perjalanan pesanan keramik Anda dari studio pembakaran hingga tiba di rumah.</p>
+                      <p className="dash-block-sub">Pantau perjalanan pesanan keramik Anda dari gudang pengiriman hingga tiba di rumah.</p>
                     </div>
                     <button onClick={() => setActiveMenu('orders')} className="dash-text-action">LIHAT SEMUA →</button>
                   </div>
@@ -644,7 +644,7 @@ export default function DashboardPage() {
                         <tr>
                           <th>NO. PESANAN</th>
                           <th>TANGGAL</th>
-                          <th>KARYA KERAMIK</th>
+                          <th>PRODUK KERAMIK</th>
                           <th>TOTAL</th>
                           <th>STATUS</th>
                           <th style={{ textAlign: 'right' }}>RINCIAN</th>
@@ -682,7 +682,7 @@ export default function DashboardPage() {
                 <div className="studio-care-guarantee-card">
                   <div className="care-guarantee-left">
                     <div className="care-guarantee-text">
-                      <h4 className="care-title">Jaminan Kualitas &amp; Perawatan Studio</h4>
+                      <h4 className="care-title">Jaminan Kualitas &amp; Perawatan Keramik</h4>
                       <p className="care-body">Semua stoneware CLAYÉ diproses food-safe dan dibakar pada suhu 1240°C. Butuh panduan merawat bagian dasar unglazed atau penyimpanan jangka panjang?</p>
                     </div>
                   </div>
@@ -716,7 +716,7 @@ export default function DashboardPage() {
                       <tr>
                         <th>NO. PESANAN</th>
                         <th>TANGGAL</th>
-                        <th>KARYA KERAMIK</th>
+                        <th>PRODUK KERAMIK</th>
                         <th>TOTAL</th>
                         <th>STATUS PENGIRIMAN</th>
                         <th style={{ textAlign: 'right' }}>RINCIAN</th>
@@ -829,11 +829,11 @@ export default function DashboardPage() {
 
                   <div className="address-card-item secondary">
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                      <strong style={{ fontSize: '0.95rem', color: 'var(--color-charcoal)' }}>Kantor / Studio Bandung</strong>
+                      <strong style={{ fontSize: '0.95rem', color: 'var(--color-charcoal)' }}>Pusat Distribusi Palembang</strong>
                       <button onClick={() => showToast('Alamat kantor ditetapkan sebagai alamat utama.', 'success')} className="panel-btn-ghost" style={{ fontSize: '0.78rem' }}>Jadikan Utama</button>
                     </div>
                     <p style={{ fontSize: '0.85rem', color: 'var(--color-muted)', lineHeight: '1.6' }}>
-                      Jl. Riau No. 54, Citarum, Bandung 40115<br />
+                      Jl. Sejuta Kenangan, Palembang, Sumatera Selatan 30138<br />
                       Nomor Telepon: +62 811-2233-4455
                     </p>
                   </div>
@@ -895,7 +895,7 @@ export default function DashboardPage() {
                     <h2 className="dash-block-title">Panduan Perawatan Keramik</h2>
                     <p className="dash-block-sub">Semua stoneware CLAYÉ dibakar pada suhu 1240°C dan diproses food-safe untuk ketahanan jangka panjang.</p>
                   </div>
-                  <button onClick={() => openConcierge('Tanya lebih banyak tentang perawatan keramik CLAYÉ')} className="dash-text-action">TANYA STUDIO →</button>
+                  <button onClick={() => openConcierge('Tanya lebih banyak tentang perawatan keramik CLAYÉ')} className="dash-text-action">TANYA TOKO →</button>
                 </div>
 
                 <div className="patron-care-grid">
@@ -924,9 +924,9 @@ export default function DashboardPage() {
                 <div style={{ marginTop: '1.5rem', padding: '1.25rem 1.5rem', background: '#FAF7F2', border: '1px solid #ECE4DA', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
                   <div>
                     <strong style={{ fontSize: '0.95rem', color: 'var(--color-charcoal)' }}>Ada pertanyaan tentang perawatan karya Anda?</strong>
-                    <p style={{ fontSize: '0.8rem', color: 'var(--color-muted)', marginTop: '0.25rem' }}>Tim studio siap menjawab pertanyaan spesifik Anda tentang glasir, penyimpanan, dan perawatan jangka panjang.</p>
+                    <p style={{ fontSize: '0.8rem', color: 'var(--color-muted)', marginTop: '0.25rem' }}>Tim asisten kurasi siap menjawab pertanyaan spesifik Anda tentang glasir, penyimpanan, dan perawatan jangka panjang.</p>
                   </div>
-                  <button onClick={() => openConcierge('Tanya lebih banyak tentang perawatan keramik')} className="claye-terracotta-btn" style={{ padding: '0.65rem 1.25rem', fontSize: '0.85rem', whiteSpace: 'nowrap' }}>Tanya Asisten Studio →</button>
+                  <button onClick={() => openConcierge('Tanya lebih banyak tentang perawatan keramik')} className="claye-terracotta-btn" style={{ padding: '0.65rem 1.25rem', fontSize: '0.85rem', whiteSpace: 'nowrap' }}>Tanya Asisten Kurasi →</button>
                 </div>
               </div>
             )}
@@ -941,7 +941,7 @@ export default function DashboardPage() {
           <div className="claye-modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <div>
-                <span className="modal-subtitle">ARSIP PESANAN STUDIO</span>
+                <span className="modal-subtitle">ARSIP PESANAN PELANGGAN</span>
                 <h3 className="modal-title">{selectedOrderModal.id}</h3>
               </div>
               <button onClick={() => setSelectedOrderModal(null)} className="modal-close-btn" aria-label="Tutup">
@@ -970,7 +970,7 @@ export default function DashboardPage() {
               </div>
 
               <div className="order-modal-items-table">
-                <h4>Daftar Karya Keramik</h4>
+                <h4>Daftar Produk Keramik</h4>
                 {selectedOrderModal.items?.map((it, idx) => (
                   <div key={idx} className="modal-item-row">
                     <span>{it.name} ({it.glaze || 'Glasir Khusus'}) × {it.quantity}</span>
@@ -1102,7 +1102,7 @@ export default function DashboardPage() {
 
               <div className="address-card-item secondary" style={{ marginTop: '1rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
-                  <strong>Kantor / Studio Bandung</strong>
+                  <strong>Pusat Distribusi Palembang</strong>
                   <button
                     onClick={() => showToast('Alamat kantor ditetapkan sebagai alamat utama.', 'success')}
                     style={{ background: 'none', border: 'none', color: '#B87355', fontSize: '0.8rem', cursor: 'pointer' }}
@@ -1110,7 +1110,7 @@ export default function DashboardPage() {
                     Jadikan Utama
                   </button>
                 </div>
-                <p>Jl. Riau No. 54, Citarum, Bandung 40115</p>
+                <p>Jl. Sejuta Kenangan, Palembang, Sumatera Selatan 30138</p>
                 <p>Nomor Telepon: +62 811-2233-4455</p>
               </div>
             </div>
@@ -1139,7 +1139,7 @@ export default function DashboardPage() {
           <div className="claye-modal-content" style={{ maxWidth: '580px' }} onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <div>
-                <span className="modal-subtitle">PANDUAN STUDIO</span>
+                <span className="modal-subtitle">PANDUAN PERAWATAN KERAMIK</span>
                 <h3 className="modal-title">Panduan Perawatan Keramik</h3>
               </div>
               <button onClick={() => setCareModalOpen(false)} className="modal-close-btn" aria-label="Tutup">
@@ -1170,7 +1170,7 @@ export default function DashboardPage() {
                 }}
                 className="btn-modal-action"
               >
-                Tanya Asisten Studio →
+                Tanya Asisten Kurasi →
               </button>
               <button onClick={() => setCareModalOpen(false)} className="btn-modal-cancel">
                 Tutup
@@ -1182,3 +1182,4 @@ export default function DashboardPage() {
     </div>
   );
 }
+

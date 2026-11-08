@@ -6788,4 +6788,532 @@ input, select, textarea {
   }
 }
 
+/* ==========================================================================
+   RESPONSIVITAS MOBILE & DESKTOP MENYELURUH (PWA & HOSTING READY)
+   ========================================================================== */
+
+/* 1. Global Viewport & Container */
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+  -webkit-text-size-adjust: 100%;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* 2. Admin Topbar & Header Mobile */
+@media (max-width: 900px) {
+  .claye-admin-topbar {
+    padding: 0.6rem 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .admin-topbar-inner {
+    gap: 0.75rem;
+  }
+
+  .admin-topbar-search {
+    max-width: 240px;
+  }
+
+  .admin-page-grid {
+    grid-template-columns: 1fr !important;
+    min-height: auto;
+  }
+
+  /* Admin Sidebar: Diubah jadi Swipeable Sub-Header Horisontal pada Tablet & HP */
+  .admin-sidebar-menu {
+    border-right: none !important;
+    border-bottom: 1px solid var(--color-border) !important;
+    padding: 0.5rem 0.85rem !important;
+    background-color: #FFFFFF !important;
+    position: sticky !important;
+    top: 53px !important;
+    z-index: 95 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.5rem !important;
+  }
+
+  .sidebar-nav-groups-wrap {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 0.35rem !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    padding: 2px 0 !important;
+  }
+
+  .sidebar-nav-groups-wrap::-webkit-scrollbar {
+    display: none;
+  }
+
+  .sidebar-group {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 0.35rem !important;
+    margin-bottom: 0 !important;
+  }
+
+  .sidebar-group-title {
+    display: none !important;
+  }
+
+  .sidebar-nav-item {
+    white-space: nowrap !important;
+    padding: 0.45rem 0.75rem !important;
+    font-size: 0.78rem !important;
+    border-radius: 999px !important;
+    background-color: #F8F5F0 !important;
+    border: 1px solid #EAE4DC !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.4rem !important;
+    width: auto !important;
+  }
+
+  .sidebar-nav-item.active {
+    background-color: var(--color-charcoal) !important;
+    color: #FAF7F2 !important;
+    border-color: var(--color-charcoal) !important;
+  }
+
+  .sidebar-nav-item:hover:not(.active) {
+    background-color: #EDE7DD !important;
+  }
+
+  .sidebar-footer-actions {
+    margin: 0 !important;
+    padding: 0 !important;
+    flex-shrink: 0 !important;
+  }
+
+  .sidebar-logout-btn {
+    padding: 0.45rem 0.75rem !important;
+    font-size: 0.75rem !important;
+    white-space: nowrap !important;
+    border-radius: 999px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.35rem !important;
+    border: 1px solid #E4D0C5 !important;
+    background-color: #FAF2EC !important;
+    color: var(--color-terracotta) !important;
+  }
+
+  .admin-main-viewport {
+    padding: 1.25rem 1rem !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .admin-topbar-search {
+    display: none !important;
+  }
+
+  .admin-user-details .admin-user-role {
+    display: none !important;
+  }
+
+  .admin-user-details .admin-user-name {
+    font-size: 0.78rem !important;
+  }
+
+  .admin-purpose-card {
+    padding: 1rem 1rem !important;
+  }
+
+  .purpose-title {
+    font-size: 1.15rem !important;
+    line-height: 1.35 !important;
+  }
+
+  .admin-metrics-row {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.65rem !important;
+  }
+
+  .admin-metric-card {
+    padding: 0.75rem 0.85rem !important;
+  }
+
+  .metric-title {
+    font-size: 0.62rem !important;
+  }
+
+  .metric-primary-val {
+    font-size: 1.25rem !important;
+  }
+
+  .admin-trajectory-split-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+
+  .admin-chart-panel {
+    padding: 1rem !important;
+  }
+
+  .chart-panel-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.75rem !important;
+  }
+
+  .chart-metrics-row {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+  }
+
+  .sales-svg-chart-container {
+    overflow-x: auto !important;
+    width: 100% !important;
+  }
+
+  .sales-chart-svg {
+    min-width: 480px !important;
+  }
+
+  /* Admin Filter Bar Mobile */
+  .admin-filter-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.65rem !important;
+  }
+
+  .filter-tabs-row {
+    width: 100% !important;
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+  }
+
+  .filter-search-box {
+    min-width: 100% !important;
+    width: 100% !important;
+  }
+
+  /* Admin Table Wrapper */
+  .acquisitions-table-wrap {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    border-radius: 6px !important;
+    border: 1px solid var(--color-border) !important;
+    width: 100% !important;
+  }
+
+  .claye-patron-table {
+    min-width: 680px !important;
+  }
+}
+
+/* 3. Customer Storefront Navigation (Navbar) Mobile */
+@media (max-width: 768px) {
+  .claye-navbar-container {
+    padding: 0 1rem !important;
+    height: 58px !important;
+  }
+
+  .claye-brand-logo {
+    font-size: 1.35rem !important;
+    letter-spacing: 0.15em !important;
+  }
+
+  .claye-navbar-actions {
+    gap: 0.65rem !important;
+  }
+
+  .nav-action-icon-btn {
+    width: 34px !important;
+    height: 34px !important;
+  }
+
+  .nav-single-back-admin-btn {
+    padding: 0.35rem 0.65rem !important;
+    font-size: 0.72rem !important;
+  }
+
+  .mobile-nav-drawer {
+    position: fixed !important;
+    top: 58px !important;
+    left: 0 !important;
+    right: 0 !important;
+    background-color: #FAF7F2 !important;
+    border-bottom: 2px solid #EAE4DC !important;
+    padding: 1.25rem 1.5rem !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12) !important;
+    z-index: 999 !important;
+  }
+
+  .mobile-link {
+    display: block !important;
+    width: 100% !important;
+    text-align: left !important;
+    padding: 0.75rem 0 !important;
+    font-size: 0.92rem !important;
+    font-weight: 600 !important;
+    color: var(--color-charcoal) !important;
+    border: none !important;
+    background: none !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+    cursor: pointer !important;
+    font-family: var(--font-sans) !important;
+  }
+}
+
+/* 4. Product Grids: 2-Kolom Rapi pada Mobile (Seperti Aplikasi E-Commerce Modern) */
+@media (max-width: 768px) {
+  .claye-curated-grid,
+  .store-products-grid,
+  .catalog-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.75rem !important;
+  }
+
+  .curated-product-card {
+    border-radius: 6px !important;
+  }
+
+  .curated-card-info {
+    padding: 0.65rem 0.75rem 0.75rem !important;
+  }
+
+  .card-title-price-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.2rem !important;
+  }
+
+  .curated-item-name {
+    font-size: 0.88rem !important;
+    line-height: 1.3 !important;
+  }
+
+  .curated-item-price {
+    font-size: 0.85rem !important;
+    color: var(--color-terracotta) !important;
+    font-weight: 700 !important;
+  }
+
+  .curated-item-subtitle {
+    font-size: 0.7rem !important;
+  }
+
+  .quick-add-pill-btn {
+    font-size: 0.7rem !important;
+    padding: 0.4rem 0.75rem !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .claye-curated-grid,
+  .store-products-grid,
+  .catalog-grid {
+    gap: 0.5rem !important;
+  }
+
+  .curated-card-info {
+    padding: 0.5rem 0.6rem 0.65rem !important;
+  }
+}
+
+/* 5. Detail Page (Halaman Rincian Karya Keramik) Mobile */
+@media (max-width: 900px) {
+  .detail-main-layout {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
+  }
+
+  .detail-visual-column {
+    width: 100% !important;
+  }
+
+  .detail-main-img-box {
+    border-radius: 8px !important;
+  }
+
+  .detail-thumbs-strip {
+    gap: 0.5rem !important;
+  }
+
+  .detail-thumb-box {
+    width: 60px !important;
+    height: 60px !important;
+  }
+
+  .detail-hero-title {
+    font-size: 1.85rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .detail-cta-bar {
+    position: sticky !important;
+    bottom: 0 !important;
+    background-color: #FFFFFF !important;
+    padding: 0.75rem 1rem !important;
+    margin: 1.5rem -1rem 0 !important;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08) !important;
+    z-index: 50 !important;
+  }
+
+  .dimensions-spec-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+/* 6. Keranjang & Checkout Mobile */
+@media (max-width: 900px) {
+  .cart-grid-layout,
+  .checkout-split-layout {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
+  }
+
+  .checkout-steps-column {
+    order: 1;
+  }
+
+  .checkout-summary-column {
+    order: 2;
+  }
+
+  .checkout-form-row {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+
+  .payment-method-tile {
+    padding: 0.85rem !important;
+  }
+}
+
+/* 7. Patron Dashboard Akun Mobile */
+@media (max-width: 900px) {
+  .patron-page-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .patron-sidebar-menu {
+    border-right: none !important;
+    border-bottom: 1px solid var(--color-border) !important;
+    padding: 1rem !important;
+  }
+
+  .patron-nav-list {
+    display: flex !important;
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    gap: 0.4rem !important;
+    white-space: nowrap !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+  }
+
+  .patron-nav-btn {
+    width: auto !important;
+    padding: 0.5rem 0.85rem !important;
+    border-radius: 999px !important;
+    border: 1px solid #EAE4DC !important;
+    background-color: #FAF7F2 !important;
+  }
+
+  .patron-nav-btn.active {
+    background-color: var(--color-charcoal) !important;
+    color: #FAF7F2 !important;
+  }
+
+  .patron-main-viewport {
+    padding: 1.25rem 1rem !important;
+  }
+}
+
+/* 8. Modals Mobile Rapi & Tidak Terpotong */
+@media (max-width: 600px) {
+  .claye-modal-overlay {
+    padding: 0.65rem !important;
+  }
+
+  .claye-modal-content {
+    width: 96% !important;
+    max-width: 96% !important;
+    max-height: 90vh !important;
+    border-radius: 8px !important;
+  }
+
+  .modal-header {
+    padding: 1rem 1.15rem !important;
+  }
+
+  .modal-title {
+    font-size: 1.25rem !important;
+  }
+
+  .modal-body {
+    padding: 1.15rem 1rem !important;
+  }
+
+  .modal-footer {
+    padding: 0.85rem 1rem !important;
+    flex-direction: column-reverse !important;
+    gap: 0.5rem !important;
+  }
+
+  .btn-modal-action,
+  .btn-modal-cancel {
+    width: 100% !important;
+    text-align: center !important;
+  }
+}
+
+/* 9. Hero Section & Typography Mobile */
+@media (max-width: 768px) {
+  .claye-hero-section {
+    padding: 3rem 0 2rem !important;
+  }
+
+  .hero-editorial-title {
+    font-size: 2.1rem !important;
+    line-height: 1.2 !important;
+  }
+
+  .hero-editorial-lead {
+    font-size: 0.95rem !important;
+    line-height: 1.55 !important;
+  }
+
+  .section-serif-heading {
+    font-size: 1.55rem !important;
+    line-height: 1.3 !important;
+  }
+
+  .section-subtext {
+    font-size: 0.85rem !important;
+  }
+
+  .claye-footer {
+    padding: 3rem 1rem 2.5rem !important;
+  }
+
+  .footer-wabi-sabi-quote {
+    font-size: 1.15rem !important;
+    margin-bottom: 1.75rem !important;
+  }
+
+  .footer-horizontal-links {
+    gap: 1rem !important;
+    font-size: 0.72rem !important;
+  }
+}
+
+
 

@@ -42,11 +42,11 @@ export default function CatalogPage() {
         {/* HEADER KATALOG */}
         <div className="catalog-page-header">
           <div className="studio-edition-badge">
-            <span className="badge-dot">•</span> KOLEKSI KERAMIK ATELIER
+            <span className="badge-dot">•</span> KOLEKSI KERAMIK TERKURASI
           </div>
           <h1 className="catalog-main-title">Katalog Produk Keramik</h1>
           <p className="catalog-lead-text">
-            Koleksi stoneware buatan tangan yang dibakar dengan suhu tinggi menggunakan tanah liat mineral nusantara dan glasir alami food-grade.
+            Koleksi keramik stoneware pilihan yang kami kurasi langsung dari berbagai sentra pengrajin tembikar lokal terbaik. Memadukan estetika wabi-sabi dengan standar mutu dan keamanan pangan (food-grade).
           </p>
         </div>
 
@@ -100,14 +100,14 @@ export default function CatalogPage() {
 
         {/* JUMLAH HASIL */}
         <div className="catalog-results-meta">
-          Menampilkan <strong>{filteredProducts.length}</strong> karya keramik
+          Menampilkan <strong>{filteredProducts.length}</strong> produk keramik kurasi
           {selectedCategory !== 'Semua' && <span> pada kategori "{selectedCategory}"</span>}
         </div>
 
         {/* GRID PRODUK */}
         {filteredProducts.length === 0 ? (
           <div className="catalog-empty-notice">
-            <h3>Karya Keramik Tidak Ditemukan</h3>
+            <h3>Produk Keramik Tidak Ditemukan</h3>
             <p>Coba gunakan kata kunci lain atau hapus filter kategori.</p>
             <button
               onClick={() => { setSelectedCategory('Semua'); setSearchQuery(''); }}

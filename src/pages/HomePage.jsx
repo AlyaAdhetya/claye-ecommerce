@@ -14,14 +14,14 @@ export default function HomePage() {
           {/* KOLOM KIRI HERO */}
           <div className="hero-text-col">
             <div className="studio-edition-badge">
-              <span className="badge-dot">•</span> EDISI STUDIO 2025
+              <span className="badge-dot">•</span> KURASI KOLEKSI 2025
             </div>
             <h1 className="hero-editorial-title">
-              Karya Keramik Estetik,<br />
-              Dibuat untuk Keseharian.
+              Kurasi Keramik Estetik,<br />
+              Terpilih untuk Keseharian.
             </h1>
             <p className="hero-editorial-desc">
-              Keramik stoneware buatan tangan yang dibakar dengan kesabaran untuk menghadirkan keindahan alami dan ketenangan ke dalam ruang tinggal Anda. Setiap karya membawa karakter otentik sang perajin.
+              Koleksi keramik stoneware pilihan yang dikurasi langsung dari berbagai pengrajin dan studio tembikar terbaik untuk menghadirkan keindahan alami dan ketenangan ke dalam ruang tinggal Anda. Setiap produk diseleksi secara ketat demi kualitas dan estetika terbaik.
             </p>
             <div className="hero-cta-wrap">
               <button
@@ -33,12 +33,12 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* KOLOM KANAN HERO - FOTOGRAFI STUDIO */}
+          {/* KOLOM KANAN HERO - FOTOGRAFI KOLEKSI */}
           <div className="hero-visual-col">
             <div className="hero-image-frame">
               <img
                 src="/assets/images/hero_bg.jpg"
-                alt="Keramik Stoneware Buatan Tangan CLAYÉ"
+                alt="Keramik Stoneware Kurasi Pilihan CLAYÉ"
                 className="hero-main-img"
               />
             </div>
@@ -55,7 +55,7 @@ export default function HomePage() {
             </div>
             <h2 className="featured-heading">Koleksi Unggulan</h2>
             <p className="featured-subheading">
-              Pilihan karya keramik fungsional dan dekoratif untuk ruang hunian Anda.
+              Pilihan karya keramik fungsional dan dekoratif hasil kurasi untuk ruang hunian Anda.
             </p>
           </div>
 
@@ -110,20 +110,20 @@ export default function HomePage() {
               onClick={() => navigate('/katalog')}
               className="view-archive-link-btn"
             >
-              LIHAT SELURUH KOLEKSI STUDIO →
+              LIHAT SELURUH KOLEKSI TERKURASI →
             </button>
           </div>
         </div>
       </section>
 
-      {/* KOMITMEN KERAJINAN TANGAN */}
+      {/* KOMITMEN KURASI */}
       <section className="claye-promise-banner">
         <div className="container">
           <div className="promise-inner-card">
-            <span className="promise-small-label">KOMITMEN STUDIO CLAYÉ</span>
-            <h2 className="promise-serif-title">Dibentuk Sepenuhnya oleh Tangan Manusia</h2>
+            <span className="promise-small-label">STANDAR KURASI CLAYÉ</span>
+            <h2 className="promise-serif-title">Dikurasi Teliti dari Studio Pengrajin Terbaik</h2>
             <p className="promise-body-text">
-              Kami menolak pencetakan massal instan. Setiap karya Sunday Mug maupun mangkuk Solace memiliki sedikit perbedaan organik yang unik; bobot dalam jemari dan lengkungan bibir cangkir adalah bukti nyata bahwa waktu, ketulusan, dan tanah liat menyatu menjadi karya bernilai tinggi.
+              Kami tidak memproduksi secara massal sendiri, melainkan berkeliling mencari dan mengurasi karya keramik terbaik dari pengrajin lokal berbakat dan mitra studio tembikar terpercaya. Setiap karya seperti Sunday Mug maupun mangkuk Solace diseleksi melalui kontrol kualitas ketat untuk memastikan Anda menerima produk berkualitas artisan bernilai tinggi.
             </p>
             <div className="promise-action-link" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
               <button
@@ -131,13 +131,13 @@ export default function HomePage() {
                 className="atelier-inquiry-btn"
                 style={{ backgroundColor: 'var(--color-charcoal)', color: '#FFFFFF', borderColor: 'var(--color-charcoal)' }}
               >
-                Tentang Studio & Cerita Kami →
+                Tentang CLAYÉ & Cerita Kurasi →
               </button>
               <button
-                onClick={() => openConcierge('Ceritakan proses kurasi karya keramik di studio CLAYÉ')}
+                onClick={() => openConcierge('Ceritakan bagaimana CLAYÉ mengurasi produk dari mitra pengrajin')}
                 className="atelier-inquiry-btn"
               >
-                Konsultasi Karya Keramik
+                Konsultasi Produk Kurasi
               </button>
             </div>
           </div>

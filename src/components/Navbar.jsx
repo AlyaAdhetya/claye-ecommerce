@@ -32,6 +32,11 @@ export default function Navbar() {
     }
   };
 
+  // HEADER HANYA AKAN MUNCUL JIKA PELANGGAN / ADMIN SUDAH MASUK KE AKUNNYA (LOGIN)
+  if (!user || currentRoute === '/login' || currentRoute === '/register') {
+    return null;
+  }
+
   if (isAdminPage) {
     return (
       <header className="claye-admin-topbar">
@@ -69,34 +74,7 @@ export default function Navbar() {
               </svg>
             </button>
 
-            {/* TOMBOL LIHAT TOKO KHUSUS ADMIN */}
-            <button
-              onClick={openAdminStorefront}
-              className="admin-view-store-btn"
-              title="Lihat Tampilan Toko / Etalase Katalog Produk"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.45rem',
-                backgroundColor: 'var(--color-terracotta)',
-                color: '#FFFFFF',
-                border: 'none',
-                padding: '6px 14px',
-                borderRadius: '6px',
-                fontSize: '0.78rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-                letterSpacing: '0.02em',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.08)'
-              }}
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                <circle cx="12" cy="12" r="3"></circle>
-              </svg>
-              <span>Lihat Toko</span>
-            </button>
-
+            {/* PROFIL AKUN ADMIN */}
             <button
               onClick={() => handleNav('/dashboard')}
               className="admin-user-profile"
@@ -119,23 +97,6 @@ export default function Navbar() {
                 <span className="admin-user-role" style={{ fontSize: '0.68rem', color: '#8C8680', display: 'block' }}>Akun Admin</span>
               </div>
             </button>
-
-            <button
-              onClick={logout}
-              style={{
-                background: 'none',
-                border: '1px solid #D8D2C7',
-                color: '#555',
-                padding: '6px 12px',
-                borderRadius: '4px',
-                fontSize: '0.75rem',
-                cursor: 'pointer',
-                letterSpacing: '0.04em'
-              }}
-              title="Keluar dari Akun Admin"
-            >
-              Keluar
-            </button>
           </div>
         </div>
       </header>
@@ -155,7 +116,7 @@ export default function Navbar() {
             </button>
           </div>
 
-          {/* MENU NAVIGASI: KHUSUS PELANGGAN ATAU KHUSUS ADMIN */}
+          {/* MENU NAVIGASI: HANYA BERANDA, KATALOG, TENTANG KAMI */}
           <nav className="claye-navbar-links">
             {isAdminUser ? (
               <button
@@ -185,17 +146,11 @@ export default function Navbar() {
                 >
                   TENTANG KAMI
                 </button>
-                <button
-                  onClick={() => handleNav(user ? '/dashboard' : '/login')}
-                  className={`nav-text-link ${currentRoute === '/dashboard' || currentRoute === '/login' ? 'active' : ''}`}
-                >
-                  AKUN SAYA
-                </button>
               </>
             )}
           </nav>
 
-          {/* AKSI KANAN (CLEAN SVG ICONS TANPA EMOJI) */}
+          {/* AKSI KANAN */}
           <div className="claye-navbar-actions">
             {/* PENCARIAN */}
             <button
@@ -210,7 +165,7 @@ export default function Navbar() {
               </svg>
             </button>
 
-            {/* KERANJANG BELANJA - KHUSUS PELANGGAN (DISEMBUNYIKAN UNTUK ADMIN) */}
+            {/* KERANJANG BELANJA */}
             {!isAdminUser && (
               <button
                 onClick={() => handleNav('/keranjang')}
@@ -229,7 +184,7 @@ export default function Navbar() {
               </button>
             )}
 
-            {/* SATU TOMBOL KEMBALI KE DASHBOARD KHUSUS ADMIN / AKUN PELANGGAN */}
+            {/* TOMBOL AKUN & KELUAR */}
             {isAdminUser ? (
               <button
                 onClick={() => handleNav('/admin')}
@@ -239,29 +194,37 @@ export default function Navbar() {
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="15 18 9 12 15 6"></polyline>
                 </svg>
-                <span>Kembali ke Dashboard</span>
+                <span>Dashboard Admin</span>
               </button>
             ) : user ? (
-              <button
-                onClick={() => handleNav('/dashboard')}
-                className="nav-avatar-btn"
-                title={`Akun: ${user.name}`}
-              >
-                {user.name.charAt(0).toUpperCase()}
-              </button>
-            ) : (
-              <button
-                onClick={() => handleNav('/login')}
-                className="nav-action-icon-btn"
-                title="Masuk / Daftar Akun"
-                aria-label="Masuk atau Daftar Akun"
-              >
-                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-              </button>
-            )}
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem' }}>
+                <button
+                  onClick={() => handleNav('/dashboard')}
+                  className="nav-avatar-btn"
+                  title={`Akun Saya: ${user.name}`}
+                  aria-label="Akun Saya"
+                >
+                  {user.name.charAt(0).toUpperCase()}
+                </button>
+                <button
+                  onClick={logout}
+                  className="nav-action-logout-text"
+                  title="Keluar dari Akun"
+                  style={{
+                    background: 'none',
+                    border: '1px solid #D8D2C7',
+                    borderRadius: '4px',
+                    padding: '4px 8px',
+                    fontSize: '0.72rem',
+                    color: '#6A645D',
+                    cursor: 'pointer',
+                    letterSpacing: '0.04em'
+                  }}
+                >
+                  Keluar
+                </button>
+              </div>
+            ) : null}
 
             {/* HAMBURGER MENU MOBILE */}
             <button
@@ -281,7 +244,7 @@ export default function Navbar() {
             <form onSubmit={handleSearchSubmit} className="search-form-inner container">
               <input
                 type="text"
-                placeholder="Cari karya keramik: mug, piring, mangkuk, vas, dripper..."
+                placeholder="Cari produk keramik: mug, piring, mangkuk, vas, teko..."
                 value={navSearchQuery}
                 onChange={(e) => setNavSearchQuery(e.target.value)}
                 autoFocus
@@ -297,13 +260,27 @@ export default function Navbar() {
           <div className="mobile-nav-drawer">
             <div className="mobile-nav-links">
               <button onClick={() => handleNav('/')} className="mobile-link">BERANDA</button>
-              <button onClick={() => handleNav('/katalog')} className="mobile-link">KATALOG PRODUK</button>
+              <button onClick={() => handleNav('/katalog')} className="mobile-link">KATALOG</button>
               <button onClick={() => handleNav('/tentang')} className="mobile-link">TENTANG KAMI</button>
-              <button onClick={() => handleNav('/keranjang')} className="mobile-link">KERANJANG ({cartCount})</button>
-              <button onClick={() => handleNav(user ? '/dashboard' : '/login')} className="mobile-link">
-                {user ? 'AKUN SAYA' : 'MASUK / DAFTAR'}
-              </button>
-              <button onClick={() => handleNav('/checkout')} className="mobile-link">PEMBAYARAN (CHECKOUT)</button>
+              {isAdminUser && (
+                <button
+                  onClick={() => handleNav('/admin')}
+                  className="mobile-link"
+                  style={{ fontWeight: 700, color: 'var(--color-terracotta)' }}
+                >
+                  DASHBOARD ADMIN
+                </button>
+              )}
+              {user && (
+                <div style={{ borderTop: '1px solid #EAE4DC', margin: '0.75rem 0', paddingTop: '0.75rem' }}>
+                  <button onClick={() => handleNav('/dashboard')} className="mobile-link" style={{ fontSize: '0.85rem' }}>
+                    AKUN SAYA ({user.name})
+                  </button>
+                  <button onClick={logout} className="mobile-link" style={{ fontSize: '0.85rem', color: '#B87355' }}>
+                    KELUAR DARI AKUN
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         )}
