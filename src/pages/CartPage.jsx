@@ -2,16 +2,46 @@ import React, { useState } from 'react';
 import { useShop } from '../context/ShopContext';
 
 export default function CartPage() {
-  const { cart, updateCartQty, removeFromCart, clearCart, navigate, showToast, openConcierge } = useShop();
+  const {
+    cart,
+    updateCartQty,
+    removeFromCart,
+    clearCart,
+    toggleCartItemSelection,
+    selectAllCartItems,
+    updateCartItemGlaze,
+    products,
+    navigate,
+    showToast,
+    openConcierge
+  } = useShop();
 
   const [couponInput, setCouponInput] = useState('');
   const [discountPercent, setDiscountPercent] = useState(0);
   const [appliedCoupon, setAppliedCoupon] = useState('');
 
-  const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const totalPieces = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const selectedItems = cart.filter(item => item.selected !== false);
+  const allSelected = cart.length > 0 && cart.every(item => item.selected !== false);
+  const selectedCount = selectedItems.length;
+  const totalPieces = selectedItems.reduce((sum, item) => sum + item.quantity, 0);
+  const allTotalPieces = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const subtotal = selectedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const discountAmount = Math.round((subtotal * discountPercent) / 100);
   const finalTotal = subtotal - discountAmount;
+
+  const getAvailableGlazes = (item) => {
+    const prod = products?.find(p => p.id === item.id || p.name === item.name);
+    if (prod && prod.glazeOptions && prod.glazeOptions.length > 0) {
+      return prod.glazeOptions.map(g => g.name);
+    }
+    return [
+      'Glasir Gading Alami',
+      'Glasir Abu Kayu Sage',
+      'Glasir Batu Pasir',
+      'Glasir Biru Samudra (Neko)',
+      'Glasir Hitam Arang Tenmoku'
+    ];
+  };
 
   const handleApplyCoupon = (e) => {
     e.preventDefault();
@@ -57,7 +87,7 @@ export default function CartPage() {
         <div className="cart-breadcrumb">
           <button onClick={() => navigate('/')}>BERANDA</button>
           <span className="bc-sep">/</span>
-          <span className="bc-current">KERANJANG BELANJA ({totalPieces})</span>
+          <span className="bc-current">KERANJANG BELANJA ({allTotalPieces})</span>
         </div>
 
         {/* HEADER */}
@@ -82,8 +112,58 @@ export default function CartPage() {
         <div className="cart-grid-layout">
           {/* DAFTAR ITEM */}
           <div className="cart-items-column">
+            {/* BAR PILIH SEMUA */}
+            <div
+              className="cart-select-all-bar"
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '0.85rem 1.25rem',
+                backgroundColor: '#FFFFFF',
+                border: '1px solid var(--color-border)',
+                borderRadius: '4px',
+                marginBottom: '1rem'
+              }}
+            >
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem', color: 'var(--color-charcoal)' }}>
+                <input
+                  type="checkbox"
+                  checked={allSelected}
+                  onChange={(e) => selectAllCartItems(e.target.checked)}
+                  style={{ width: '18px', height: '18px', accentColor: 'var(--color-terracotta)', cursor: 'pointer' }}
+                />
+                <span>Pilih Semua ({selectedCount}/{cart.length} Produk Terpilih)</span>
+              </label>
+              {cart.length - selectedCount > 0 && (
+                <span style={{ fontSize: '0.78rem', color: '#8A857F' }}>
+                  {cart.length - selectedCount} produk disimpan di keranjang untuk nanti
+                </span>
+              )}
+            </div>
+
             {cart.map((item, idx) => (
-              <div key={idx} className="cart-item-row-card">
+              <div
+                key={idx}
+                className="cart-item-row-card"
+                style={{
+                  opacity: item.selected === false ? 0.65 : 1,
+                  transition: 'opacity 0.2s ease, border-color 0.2s ease',
+                  borderColor: item.selected === false ? '#EAE6DF' : '#DED8CF'
+                }}
+              >
+                {/* CHECKBOX PILIH ITEM */}
+                <div style={{ display: 'flex', alignItems: 'center', padding: '0 0.5rem 0 0' }}>
+                  <input
+                    type="checkbox"
+                    checked={item.selected !== false}
+                    onChange={() => toggleCartItemSelection(idx)}
+                    style={{ width: '18px', height: '18px', accentColor: 'var(--color-terracotta)', cursor: 'pointer' }}
+                    title={item.selected !== false ? 'Batalkan pilihan (tetap simpan di keranjang)' : 'Pilih untuk dibeli'}
+                    aria-label={`Pilih ${item.name}`}
+                  />
+                </div>
+
                 <div className="cart-item-photo">
                   <img src={item.image} alt={item.name} />
                 </div>
@@ -101,14 +181,28 @@ export default function CartPage() {
                     </button>
                   </div>
 
-                  <div className="cart-item-glaze-tag">
-                    <span
-                      className="swatch-mini-dot"
+                  {/* PEMILIH TIPE / GLASIR */}
+                  <div className="cart-item-glaze-tag" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', margin: '0.35rem 0' }}>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--color-muted)' }}>Tipe / Glasir:</span>
+                    <select
+                      value={item.selectedGlaze || 'Glasir Gading Alami'}
+                      onChange={(e) => updateCartItemGlaze(idx, e.target.value)}
                       style={{
-                        backgroundColor: item.selectedGlaze === 'Hijau Sage' ? '#BDC7B9' : '#EBE5D8'
+                        padding: '3px 8px',
+                        fontSize: '0.8rem',
+                        borderRadius: '4px',
+                        border: '1px solid #DED8CF',
+                        backgroundColor: '#FAF8F5',
+                        color: 'var(--color-charcoal)',
+                        cursor: 'pointer'
                       }}
-                    />
-                    <span>Warna Glasir: {item.selectedGlaze || 'Alami'}</span>
+                    >
+                      {getAvailableGlazes(item).map((glazeName) => (
+                        <option key={glazeName} value={glazeName}>
+                          {glazeName}
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
                   {item.stamp && (
@@ -151,7 +245,7 @@ export default function CartPage() {
             <div className="cart-packaging-assurance">
               <div>
                 <strong>Gratis Kemasan Protektif CLAYÉ Termasuk</strong>
-                <p>Bantalan pulp daur ulang dan pelindung sarang lebah menjamin keramik Anda tiba tanpa risiko pecah.</p>
+                <p>Bantalan pulp daur ulang dan pelindung sarang lebah menjamin keramik Anda tiba tanpa risiko pecah. Produk yang tidak dicentang akan tetap tersimpan aman di keranjang untuk pesanan Anda selanjutnya.</p>
               </div>
             </div>
           </div>
@@ -191,7 +285,7 @@ export default function CartPage() {
 
               <div className="summary-cost-breakdown" style={{ marginTop: '1.5rem' }}>
                 <div className="cost-row">
-                  <span>Subtotal ({totalPieces} produk)</span>
+                  <span>Subtotal ({totalPieces} produk terpilih)</span>
                   <strong>Rp {subtotal.toLocaleString('id-ID')}</strong>
                 </div>
 
@@ -204,7 +298,7 @@ export default function CartPage() {
 
                 <div className="cost-row">
                   <span>Estimasi Ongkos Kirim Reguler</span>
-                  <strong>Rp 15.000</strong>
+                  <strong>{selectedCount > 0 ? 'Rp 15.000' : 'Rp 0'}</strong>
                 </div>
 
                 <div className="cost-row">
@@ -218,17 +312,28 @@ export default function CartPage() {
                     <span className="total-tax-note">SUDAH TERMASUK PAJAK</span>
                   </div>
                   <div className="total-big-amount">
-                    Rp {(finalTotal + 15000).toLocaleString('id-ID')}
+                    Rp {(selectedCount > 0 ? finalTotal + 15000 : 0).toLocaleString('id-ID')}
                   </div>
                 </div>
               </div>
 
               <button
-                onClick={() => navigate('/checkout')}
+                onClick={() => {
+                  if (selectedCount === 0) {
+                    showToast('Silakan pilih minimal 1 karya keramik yang ingin dibeli.', 'error');
+                    return;
+                  }
+                  navigate('/checkout');
+                }}
+                disabled={selectedCount === 0}
                 className="place-order-cta-btn"
-                style={{ marginTop: '1.5rem' }}
+                style={{
+                  marginTop: '1.5rem',
+                  opacity: selectedCount === 0 ? 0.6 : 1,
+                  cursor: selectedCount === 0 ? 'not-allowed' : 'pointer'
+                }}
               >
-                Lanjut ke Pembayaran →
+                {selectedCount === 0 ? 'Pilih Produk untuk Checkout' : `Lanjut ke Pembayaran (${totalPieces} pcs) →`}
               </button>
 
               <div style={{ textAlign: 'center', marginTop: '1rem' }}>

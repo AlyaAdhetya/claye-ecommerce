@@ -59,59 +59,125 @@ const INITIAL_CART = [
 
 const INITIAL_ORDERS = [
   {
-    id: '#CLY-2026-003',
-    date: '22 Okt 2026',
-    itemsSummary: 'The Sunday Mug + The Everyday Plate',
+    id: '#CLY-2026-021',
+    patron: 'Nadia Putri',
+    initials: 'NP',
+    email: 'nadia.putri@gmail.com',
+    phone: '+62 812-9988-7711',
+    city: 'Jakarta Selatan',
+    address: 'Jl. Senopati No. 44, Kebayoran Baru, Jakarta Selatan',
+    date: '20 Okt 2026',
+    itemsSummary: 'The Sunday Mug (Glasir Batu Pasir)',
     variantSummary: 'Batu Pasir & Gading',
     items: [
-      { name: 'The Sunday Mug', glaze: 'Batu Pasir', quantity: 1, price: 125000 },
-      { name: 'The Everyday Plate', glaze: 'Gading (Ivory)', quantity: 1, price: 150000 }
+      { name: 'The Sunday Mug', glaze: 'Batu Pasir', quantity: 1, price: 125000 }
     ],
-    total: 275000,
+    total: 250000,
     shippingFee: 15000,
-    grandTotal: 290000,
-    fulfillment: 'SELESAI',
-    paymentStatus: 'LUNAS',
-    paymentMethod: 'Transfer Bank (BCA)',
-    courier: 'Pengiriman Reguler (Eco Shield)',
-    trackingNumber: 'CLY-EXP-89021-PLM',
+    grandTotal: 265000,
+    paymentStatus: 'Lunas',
+    paymentMethod: 'Transfer BCA',
+    fulfillment: 'Diproses',
+    courier: 'JNE Eco-Shield (Garansi Pecah Belah)',
+    trackingNumber: 'CLY-EXP-99201-BDG',
     image: '/assets/images/product_mug.jpg'
   },
   {
-    id: '#CLY-2026-002',
-    date: '18 Okt 2026',
-    itemsSummary: 'The Everyday Plate',
+    id: '#CLY-2026-022',
+    patron: 'Rania Putri',
+    initials: 'RP',
+    email: 'rania.p@outlook.com',
+    phone: '+62 813-2211-4455',
+    city: 'Bandung Barat',
+    address: 'Komp. Setiabudi Regency No. 12, Bandung Barat',
+    date: '21 Okt 2026',
+    itemsSummary: 'The Everyday Plate (Glasir Gading)',
     variantSummary: 'Gading (Ivory) • Jml: 1',
     items: [
-      { name: 'The Everyday Plate', glaze: 'Gading (Ivory)', quantity: 1, price: 150000 }
-    ],
-    total: 150000,
-    shippingFee: 15000,
-    grandTotal: 165000,
-    fulfillment: 'DIPROSES',
-    paymentStatus: 'LUNAS',
-    paymentMethod: 'E-Wallet Instan (QRIS)',
-    courier: 'Pengiriman Reguler (Eco Shield)',
-    trackingNumber: 'CLY-EXP-87944-PLM',
-    image: '/assets/images/product_plate.jpg'
-  },
-  {
-    id: '#CLY-2026-001',
-    date: '12 Okt 2026',
-    itemsSummary: 'The Sunday Mug',
-    variantSummary: 'Glasir Hijau Sage • Jml: 1',
-    items: [
-      { name: 'The Sunday Mug', glaze: 'Hijau Sage', quantity: 1, price: 125000 }
+      { name: 'The Everyday Plate', glaze: 'Gading (Ivory)', quantity: 1, price: 125000 }
     ],
     total: 125000,
     shippingFee: 15000,
     grandTotal: 140000,
-    fulfillment: 'SELESAI',
-    paymentStatus: 'LUNAS',
-    paymentMethod: 'Virtual Account (BCA)',
+    paymentStatus: 'Lunas',
+    paymentMethod: 'QRIS Instan',
+    fulfillment: 'Selesai',
+    courier: 'Kurir Pengiriman Ekstra Proteksi (Same Day)',
+    trackingNumber: 'CLY-EXP-99202-BDG',
+    image: '/assets/images/product_plate.jpg'
+  },
+  {
+    id: '#CLY-2026-023',
+    patron: 'Alya Safitri',
+    initials: 'AS',
+    email: 'alya.safitri@yahoo.com',
+    phone: '+62 819-3344-5566',
+    city: 'Surabaya Timur',
+    address: 'Jl. Kertajaya Indah No. 88, Surabaya Timur',
+    date: '22 Okt 2026',
+    itemsSummary: 'Kyoto Pourer Vessel + Mangkuk Solace',
+    variantSummary: 'Stoneware Alami',
+    items: [
+      { name: 'Kyoto Pourer Vessel', glaze: 'Alami', quantity: 1, price: 185000 },
+      { name: 'Mangkuk Solace', glaze: 'Gading', quantity: 1, price: 115000 }
+    ],
+    total: 300000,
+    shippingFee: 20000,
+    grandTotal: 320000,
+    paymentStatus: 'Menunggu',
+    paymentMethod: 'Virtual Account Mandiri',
+    fulfillment: 'Menunggu Pembayaran',
+    courier: 'J&T Cargo Wood Crate',
+    trackingNumber: 'CLY-EXP-99203-BDG',
+    image: '/assets/images/product_bowl.jpg'
+  },
+  {
+    id: '#CLY-2026-024',
+    patron: 'Dinda Maharani',
+    initials: 'DM',
+    email: 'dinda.m@gmail.com',
+    phone: '+62 821-5566-7788',
+    city: 'Denpasar, Bali',
+    address: 'Jl. Danau Tamblingan No. 17, Sanur, Denpasar, Bali',
+    date: '23 Okt 2026',
+    itemsSummary: 'Wabi Matcha Chawan Vessel',
+    variantSummary: 'Abu Kayu & Besi Matte',
+    items: [
+      { name: 'Wabi Matcha Chawan Vessel', glaze: 'Celadon', quantity: 1, price: 150000 }
+    ],
+    total: 150000,
+    shippingFee: 20000,
+    grandTotal: 170000,
+    paymentStatus: 'Lunas',
+    paymentMethod: 'Transfer BCA',
+    fulfillment: 'Diproses',
+    courier: 'SiCepat Best Eco Shield',
+    trackingNumber: 'CLY-EXP-99204-BDG',
+    image: '/assets/images/product_bowl.jpg'
+  },
+  {
+    id: '#CLY-2026-003',
+    patron: 'Arumi',
+    initials: 'AR',
+    email: 'arumi@example.com',
+    phone: '+62 812-3456-7890',
+    city: 'Palembang',
+    address: 'Jl. Sejuta Kenangan No. 12, Palembang',
+    date: '24 Okt 2026',
+    itemsSummary: 'The Sunday Mug (Neko Wave Edition)',
+    variantSummary: 'Biru Kobalt Ombak • Jml: 1',
+    items: [
+      { name: 'The Sunday Mug (Neko Wave Edition)', glaze: 'Biru Kobalt Ombak', quantity: 1, price: 135000 }
+    ],
+    total: 135000,
+    shippingFee: 15000,
+    grandTotal: 150000,
+    fulfillment: 'Selesai',
+    paymentStatus: 'Lunas',
+    paymentMethod: 'Transfer Bank (BCA)',
     courier: 'Pengiriman Reguler (Eco Shield)',
-    trackingNumber: 'CLY-EXP-86104-PLM',
-    image: '/assets/images/product_mug.jpg'
+    trackingNumber: 'CLY-EXP-89021-PLM',
+    image: '/assets/images/product_neko_mug.jpg'
   }
 ];
 
@@ -151,8 +217,14 @@ export function ShopProvider({ children }) {
 
   const [orders, setOrders] = useState(() => {
     try {
-      const saved = localStorage.getItem('claye_orders_id_v3');
-      return saved ? JSON.parse(saved) : INITIAL_ORDERS;
+      const saved = localStorage.getItem('claye_orders_id_v4');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        const existingIds = new Set(parsed.map(o => o.id));
+        const missingOrders = INITIAL_ORDERS.filter(o => !existingIds.has(o.id));
+        return [...parsed, ...missingOrders];
+      }
+      return INITIAL_ORDERS;
     } catch {
       return INITIAL_ORDERS;
     }
@@ -234,7 +306,7 @@ export function ShopProvider({ children }) {
   }, [user]);
 
   useEffect(() => {
-    localStorage.setItem('claye_orders_id_v3', JSON.stringify(orders));
+    localStorage.setItem('claye_orders_id_v4', JSON.stringify(orders));
   }, [orders]);
 
   useEffect(() => {
@@ -261,6 +333,41 @@ export function ShopProvider({ children }) {
               ? p.product_glazes.map(g => ({ id: g.id, name: g.glaze_name, hex: g.hex_preview || '#EBE5D8' }))
               : [{ id: 'default', name: 'Alami', hex: '#EBE5D8' }]
           })));
+        }
+
+        const dbOrders = await supabaseService.getOrders();
+        if (dbOrders && dbOrders.length > 0) {
+          const formatted = dbOrders.map(dbo => ({
+            id: dbo.order_number || `#CLY-2026-${dbo.id}`,
+            patron: dbo.recipient_name || 'Pelanggan CLAYÉ',
+            initials: (dbo.recipient_name || 'CL').substring(0, 2).toUpperCase(),
+            email: dbo.recipient_phone || 'admin@claye.id',
+            phone: dbo.recipient_phone || '-',
+            city: dbo.shipping_city || 'Palembang',
+            address: dbo.shipping_address || 'Jl. Sejuta Kenangan',
+            date: new Date(dbo.created_at || Date.now()).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
+            itemsSummary: dbo.order_items?.map(oi => oi.product_name_snapshot).join(' + ') || 'Karya Keramik Kurasi',
+            variantSummary: dbo.order_items?.map(oi => `${oi.glaze_name_snapshot} • Jml: ${oi.quantity}`).join(', ') || '',
+            items: dbo.order_items?.map(oi => ({
+              name: oi.product_name_snapshot,
+              glaze: oi.glaze_name_snapshot,
+              quantity: oi.quantity,
+              price: oi.unit_price_snapshot
+            })) || [],
+            total: dbo.total_items_amount || 0,
+            shippingFee: dbo.shipping_fee || 15000,
+            grandTotal: dbo.grand_total || 0,
+            fulfillment: dbo.fulfillment_status === 'SELESAI' ? 'Selesai' : dbo.fulfillment_status === 'DIPROSES' || dbo.fulfillment_status === 'DIPROSES_KURASI' ? 'Diproses' : 'Menunggu',
+            paymentStatus: dbo.payment_status === 'LUNAS' ? 'Lunas' : 'Menunggu',
+            paymentMethod: dbo.payment_method || 'Transfer Bank',
+            courier: dbo.courier_name || 'Eco Shield',
+            trackingNumber: dbo.tracking_number || dbo.order_number
+          }));
+          setOrders(prev => {
+            const existingIds = new Set(prev.map(o => o.id));
+            const newFromDb = formatted.filter(o => !existingIds.has(o.id));
+            return [...newFromDb, ...prev];
+          });
         }
       } catch (err) {
         console.warn('Inisialisasi Supabase menggunakan fallback lokal:', err);
@@ -296,7 +403,7 @@ export function ShopProvider({ children }) {
       );
       if (existingIndex > -1) {
         return prev.map((item, idx) => 
-          idx === existingIndex ? { ...item, quantity: item.quantity + quantity } : item
+          idx === existingIndex ? { ...item, quantity: item.quantity + quantity, selected: true } : item
         );
       }
       return [
@@ -307,7 +414,8 @@ export function ShopProvider({ children }) {
           basePrice: product.price,
           quantity,
           selectedGlaze: glaze,
-          stamp
+          stamp,
+          selected: true
         }
       ];
     });
@@ -321,6 +429,27 @@ export function ShopProvider({ children }) {
         idx === index ? { ...item, quantity: Math.max(1, qty) } : item
       )
     );
+  };
+
+  const toggleCartItemSelection = (index) => {
+    setCart(prev =>
+      prev.map((item, idx) =>
+        idx === index ? { ...item, selected: item.selected === false ? true : false } : item
+      )
+    );
+  };
+
+  const selectAllCartItems = (selectAll = true) => {
+    setCart(prev => prev.map(item => ({ ...item, selected: selectAll })));
+  };
+
+  const updateCartItemGlaze = (index, newGlaze) => {
+    setCart(prev =>
+      prev.map((item, idx) =>
+        idx === index ? { ...item, selectedGlaze: newGlaze } : item
+      )
+    );
+    showToast(`Varian tipe/glasir berhasil diubah menjadi "${newGlaze}".`, 'info');
   };
 
   const removeFromCart = (index) => {
@@ -344,7 +473,10 @@ export function ShopProvider({ children }) {
     });
   };
 
-  const cartTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const selectedCart = cart.filter(item => item.selected !== false);
+  const selectedCartTotal = selectedCart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const selectedCartCount = selectedCart.reduce((sum, item) => sum + item.quantity, 0);
+  const cartTotal = selectedCartTotal;
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   const login = (email, password, forcedRole = null) => {
@@ -411,40 +543,112 @@ export function ShopProvider({ children }) {
   const createOrder = (orderData) => {
     const randNum = Math.floor(100 + Math.random() * 900);
     const orderId = `#CLY-2026-${randNum}`;
+    const patronName = orderData.patron || (user ? (user.fullName || user.name) : 'Arumi');
+    const userCity = orderData.city || (user ? user.city : 'Palembang');
+    const userAddress = orderData.address || orderData.shippingAddress || (user ? `${user.address}, ${user.city}` : 'Jl. Sejuta Kenangan No. 12, Palembang');
+    const userEmail = orderData.email || (user ? user.email : 'arumi@example.com');
+    const userPhone = orderData.phone || (user ? user.phone : '+62 812-3456-7890');
+
+    const targetItems = cart.filter(i => i.selected !== false);
+    const itemsToOrder = targetItems.length > 0 ? targetItems : cart;
+    const itemsTotal = itemsToOrder.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
     const newOrder = {
       id: orderId,
+      patron: patronName,
+      initials: patronName.substring(0, 2).toUpperCase(),
+      email: userEmail,
+      phone: userPhone,
+      city: userCity,
+      address: userAddress,
       date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
-      itemsSummary: cart.map(i => i.name).join(' + '),
-      variantSummary: cart.map(i => `${i.selectedGlaze || 'Gading'} • Jml: ${i.quantity}`).join(', '),
-      items: cart.map(i => ({
+      itemsSummary: itemsToOrder.map(i => i.name).join(' + '),
+      variantSummary: itemsToOrder.map(i => `${i.selectedGlaze || 'Gading'} • Jml: ${i.quantity}`).join(', '),
+      items: itemsToOrder.map(i => ({
         name: i.name,
         glaze: i.selectedGlaze,
         stamp: i.stamp,
         quantity: i.quantity,
         price: i.price
       })),
-      total: cartTotal,
+      total: itemsTotal,
       shippingFee: orderData.shippingFee || 15000,
-      grandTotal: (cartTotal + (orderData.shippingFee || 15000)),
-      fulfillment: 'DIPROSES',
-      paymentStatus: 'LUNAS',
+      grandTotal: itemsTotal + (orderData.shippingFee || 15000),
+      fulfillment: 'Diproses',
+      paymentStatus: 'Lunas',
       paymentMethod: orderData.paymentMethod || 'Transfer Bank (BCA)',
       courier: orderData.courier || 'Pengiriman Reguler (Eco Shield)',
       trackingNumber: `CLY-EXP-${randNum}-PLM`,
-      image: cart[0]?.image || '/assets/images/product_mug.jpg',
-      shippingAddress: orderData.shippingAddress || (user ? `${user.address}, ${user.city}` : 'Jl. Sejuta Kenangan, Palembang, Sumatera Selatan')
+      image: itemsToOrder[0]?.image || '/assets/images/product_mug.jpg',
+      shippingAddress: userAddress
     };
+
     setOrders(prev => [newOrder, ...prev]);
-    clearCart();
+
+    // Hapus hanya barang yang fix dibeli; barang yang tidak dicentang tetap tersimpan di keranjang
+    setCart(prev => prev.filter(i => i.selected === false));
 
     // Simpan ke Supabase jika terhubung
     if (isSupabaseConfigured()) {
-      supabaseService.createOrder(newOrder, cart).catch(err => {
+      supabaseService.createOrder(newOrder, itemsToOrder).catch(err => {
         console.warn('Gagal menyimpan pesanan ke Supabase:', err);
       });
     }
 
     return newOrder;
+  };
+
+  const updateOrderFulfillment = (orderId, newStatus) => {
+    setOrders(prev =>
+      prev.map(ord => ord.id === orderId ? { ...ord, fulfillment: newStatus } : ord)
+    );
+    showToast(`Status pengiriman ${orderId} diubah menjadi "${newStatus}".`, 'success');
+  };
+
+  const syncOrders = async () => {
+    if (isSupabaseConfigured()) {
+      try {
+        const dbOrders = await supabaseService.getOrders();
+        if (dbOrders && dbOrders.length > 0) {
+          const formatted = dbOrders.map(dbo => ({
+            id: dbo.order_number || `#CLY-2026-${dbo.id}`,
+            patron: dbo.recipient_name || 'Pelanggan CLAYÉ',
+            initials: (dbo.recipient_name || 'CL').substring(0, 2).toUpperCase(),
+            email: dbo.recipient_phone || 'admin@claye.id',
+            phone: dbo.recipient_phone || '-',
+            city: dbo.shipping_city || 'Palembang',
+            address: dbo.shipping_address || 'Jl. Sejuta Kenangan',
+            date: new Date(dbo.created_at || Date.now()).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
+            itemsSummary: dbo.order_items?.map(oi => oi.product_name_snapshot).join(' + ') || 'Karya Keramik Kurasi',
+            variantSummary: dbo.order_items?.map(oi => `${oi.glaze_name_snapshot} • Jml: ${oi.quantity}`).join(', ') || '',
+            items: dbo.order_items?.map(oi => ({
+              name: oi.product_name_snapshot,
+              glaze: oi.glaze_name_snapshot,
+              quantity: oi.quantity,
+              price: oi.unit_price_snapshot
+            })) || [],
+            total: dbo.total_items_amount || 0,
+            shippingFee: dbo.shipping_fee || 15000,
+            grandTotal: dbo.grand_total || 0,
+            fulfillment: dbo.fulfillment_status === 'SELESAI' ? 'Selesai' : dbo.fulfillment_status === 'DIPROSES' || dbo.fulfillment_status === 'DIPROSES_KURASI' ? 'Diproses' : 'Menunggu',
+            paymentStatus: dbo.payment_status === 'LUNAS' ? 'Lunas' : 'Menunggu',
+            paymentMethod: dbo.payment_method || 'Transfer Bank',
+            courier: dbo.courier_name || 'Eco Shield',
+            trackingNumber: dbo.tracking_number || dbo.order_number
+          }));
+          setOrders(prev => {
+            const existingIds = new Set(prev.map(o => o.id));
+            const newFromDb = formatted.filter(o => !existingIds.has(o.id));
+            return [...newFromDb, ...prev];
+          });
+          showToast('Data pesanan berhasil disinkronisasi dari database.', 'success');
+          return;
+        }
+      } catch (err) {
+        console.warn('Gagal sinkronisasi pesanan dari Supabase:', err);
+      }
+    }
+    showToast('Data pesanan telah diperbarui.', 'success');
   };
 
   const addProduct = (newProd) => {
@@ -525,6 +729,8 @@ export function ShopProvider({ children }) {
       selectedProductId,
       cartTotal,
       cartCount,
+      selectedCartTotal,
+      selectedCartCount,
       isChatOpen,
       chatInitialPrompt,
       isCartDrawerOpen,
@@ -537,12 +743,17 @@ export function ShopProvider({ children }) {
       updateCartQty,
       removeFromCart,
       clearCart,
+      toggleCartItemSelection,
+      selectAllCartItems,
+      updateCartItemGlaze,
       toggleWishlist,
       login,
       register,
       logout,
       updateProfile,
       createOrder,
+      updateOrderFulfillment,
+      syncOrders,
       addProduct,
       updateProduct,
       deleteProduct,

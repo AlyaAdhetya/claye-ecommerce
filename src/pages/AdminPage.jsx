@@ -4,6 +4,9 @@ import { useShop } from '../context/ShopContext';
 export default function AdminPage() {
   const {
     products,
+    orders,
+    updateOrderFulfillment,
+    syncOrders,
     addProduct,
     updateProduct,
     deleteProduct,
@@ -110,77 +113,8 @@ export default function AdminPage() {
     bcaActive: true
   });
 
-  // Mock initial orders
-  const [adminOrders, setAdminOrders] = useState([
-    {
-      id: '#CLY-2026-021',
-      patron: 'Nadia Putri',
-      initials: 'NP',
-      email: 'nadia.putri@gmail.com',
-      phone: '+62 812-9988-7711',
-      city: 'Jakarta Selatan',
-      address: 'Jl. Senopati No. 44, Kebayoran Baru, Jakarta Selatan',
-      date: '20 Okt 2026',
-      itemsSummary: 'The Sunday Mug (Glasir Batu Pasir)',
-      total: 250000,
-      paymentStatus: 'Lunas',
-      paymentMethod: 'Transfer BCA',
-      fulfillment: 'Diproses',
-      courier: 'JNE Eco-Shield (Garansi Pecah Belah)',
-      trackingNumber: 'CLY-EXP-99201-BDG'
-    },
-    {
-      id: '#CLY-2026-022',
-      patron: 'Rania Putri',
-      initials: 'RP',
-      email: 'rania.p@outlook.com',
-      phone: '+62 813-2211-4455',
-      city: 'Bandung Barat',
-      address: 'Komp. Setiabudi Regency No. 12, Bandung Barat',
-      date: '21 Okt 2026',
-      itemsSummary: 'The Everyday Plate (Glasir Gading)',
-      total: 125000,
-      paymentStatus: 'Lunas',
-      paymentMethod: 'QRIS Instan',
-      fulfillment: 'Selesai',
-      courier: 'Kurir Pengiriman Ekstra Proteksi (Same Day)',
-      trackingNumber: 'CLY-EXP-99202-BDG'
-    },
-    {
-      id: '#CLY-2026-023',
-      patron: 'Alya Safitri',
-      initials: 'AS',
-      email: 'alya.safitri@yahoo.com',
-      phone: '+62 819-3344-5566',
-      city: 'Surabaya Timur',
-      address: 'Jl. Kertajaya Indah No. 88, Surabaya Timur',
-      date: '22 Okt 2026',
-      itemsSummary: 'Kyoto Pourer Vessel + Mangkuk Solace',
-      total: 300000,
-      paymentStatus: 'Menunggu',
-      paymentMethod: 'Virtual Account Mandiri',
-      fulfillment: 'Menunggu Pembayaran',
-      courier: 'J&T Cargo Wood Crate',
-      trackingNumber: 'CLY-EXP-99203-BDG'
-    },
-    {
-      id: '#CLY-2026-024',
-      patron: 'Dinda Maharani',
-      initials: 'DM',
-      email: 'dinda.m@gmail.com',
-      phone: '+62 821-5566-7788',
-      city: 'Denpasar, Bali',
-      address: 'Jl. Danau Tamblingan No. 17, Sanur, Denpasar, Bali',
-      date: '23 Okt 2026',
-      itemsSummary: 'Wabi Matcha Chawan Vessel',
-      total: 150000,
-      paymentStatus: 'Lunas',
-      paymentMethod: 'Transfer BCA',
-      fulfillment: 'Diproses',
-      courier: 'SiCepat Best Eco Shield',
-      trackingNumber: 'CLY-EXP-99204-BDG'
-    }
-  ]);
+  // Live orders from ShopContext (unified with checkout & Supabase)
+  const adminOrders = orders || [];
 
   // Mock collector patrons data
   const collectors = [
@@ -356,21 +290,23 @@ export default function AdminPage() {
   };
 
   const handleUpdateFulfillment = (orderId, newStatus) => {
-    setAdminOrders(prev =>
-      prev.map(ord => ord.id === orderId ? { ...ord, fulfillment: newStatus } : ord)
-    );
-    showToast(`Status pengiriman ${orderId} diubah menjadi "${newStatus}".`, 'success');
+    if (updateOrderFulfillment) {
+      updateOrderFulfillment(orderId, newStatus);
+    }
     if (inspectOrderData && inspectOrderData.id === orderId) {
-      setInspectOrderData({ ...inspectOrderData, fulfillment: newStatus });
+      setInspectOrderData(prev => ({ ...prev, fulfillment: newStatus }));
     }
   };
 
   // Filtered orders
   const filteredOrders = adminOrders.filter(ord => {
-    const matchStatus = orderStatusFilter === 'Semua' || ord.fulfillment.toLowerCase().includes(orderStatusFilter.toLowerCase()) || (orderStatusFilter === 'Menunggu' && ord.fulfillment.toLowerCase().includes('menunggu'));
-    const matchSearch = ord.id.toLowerCase().includes(orderSearchQuery.toLowerCase()) ||
-      ord.patron.toLowerCase().includes(orderSearchQuery.toLowerCase()) ||
-      ord.city.toLowerCase().includes(orderSearchQuery.toLowerCase());
+    const fulfillmentStr = (ord.fulfillment || 'Diproses').toLowerCase();
+    const matchStatus = orderStatusFilter === 'Semua' ||
+      fulfillmentStr.includes(orderStatusFilter.toLowerCase()) ||
+      (orderStatusFilter === 'Menunggu' && (fulfillmentStr.includes('menunggu') || (ord.paymentStatus || '').toLowerCase().includes('menunggu')));
+    const matchSearch = (ord.id || '').toLowerCase().includes(orderSearchQuery.toLowerCase()) ||
+      (ord.patron || '').toLowerCase().includes(orderSearchQuery.toLowerCase()) ||
+      (ord.city || '').toLowerCase().includes(orderSearchQuery.toLowerCase());
     return matchStatus && matchSearch;
   });
 
@@ -845,8 +781,12 @@ export default function AdminPage() {
                           <td><strong>{ord.id.replace('#', '')}</strong></td>
                           <td><strong>{ord.patron}</strong></td>
                           <td>{ord.city}</td>
-                          <td style={{ fontSize: '0.78rem' }}>{ord.itemsSummary}</td>
-                          <td>Rp {ord.total.toLocaleString('id-ID')}</td>
+                          <td style={{ fontSize: '0.78rem', maxWidth: '170px' }} title={ord.itemsSummary}>
+                            <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '170px' }}>
+                              {ord.itemsSummary || 'Karya Keramik Kurasi'}
+                            </div>
+                          </td>
+                          <td style={{ whiteSpace: 'nowrap', minWidth: '100px' }}>Rp {(ord.total || 0).toLocaleString('id-ID')}</td>
                           <td>
                             <span className={`status-pill ${ord.fulfillment === 'Selesai' ? 'pill-completed' : ord.fulfillment === 'Diproses' ? 'pill-processing' : 'pill-awaiting'}`}>
                               {ord.fulfillment}
@@ -889,7 +829,7 @@ export default function AdminPage() {
                 </div>
                 <h2 className="purpose-title" style={{ marginBottom: '0.25rem' }}>Manajemen Pemrosesan Pesanan dan Pengiriman Gudang</h2>
                 <div className="purpose-quick-nav" style={{ marginTop: '0.85rem', paddingTop: '0.85rem' }}>
-                  <button onClick={() => showToast('Daftar pesanan berhasil disinkronisasi dengan server.', 'success')} className="purpose-action-btn secondary">
+                  <button onClick={() => syncOrders && syncOrders()} className="purpose-action-btn secondary">
                     sinkronkan data
                   </button>
                   <button onClick={() => showToast('Seluruh slip label pengemasan siap dicetak.', 'info')} className="purpose-action-btn secondary">
@@ -944,8 +884,8 @@ export default function AdminPage() {
                         <th>PELANGGAN</th>
                         <th>KOTA</th>
                         <th>TANGGAL</th>
-                        <th>KARYA KERAMIK</th>
-                        <th>TOTAL BIAYA</th>
+                        <th style={{ minWidth: '160px', maxWidth: '200px' }}>KARYA KERAMIK</th>
+                        <th style={{ whiteSpace: 'nowrap', minWidth: '120px' }}>TOTAL BIAYA</th>
                         <th>STATUS BAYAR</th>
                         <th>STATUS FULFILLMENT</th>
                         <th style={{ textAlign: 'right' }}>AKSI</th>
@@ -969,11 +909,18 @@ export default function AdminPage() {
                             </td>
                             <td>{ord.city}</td>
                             <td className="cell-date">{ord.date}</td>
-                            <td style={{ fontSize: '0.78rem', maxWidth: '200px' }}>
-                              {ord.itemsSummary}
+                            <td style={{ fontSize: '0.78rem', maxWidth: '180px' }} title={ord.itemsSummary}>
+                              <div style={{
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                maxWidth: '180px'
+                              }}>
+                                {ord.itemsSummary || 'Karya Keramik Kurasi'}
+                              </div>
                             </td>
-                            <td className="cell-total">
-                              Rp {ord.total.toLocaleString('id-ID')}
+                            <td className="cell-total" style={{ whiteSpace: 'nowrap', minWidth: '120px' }}>
+                              Rp {(ord.total || 0).toLocaleString('id-ID')}
                             </td>
                             <td className="cell-payment-status">
                               <span className={`status-pill ${ord.paymentStatus === 'Lunas' ? 'pill-completed' : 'pill-pending'}`}>
@@ -2300,10 +2247,27 @@ export default function AdminPage() {
                 <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#8A857F', letterSpacing: '0.08em' }}>
                   KARYA KERAMIK DALAM PAKET
                 </span>
-                <div style={{ marginTop: '0.5rem', padding: '0.75rem', border: '1px solid #EAE6DF', borderRadius: '4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span>{inspectOrderData.itemsSummary || 'Karya Keramik Kurasi CLAYÉ'}</span>
-                  <strong>Rp {inspectOrderData.total.toLocaleString('id-ID')}</strong>
-                </div>
+                {inspectOrderData.items && inspectOrderData.items.length > 0 ? (
+                  <div style={{ marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    {inspectOrderData.items.map((it, idx) => (
+                      <div key={idx} style={{ padding: '0.75rem', border: '1px solid #EAE6DF', borderRadius: '4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div>
+                          <strong style={{ fontSize: '0.88rem', display: 'block', color: 'var(--color-charcoal)' }}>{it.name}</strong>
+                          <span style={{ fontSize: '0.78rem', color: '#8A857F' }}>
+                            Tipe / Glasir: {it.glaze || 'Alami'} • Jml: {it.quantity || 1}
+                            {it.stamp ? ` • Grafir: "${it.stamp}"` : ''}
+                          </span>
+                        </div>
+                        <strong>Rp {((it.price || 0) * (it.quantity || 1)).toLocaleString('id-ID')}</strong>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div style={{ marginTop: '0.5rem', padding: '0.75rem', border: '1px solid #EAE6DF', borderRadius: '4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>{inspectOrderData.itemsSummary || 'Karya Keramik Kurasi CLAYÉ'}</span>
+                    <strong>Rp {(inspectOrderData.total || 0).toLocaleString('id-ID')}</strong>
+                  </div>
+                )}
               </div>
 
               <div className="form-group-claye">

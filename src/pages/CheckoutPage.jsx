@@ -19,10 +19,12 @@ export default function CheckoutPage() {
   const [copiedBank, setCopiedBank] = useState(false);
   const [orderCompleteData, setOrderCompleteData] = useState(null);
 
+  const checkoutItems = cart.filter(item => item.selected !== false);
+  const itemsToProcess = checkoutItems.length > 0 ? checkoutItems : (cart.length > 0 ? cart : []);
   const shippingCost = shippingMethod === 'express' ? 25000 : 15000;
-  const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const subtotal = itemsToProcess.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const totalWithShipping = subtotal + shippingCost;
-  const totalPieces = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const totalPieces = itemsToProcess.reduce((sum, item) => sum + item.quantity, 0);
 
   const handleCopyAccount = () => {
     navigator.clipboard?.writeText('8092 1190 44');
@@ -39,9 +41,9 @@ export default function CheckoutPage() {
       return;
     }
 
-    if (cart.length === 0) {
-      showToast('Keranjang belanja Anda kosong!', 'error');
-      navigate('/katalog');
+    if (cart.length === 0 || itemsToProcess.length === 0) {
+      showToast('Keranjang belanja Anda kosong atau belum ada produk yang dicentang!', 'error');
+      navigate('/cart');
       return;
     }
 
@@ -59,7 +61,13 @@ export default function CheckoutPage() {
       shippingFee: shippingCost,
       paymentMethod: paymentLabel,
       courier: courierLabel,
-      shippingAddress: `${formData.address}, ${formData.city} ${formData.postalCode}`
+      shippingAddress: `${formData.address}, ${formData.city} ${formData.postalCode}`,
+      patron: formData.fullName || (user ? (user.fullName || user.name) : 'Arumi'),
+      email: formData.email || (user ? user.email : 'arumi@example.com'),
+      phone: formData.phone || (user ? user.phone : '+62 812-3456-7890'),
+      city: formData.city || (user ? user.city : 'Palembang'),
+      address: formData.address || (user ? user.address : 'Jl. Sejuta Kenangan No. 12'),
+      postalCode: formData.postalCode || '30138'
     });
 
     setOrderCompleteData(newOrder);
@@ -433,7 +441,7 @@ export default function CheckoutPage() {
 
               {/* LIST PRODUK MINI */}
               <div className="summary-items-list">
-                {cart.map((item, idx) => (
+                {itemsToProcess.map((item, idx) => (
                   <div key={idx} className="summary-item-row">
                     <img src={item.image} alt={item.name} className="summary-item-img" />
                     <div className="summary-item-info">
