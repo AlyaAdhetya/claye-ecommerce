@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useShop } from '../context/ShopContext';
+import MidtransSnapModal from '../components/MidtransSnapModal';
 
 export default function CheckoutPage() {
-  const { cart, user, createOrder, navigate, openConcierge, showToast } = useShop();
+  const { cart, user, createOrder, updateOrderPayment, navigate, openConcierge, showToast } = useShop();
 
   const [formData, setFormData] = useState({
     fullName: user ? (user.fullName || user.name) : 'Raden Ayu Paramitha',
@@ -15,9 +16,11 @@ export default function CheckoutPage() {
   });
 
   const [shippingMethod, setShippingMethod] = useState('regular');
-  const [paymentMethod, setPaymentMethod] = useState('bank');
+  const [paymentMethod, setPaymentMethod] = useState('midtrans');
   const [copiedBank, setCopiedBank] = useState(false);
   const [orderCompleteData, setOrderCompleteData] = useState(null);
+  const [isMidtransOpen, setIsMidtransOpen] = useState(false);
+  const [pendingOrder, setPendingOrder] = useState(null);
 
   const checkoutItems = cart.filter(item => item.selected !== false);
   const itemsToProcess = checkoutItems.length > 0 ? checkoutItems : (cart.length > 0 ? cart : []);
@@ -47,19 +50,20 @@ export default function CheckoutPage() {
       return;
     }
 
-    const paymentLabel = paymentMethod === 'bank'
-      ? 'Transfer Bank (BCA Manual)'
-      : paymentMethod === 'qris'
-      ? 'E-Wallet Instan & QRIS'
-      : 'Virtual Account Otomatis';
-
     const courierLabel = shippingMethod === 'express'
       ? 'Pengiriman Kilat (Prioritas)'
       : 'Pengiriman Reguler (Eco Shield)';
 
+    const isMidtrans = paymentMethod === 'midtrans' || paymentMethod === 'qris' || paymentMethod === 'va';
+    const initialPaymentStatus = isMidtrans ? 'Menunggu Pembayaran' : 'Menunggu Pembayaran';
+    const paymentLabel = isMidtrans
+      ? 'Midtrans Snap Gateway (QRIS/VA)'
+      : 'Transfer Bank (BCA Manual)';
+
     const newOrder = createOrder({
       shippingFee: shippingCost,
       paymentMethod: paymentLabel,
+      paymentStatus: initialPaymentStatus,
       courier: courierLabel,
       shippingAddress: `${formData.address}, ${formData.city} ${formData.postalCode}`,
       patron: formData.fullName || (user ? (user.fullName || user.name) : 'Arumi'),
@@ -70,59 +74,185 @@ export default function CheckoutPage() {
       postalCode: formData.postalCode || '30138'
     });
 
-    setOrderCompleteData(newOrder);
-    showToast('Pesanan berhasil dibuat. Tim kurasi bersiap mengemas produk Anda.', 'success');
+    if (isMidtrans) {
+      setPendingOrder(newOrder);
+      setIsMidtransOpen(true);
+      showToast('Membuka gerbang pembayaran Midtrans Snap (Sandbox)...', 'info');
+    } else {
+      setOrderCompleteData(newOrder);
+      showToast('Pesanan berhasil dibuat. Silakan selesaikan pembayaran.', 'success');
+    }
+  };
+
+  const handleMidtransSuccess = (paymentDetails) => {
+    if (pendingOrder) {
+      updateOrderPayment(pendingOrder.id, 'Lunas', paymentDetails.paymentMethod);
+      setOrderCompleteData({
+        ...pendingOrder,
+        paymentStatus: 'Lunas',
+        paymentMethod: paymentDetails.paymentMethod,
+        fulfillment: 'Diproses'
+      });
+      setIsMidtransOpen(false);
+      showToast('Pembayaran Midtrans berhasil diverifikasi!', 'success');
+    }
+  };
+
+  const handleMidtransClose = () => {
+    setIsMidtransOpen(false);
+    if (pendingOrder) {
+      setOrderCompleteData(pendingOrder);
+      showToast('Pesanan disimpan dengan status Menunggu Pembayaran.', 'info');
+    }
   };
 
   if (orderCompleteData) {
+    const isPaid = orderCompleteData.paymentStatus === 'Lunas';
+
     return (
       <div className="claye-checkout-page" style={{ padding: '4rem 0 6rem' }}>
         <div className="container" style={{ maxWidth: '640px' }}>
-          <div className="checkout-success-card">
-            <div className="success-icon-badge">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          <div className="checkout-success-card" style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: '8px',
+            border: '1px solid #EAE6DF',
+            padding: '2.5rem 2rem',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
+          }}>
+            <div className="success-icon-badge" style={{
+              backgroundColor: isPaid ? '#10B981' : '#F59E0B',
+              color: '#FFFFFF',
+              width: '56px',
+              height: '56px',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 1.25rem'
+            }}>
+              {isPaid ? (
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              ) : (
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              )}
             </div>
-            <span className="order-received-tag">PESANAN KURASI DIKONFIRMASI</span>
-            <h1 className="success-title">Terima Kasih Atas Pesanan Anda</h1>
-            <p className="success-body">
-              Pesanan keramik Anda telah terdaftar dengan nomor referensi <strong>{orderCompleteData.id}</strong>. Tim logistik CLAYÉ sedang menyiapkan produk kurasi pilihan Anda dengan perlindungan kemasan ramah lingkungan.
+
+            <span className="order-received-tag" style={{
+              display: 'inline-block',
+              backgroundColor: isPaid ? '#ECFDF5' : '#FEF3C7',
+              color: isPaid ? '#047857' : '#92400E',
+              fontSize: '0.72rem',
+              fontWeight: 800,
+              padding: '4px 10px',
+              borderRadius: '4px',
+              letterSpacing: '0.08em',
+              marginBottom: '0.75rem'
+            }}>
+              {isPaid ? 'PEMBAYARAN DIVERIFIKASI (LUNAS)' : 'PESANAN DIDAFTARKAN (MENUNGGU PEMBAYARAN)'}
+            </span>
+
+            <h1 className="success-title" style={{ fontSize: '1.65rem', marginBottom: '0.75rem', color: '#262422' }}>
+              {isPaid ? 'Terima Kasih, Pesanan Telah Dibayar!' : 'Pesanan Anda Siap Dibayar'}
+            </h1>
+            <p className="success-body" style={{ color: '#6E6962', lineHeight: '1.6', marginBottom: '1.5rem' }}>
+              Nomor referensi pesanan Anda adalah <strong>{orderCompleteData.id}</strong>.
+              {isPaid
+                ? ' Tim kurasi CLAYÉ segera mengemas karya keramik Anda dengan proteksi double-box ramah lingkungan.'
+                : ' Silakan selesaikan pembayaran agar pesanan segera masuk ke antrean pengemasan gudang.'}
             </p>
 
-            <div className="success-summary-box">
-              <div className="summary-line">
-                <span>Total Pembayaran:</span>
-                <strong>Rp {orderCompleteData.grandTotal?.toLocaleString('id-ID')}</strong>
+            <div className="success-summary-box" style={{
+              backgroundColor: '#FAF8F5',
+              borderRadius: '6px',
+              border: '1px solid #EAE6DF',
+              padding: '1.25rem',
+              marginBottom: '1.75rem'
+            }}>
+              <div className="summary-line" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <span style={{ color: '#8A857F', fontSize: '0.85rem' }}>Total Pembayaran:</span>
+                <strong style={{ fontSize: '1.05rem', color: '#262422' }}>Rp {orderCompleteData.grandTotal?.toLocaleString('id-ID')}</strong>
               </div>
-              <div className="summary-line">
-                <span>Metode Pembayaran:</span>
-                <strong>{orderCompleteData.paymentMethod}</strong>
+              <div className="summary-line" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <span style={{ color: '#8A857F', fontSize: '0.85rem' }}>Status Pembayaran:</span>
+                <strong style={{ color: isPaid ? '#10B981' : '#D97706', fontSize: '0.88rem' }}>
+                  {orderCompleteData.paymentStatus}
+                </strong>
               </div>
-              <div className="summary-line">
-                <span>Metode Pengiriman:</span>
-                <strong>{orderCompleteData.courier}</strong>
+              <div className="summary-line" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <span style={{ color: '#8A857F', fontSize: '0.85rem' }}>Metode Pembayaran:</span>
+                <strong style={{ fontSize: '0.88rem', color: '#262422' }}>{orderCompleteData.paymentMethod}</strong>
               </div>
-              <div className="summary-line">
-                <span>Estimasi Waktu Tiba:</span>
-                <strong>2-3 Hari Kerja</strong>
+              <div className="summary-line" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#8A857F', fontSize: '0.85rem' }}>Metode Pengiriman:</span>
+                <strong style={{ fontSize: '0.88rem', color: '#262422' }}>{orderCompleteData.courier}</strong>
               </div>
             </div>
 
-            <div className="success-actions-row">
+            {!isPaid && (
+              <div style={{ marginBottom: '1.5rem' }}>
+                <button
+                  type="button"
+                  onClick={() => setIsMidtransOpen(true)}
+                  style={{
+                    width: '100%',
+                    padding: '14px',
+                    backgroundColor: '#00ADEF',
+                    color: '#FFFFFF',
+                    border: 'none',
+                    borderRadius: '6px',
+                    fontSize: '0.95rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 12px rgba(0, 173, 239, 0.3)'
+                  }}
+                >
+                  ⚡ Bayar Sekarang via Midtrans Snap (Sandbox)
+                </button>
+              </div>
+            )}
+
+            <div className="success-actions-row" style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
               <button
                 onClick={() => navigate('/dashboard')}
                 className="btn-success-primary"
+                style={{
+                  padding: '12px 20px',
+                  backgroundColor: '#B87355',
+                  color: '#FFFFFF',
+                  borderRadius: '6px',
+                  border: 'none',
+                  fontWeight: 600,
+                  cursor: 'pointer'
+                }}
               >
                 Lihat di Akun Saya (Dashboard) →
               </button>
               <button
                 onClick={() => navigate('/katalog')}
                 className="btn-success-secondary"
+                style={{
+                  padding: '12px 20px',
+                  backgroundColor: 'transparent',
+                  color: '#6E6962',
+                  borderRadius: '6px',
+                  border: '1px solid #DED8CF',
+                  fontWeight: 600,
+                  cursor: 'pointer'
+                }}
               >
-                Kembali Jelajahi Koleksi Kurasi
+                Jelajahi Koleksi Kurasi
               </button>
             </div>
           </div>
         </div>
+
+        {/* MIDTRANS MODAL PADA HALAMAN SELESAI JIKA INGIN BAYAR ULANG */}
+        <MidtransSnapModal
+          isOpen={isMidtransOpen}
+          onClose={handleMidtransClose}
+          onSuccess={handleMidtransSuccess}
+          orderData={orderCompleteData}
+        />
       </div>
     );
   }
@@ -320,7 +450,54 @@ export default function CheckoutPage() {
               </div>
 
               <div className="payment-options-container">
-                {/* 1. TRANSFER BANK */}
+                {/* 1. MIDTRANS PAYMENT GATEWAY (RECOMMENDED / SANDBOX) */}
+                <div
+                  className={`payment-option-card ${paymentMethod === 'midtrans' ? 'selected' : ''}`}
+                  onClick={() => setPaymentMethod('midtrans')}
+                  style={{
+                    border: paymentMethod === 'midtrans' ? '2px solid #00ADEF' : '1px solid #E2E8F0',
+                    backgroundColor: paymentMethod === 'midtrans' ? '#F0F9FF' : '#FFFFFF',
+                    position: 'relative'
+                  }}
+                >
+                  <div style={{
+                    position: 'absolute',
+                    top: '-10px',
+                    right: '16px',
+                    backgroundColor: '#00ADEF',
+                    color: '#FFFFFF',
+                    fontSize: '0.68rem',
+                    fontWeight: 800,
+                    padding: '2px 8px',
+                    borderRadius: '10px',
+                    letterSpacing: '0.05em'
+                  }}>
+                    OTOMATIS • MIDTRANS SANDBOX
+                  </div>
+
+                  <div className="payment-header-row">
+                    <div className="payment-radio-title">
+                      <input
+                        type="radio"
+                        name="payment"
+                        checked={paymentMethod === 'midtrans'}
+                        onChange={() => setPaymentMethod('midtrans')}
+                      />
+                      <strong>Midtrans Snap (QRIS, GoPay, VA BCA/Mandiri, Kartu)</strong>
+                    </div>
+                    <div className="bank-badges-row">
+                      <span className="bank-tag" style={{ backgroundColor: '#E0F2FE', color: '#0369A1' }}>QRIS</span>
+                      <span className="bank-tag" style={{ backgroundColor: '#E0F2FE', color: '#0369A1' }}>GOPAY</span>
+                      <span className="bank-tag" style={{ backgroundColor: '#E0F2FE', color: '#0369A1' }}>BCA VA</span>
+                      <span className="bank-tag" style={{ backgroundColor: '#E0F2FE', color: '#0369A1' }}>MANDIRI</span>
+                    </div>
+                  </div>
+                  <p className="payment-desc-text">
+                    Gerbang pembayaran resmi Indonesia dengan verifikasi instan. Dilengkapi simulator pembayaran sandbox untuk pengujian dan demo mata kuliah.
+                  </p>
+                </div>
+
+                {/* 2. TRANSFER BANK MANUAL */}
                 <div
                   className={`payment-option-card ${paymentMethod === 'bank' ? 'selected' : ''}`}
                   onClick={() => setPaymentMethod('bank')}
@@ -333,16 +510,15 @@ export default function CheckoutPage() {
                         checked={paymentMethod === 'bank'}
                         onChange={() => setPaymentMethod('bank')}
                       />
-                      <strong>Transfer Bank (Verifikasi Manual Admin)</strong>
+                      <strong>Transfer Bank Langsung (BCA Manual)</strong>
                     </div>
                     <div className="bank-badges-row">
                       <span className="bank-tag">BCA</span>
-                      <span className="bank-tag">MANDIRI</span>
-                      <span className="bank-tag">BNI</span>
+                      <span className="bank-tag">MANUAL</span>
                     </div>
                   </div>
                   <p className="payment-desc-text">
-                    Transfer langsung ke rekening resmi CLAYÉ. Verifikasi bukti pembayaran dalam 2 jam kerja.
+                    Transfer langsung ke rekening resmi CLAYÉ Studio. Verifikasi pembayaran dilakukan oleh Admin toko.
                   </p>
 
                   {paymentMethod === 'bank' && (
@@ -365,67 +541,6 @@ export default function CheckoutPage() {
                       </button>
                     </div>
                   )}
-                </div>
-
-                {/* 2. QRIS / E-WALLET */}
-                <div
-                  className={`payment-option-card ${paymentMethod === 'qris' ? 'selected' : ''}`}
-                  onClick={() => setPaymentMethod('qris')}
-                >
-                  <div className="payment-header-row">
-                    <div className="payment-radio-title">
-                      <input
-                        type="radio"
-                        name="payment"
-                        checked={paymentMethod === 'qris'}
-                        onChange={() => setPaymentMethod('qris')}
-                      />
-                      <strong>E-Wallet & QRIS Instan</strong>
-                    </div>
-                    <div className="bank-badges-row">
-                      <span className="bank-tag">QRIS</span>
-                      <span className="bank-tag">GOPAY</span>
-                      <span className="bank-tag">OVO</span>
-                      <span className="bank-tag">SHOPEEPAY</span>
-                    </div>
-                  </div>
-                  <p className="payment-desc-text">
-                    Pindai kode QRIS langsung melalui aplikasi dompet digital pilihan Anda.
-                  </p>
-
-                  {paymentMethod === 'qris' && (
-                    <div className="qris-preview-box" onClick={(e) => e.stopPropagation()}>
-                      <div className="qris-barcode-dummy">
-                        <span>Kode Pembayaran QRIS CLAYÉ Otomatis</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* 3. VIRTUAL ACCOUNT */}
-                <div
-                  className={`payment-option-card ${paymentMethod === 'va' ? 'selected' : ''}`}
-                  onClick={() => setPaymentMethod('va')}
-                >
-                  <div className="payment-header-row">
-                    <div className="payment-radio-title">
-                      <input
-                        type="radio"
-                        name="payment"
-                        checked={paymentMethod === 'va'}
-                        onChange={() => setPaymentMethod('va')}
-                      />
-                      <strong>Virtual Account (Verifikasi Otomatis)</strong>
-                    </div>
-                    <div className="bank-badges-row">
-                      <span className="bank-tag">BCA VA</span>
-                      <span className="bank-tag">MANDIRI VA</span>
-                      <span className="bank-tag">BNI VA</span>
-                    </div>
-                  </div>
-                  <p className="payment-desc-text">
-                    Nomor Virtual Account dibuat otomatis saat pesanan dikonfirmasi. Tidak perlu unggah bukti transfer.
-                  </p>
                 </div>
               </div>
             </div>
@@ -535,6 +650,14 @@ export default function CheckoutPage() {
           </div>
         </div>
       </div>
+
+      {/* POPUP MODAL GERBANG PEMBAYARAN MIDTRANS SNAP */}
+      <MidtransSnapModal
+        isOpen={isMidtransOpen}
+        onClose={handleMidtransClose}
+        onSuccess={handleMidtransSuccess}
+        orderData={pendingOrder}
+      />
     </div>
   );
 }

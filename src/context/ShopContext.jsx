@@ -574,8 +574,8 @@ export function ShopProvider({ children }) {
       total: itemsTotal,
       shippingFee: orderData.shippingFee || 15000,
       grandTotal: itemsTotal + (orderData.shippingFee || 15000),
-      fulfillment: 'Diproses',
-      paymentStatus: 'Lunas',
+      fulfillment: orderData.fulfillment || (orderData.paymentStatus === 'Menunggu Pembayaran' ? 'Menunggu' : 'Diproses'),
+      paymentStatus: orderData.paymentStatus || 'Lunas',
       paymentMethod: orderData.paymentMethod || 'Transfer Bank (BCA)',
       courier: orderData.courier || 'Pengiriman Reguler (Eco Shield)',
       trackingNumber: `CLY-EXP-${randNum}-PLM`,
@@ -603,6 +603,23 @@ export function ShopProvider({ children }) {
       prev.map(ord => ord.id === orderId ? { ...ord, fulfillment: newStatus } : ord)
     );
     showToast(`Status pengiriman ${orderId} diubah menjadi "${newStatus}".`, 'success');
+  };
+
+  const updateOrderPayment = (orderId, newPaymentStatus, newPaymentMethod = null) => {
+    setOrders(prev =>
+      prev.map(ord => {
+        if (ord.id === orderId) {
+          return {
+            ...ord,
+            paymentStatus: newPaymentStatus,
+            paymentMethod: newPaymentMethod || ord.paymentMethod,
+            fulfillment: newPaymentStatus === 'Lunas' ? 'Diproses' : ord.fulfillment
+          };
+        }
+        return ord;
+      })
+    );
+    showToast(`Status pembayaran ${orderId} berhasil diperbarui: ${newPaymentStatus}.`, 'success');
   };
 
   const syncOrders = async () => {
@@ -753,6 +770,7 @@ export function ShopProvider({ children }) {
       updateProfile,
       createOrder,
       updateOrderFulfillment,
+      updateOrderPayment,
       syncOrders,
       addProduct,
       updateProduct,
