@@ -113,56 +113,6 @@ export default function LoginPage() {
             Koleksi & Kurasi Keramik Nusantara
           </p>
 
-          {/* Tab Masuk / Daftar */}
-          <div className="auth-tabs-toggle" style={{
-            display: 'flex',
-            backgroundColor: '#F5F2EB',
-            borderRadius: '6px',
-            padding: '4px',
-            marginBottom: '1.75rem'
-          }}>
-            <button
-              type="button"
-              className={`auth-tab-btn ${!isRegister ? 'is-active' : ''}`}
-              onClick={() => setIsRegister(false)}
-              style={{
-                flex: 1,
-                padding: '10px 0',
-                border: 'none',
-                borderRadius: '4px',
-                fontSize: '0.88rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-                backgroundColor: !isRegister ? '#FFFFFF' : 'transparent',
-                color: !isRegister ? '#262422' : '#8C8680',
-                boxShadow: !isRegister ? '0 2px 4px rgba(0,0,0,0.06)' : 'none',
-                transition: 'all 0.2s ease'
-              }}
-            >
-              Masuk
-            </button>
-            <button
-              type="button"
-              className={`auth-tab-btn ${isRegister ? 'is-active' : ''}`}
-              onClick={() => setIsRegister(true)}
-              style={{
-                flex: 1,
-                padding: '10px 0',
-                border: 'none',
-                borderRadius: '4px',
-                fontSize: '0.88rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-                backgroundColor: isRegister ? '#FFFFFF' : 'transparent',
-                color: isRegister ? '#262422' : '#8C8680',
-                boxShadow: isRegister ? '0 2px 4px rgba(0,0,0,0.06)' : 'none',
-                transition: 'all 0.2s ease'
-              }}
-            >
-              Daftar Akun Baru
-            </button>
-          </div>
-
           {/* Heading */}
           <h1 className="auth-main-title" style={{
             fontSize: '1.45rem',
