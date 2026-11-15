@@ -61,17 +61,23 @@ export default function LoginPage() {
           setIsLoading(false);
           return;
         }
-        register({ fullName, email, phone });
+        const res = register({ fullName, email, phone, password });
+        setIsLoading(false);
+        if (res && res.success) {
+          // Balik lagi ke menu login setelah daftar sesuai instruksi
+          setIsRegister(false);
+          setPassword('');
+        }
       } else {
         if (!email || !password) {
           showToast('Harap masukkan email dan kata sandi.', 'error');
           setIsLoading(false);
           return;
         }
-        login(email, password);
+        const res = login(email, password);
+        setIsLoading(false);
       }
-      setIsLoading(false);
-    }, 400);
+    }, 350);
   };
 
   return (

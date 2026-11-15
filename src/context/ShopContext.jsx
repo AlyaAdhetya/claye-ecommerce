@@ -5,57 +5,26 @@ import { isSupabaseConfigured } from '../lib/supabaseClient';
 
 const ShopContext = createContext();
 
-export const DEMO_USERS = {
-  customer: {
-    role: 'customer',
-    roleName: 'Pelanggan',
-    name: 'Arumi',
-    fullName: 'Arumi',
-    email: 'arumi@example.com',
-    phone: '+62 812-3456-7890',
-    address: 'Jl. Sejuta Kenangan No. 12',
-    city: 'Palembang',
-    province: 'Sumatera Selatan',
-    postalCode: '30138',
-    country: 'Indonesia',
-    patronSince: '2024',
-    cohort: 'Pelanggan Tetap'
-  },
-  admin: {
-    role: 'admin',
-    roleName: 'Admin',
-    name: 'Admin',
-    fullName: 'Admin CLAYÉ',
-    email: 'admin@claye.id',
-    phone: '+62 811-2233-4455',
-    address: 'Jl. Sejuta Kenangan, Palembang, Sumatera Selatan',
-    city: 'Palembang',
-    province: 'Sumatera Selatan',
-    postalCode: '30138',
-    country: 'Indonesia',
-    patronSince: '2021',
-    cohort: 'Admin CLAYÉ'
-  }
+export const ADMIN_CREDENTIALS = {
+  role: 'admin',
+  roleName: 'Admin',
+  name: 'Admin',
+  fullName: 'Admin CLAYÉ',
+  email: 'admin@claye.id',
+  password: 'admin123',
+  phone: '+62 811-2233-4455',
+  address: 'Jl. Sejuta Kenangan, Palembang, Sumatera Selatan',
+  city: 'Palembang',
+  province: 'Sumatera Selatan',
+  postalCode: '30138',
+  country: 'Indonesia',
+  patronSince: '2021',
+  cohort: 'Admin CLAYÉ'
 };
 
 const INITIAL_USER = null;
-
-const INITIAL_CART = [
-  {
-    ...INITIAL_PRODUCTS[0], // The Sunday Mug
-    quantity: 1,
-    selectedGlaze: 'Hijau Sage',
-    stamp: 'Arumi',
-    customPrice: 125000
-  },
-  {
-    ...INITIAL_PRODUCTS[3], // The Everyday Plate
-    quantity: 1,
-    selectedGlaze: 'Gading (Ivory)',
-    stamp: '',
-    customPrice: 150000
-  }
-];
+const INITIAL_CART = [];
+const INITIAL_WISHLIST = [];
 
 const INITIAL_ORDERS = [
   {
@@ -154,30 +123,6 @@ const INITIAL_ORDERS = [
     courier: 'SiCepat Best Eco Shield',
     trackingNumber: 'CLY-EXP-99204-BDG',
     image: '/assets/images/product_bowl.jpg'
-  },
-  {
-    id: '#CLY-2026-003',
-    patron: 'Arumi',
-    initials: 'AR',
-    email: 'arumi@example.com',
-    phone: '+62 812-3456-7890',
-    city: 'Palembang',
-    address: 'Jl. Sejuta Kenangan No. 12, Palembang',
-    date: '24 Okt 2026',
-    itemsSummary: 'The Sunday Mug (Neko Wave Edition)',
-    variantSummary: 'Biru Kobalt Ombak • Jml: 1',
-    items: [
-      { name: 'The Sunday Mug (Neko Wave Edition)', glaze: 'Biru Kobalt Ombak', quantity: 1, price: 135000 }
-    ],
-    total: 135000,
-    shippingFee: 15000,
-    grandTotal: 150000,
-    fulfillment: 'Selesai',
-    paymentStatus: 'Lunas',
-    paymentMethod: 'Transfer Bank (BCA)',
-    courier: 'Pengiriman Reguler (Eco Shield)',
-    trackingNumber: 'CLY-EXP-89021-PLM',
-    image: '/assets/images/product_neko_mug.jpg'
   }
 ];
 
@@ -197,27 +142,106 @@ export function ShopProvider({ children }) {
     }
   });
 
-  const [cart, setCart] = useState(() => {
+  // Registry akun terdaftar (Hanya akun yang benar-benar mendaftar yang bisa login)
+  const [registeredUsers, setRegisteredUsers] = useState(() => {
     try {
-      const saved = localStorage.getItem('claye_cart_id_v4');
-      return saved ? JSON.parse(saved) : INITIAL_CART;
+      const saved = localStorage.getItem('claye_registered_users_v5');
+      return saved ? JSON.parse(saved) : [];
     } catch {
-      return INITIAL_CART;
+      return [];
     }
   });
 
+  useEffect(() => {
+    try {
+      localStorage.setItem('claye_registered_users_v5', JSON.stringify(registeredUsers));
+    } catch (e) {
+      console.warn('Gagal menyimpan daftar pengguna:', e);
+    }
+  }, [registeredUsers]);
+
+  // Status user aktif
   const [user, setUser] = useState(() => {
     try {
-      const saved = localStorage.getItem('claye_user_id_v3');
+      const saved = localStorage.getItem('claye_user_active_v8');
       return saved ? JSON.parse(saved) : INITIAL_USER;
     } catch {
       return INITIAL_USER;
     }
   });
 
+  // Keranjang terisolasi per akun pengguna (akun baru = kosong)
+  const [cart, setCart] = useState(() => {
+    try {
+      const savedUser = localStorage.getItem('claye_user_active_v8');
+      if (savedUser) {
+        const u = JSON.parse(savedUser);
+        const userCart = localStorage.getItem(`claye_cart_${u.email?.toLowerCase()}`);
+        return userCart ? JSON.parse(userCart) : [];
+      }
+      return [];
+    } catch {
+      return [];
+    }
+  });
+
+  // Wishlist terisolasi per akun pengguna (akun baru = kosong)
+  const [wishlist, setWishlist] = useState(() => {
+    try {
+      const savedUser = localStorage.getItem('claye_user_active_v8');
+      if (savedUser) {
+        const u = JSON.parse(savedUser);
+        const userWish = localStorage.getItem(`claye_wishlist_${u.email?.toLowerCase()}`);
+        return userWish ? JSON.parse(userWish) : [];
+      }
+      return [];
+    } catch {
+      return [];
+    }
+  });
+
+  // Sinkronkan keranjang & wishlist saat akun berganti
+  useEffect(() => {
+    if (user && user.email) {
+      try {
+        const userCart = localStorage.getItem(`claye_cart_${user.email.toLowerCase()}`);
+        setCart(userCart ? JSON.parse(userCart) : []);
+        const userWish = localStorage.getItem(`claye_wishlist_${user.email.toLowerCase()}`);
+        setWishlist(userWish ? JSON.parse(userWish) : []);
+      } catch (e) {
+        console.warn('Gagal memuat keranjang per user:', e);
+      }
+    } else {
+      setCart([]);
+      setWishlist([]);
+    }
+  }, [user?.email]);
+
+  // Simpan perubahan keranjang per akun pengguna
+  useEffect(() => {
+    if (user && user.email) {
+      try {
+        localStorage.setItem(`claye_cart_${user.email.toLowerCase()}`, JSON.stringify(cart));
+      } catch (e) {
+        console.warn('Gagal menyimpan keranjang:', e);
+      }
+    }
+  }, [cart, user?.email]);
+
+  // Simpan perubahan wishlist per akun pengguna
+  useEffect(() => {
+    if (user && user.email) {
+      try {
+        localStorage.setItem(`claye_wishlist_${user.email.toLowerCase()}`, JSON.stringify(wishlist));
+      } catch (e) {
+        console.warn('Gagal menyimpan favorit:', e);
+      }
+    }
+  }, [wishlist, user?.email]);
+
   const [orders, setOrders] = useState(() => {
     try {
-      const saved = localStorage.getItem('claye_orders_id_v4');
+      const saved = localStorage.getItem('claye_orders_id_v5');
       if (saved) {
         const parsed = JSON.parse(saved);
         const existingIds = new Set(parsed.map(o => o.id));
@@ -230,15 +254,6 @@ export function ShopProvider({ children }) {
     }
   });
 
-  const [wishlist, setWishlist] = useState(() => {
-    try {
-      const saved = localStorage.getItem('claye_wishlist_id_v3');
-      return saved ? JSON.parse(saved) : [2, 3];
-    } catch {
-      return [2, 3];
-    }
-  });
-
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatInitialPrompt, setChatInitialPrompt] = useState('');
   const [isCartDrawerOpen, setIsCartDrawerOpen] = useState(false);
@@ -246,7 +261,7 @@ export function ShopProvider({ children }) {
 
   // Jika belum login, rute awal wajib /login
   const [currentRoute, setCurrentRoute] = useState(() => {
-    const savedUser = localStorage.getItem('claye_user_id_v3');
+    const savedUser = localStorage.getItem('claye_user_active_v8');
     if (!savedUser) {
       if (window.location.hash !== '#/login' && window.location.hash !== '#/register') {
         window.location.hash = '/login';
@@ -479,75 +494,152 @@ export function ShopProvider({ children }) {
   const cartTotal = selectedCartTotal;
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
-  const login = (email, password, forcedRole = null) => {
-    const isAdmin = forcedRole === 'admin' || (email && email.toLowerCase().includes('admin'));
+  const login = (email, password) => {
+    const cleanEmail = (email || '').trim().toLowerCase();
+    const cleanPass = (password || '').trim();
 
-    if (isAdmin) {
-      const adminUser = {
-        ...DEMO_USERS.admin,
-        email: email || DEMO_USERS.admin.email
-      };
-      setUser(adminUser);
-      showToast('Masuk berhasil sebagai Admin CLAYÉ.', 'success');
-      navigate('/admin');
-      return;
+    if (!cleanEmail || !cleanPass) {
+      showToast('Harap masukkan alamat email dan kata sandi.', 'error');
+      return { success: false, message: 'Harap masukkan alamat email dan kata sandi.' };
     }
 
-    const isDemoCustomer = !email || email.toLowerCase() === DEMO_USERS.customer.email.toLowerCase() || email.toLowerCase() === 'fie@example.com';
-    const customerUser = {
-      ...DEMO_USERS.customer,
-      name: isDemoCustomer ? DEMO_USERS.customer.name : (email.split('@')[0].replace(/[._]/g, ' ')),
-      fullName: isDemoCustomer ? DEMO_USERS.customer.fullName : (email.split('@')[0].replace(/[._]/g, ' ')),
-      email: email || DEMO_USERS.customer.email,
-      role: 'customer',
-      roleName: 'Pelanggan'
-    };
-    setUser(customerUser);
-    showToast(`Masuk berhasil sebagai Pelanggan. Selamat datang di CLAYÉ, ${customerUser.name}.`, 'success');
-    // Setelah login, arahkan ke Beranda di mana header Beranda, Katalog, Tentang Kami aktif
+    // 1. Verifikasi Akun Admin Resmi
+    if (cleanEmail === 'admin@claye.id' || cleanEmail === 'admin') {
+      if (cleanPass === 'admin123' || cleanPass === 'claye2026' || cleanPass === 'admin') {
+        const adminUser = { ...ADMIN_CREDENTIALS };
+        setUser(adminUser);
+        localStorage.setItem('claye_user_active_v8', JSON.stringify(adminUser));
+        showToast('Masuk berhasil sebagai Administrator CLAYÉ Studio.', 'success');
+        navigate('/admin');
+        return { success: true };
+      } else {
+        showToast('Kata sandi Admin salah. Silakan coba kembali.', 'error');
+        return { success: false, message: 'Kata sandi Admin salah. Silakan coba kembali.' };
+      }
+    }
+
+    // 2. Verifikasi Akun Pelanggan (Hanya yang sudah terdaftar di registry)
+    const foundUser = registeredUsers.find(u => u.email.toLowerCase() === cleanEmail);
+    if (!foundUser) {
+      showToast('Akun belum terdaftar. Silakan daftar terlebih dahulu.', 'error');
+      return {
+        success: false,
+        message: 'Akun dengan email ini belum terdaftar. Silakan pilih tab "Daftar Akun Baru" untuk mendaftar.'
+      };
+    }
+
+    if (foundUser.password !== cleanPass) {
+      showToast('Kata sandi yang Anda masukkan salah.', 'error');
+      return {
+        success: false,
+        message: 'Kata sandi yang Anda masukkan salah. Silakan periksa kembali kata sandi Anda.'
+      };
+    }
+
+    // Berhasil Login
+    setUser(foundUser);
+    localStorage.setItem('claye_user_active_v8', JSON.stringify(foundUser));
+    showToast(`Masuk berhasil. Selamat datang di CLAYÉ, ${foundUser.name}!`, 'success');
     navigate('/');
+    return { success: true };
   };
 
   const register = (registerData) => {
+    const cleanEmail = (registerData.email || '').trim().toLowerCase();
+    const cleanPass = (registerData.password || '').trim();
+    const fullName = (registerData.fullName || '').trim();
+    const phone = (registerData.phone || '').trim();
+
+    // Validasi format email asli
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(cleanEmail)) {
+      showToast('Format email tidak valid. Gunakan alamat email aktif yang benar.', 'error');
+      return { success: false, message: 'Format email tidak valid (contoh: nama@gmail.com).' };
+    }
+
+    if (cleanEmail === 'admin@claye.id') {
+      showToast('Alamat email admin@claye.id khusus untuk akun Administrator.', 'error');
+      return { success: false, message: 'Alamat email admin@claye.id khusus untuk akun Administrator.' };
+    }
+
+    // Cek apakah email sudah terdaftar sebelumnya
+    const isExisting = registeredUsers.some(u => u.email.toLowerCase() === cleanEmail);
+    if (isExisting) {
+      showToast('Email ini sudah pernah didaftarkan. Silakan langsung masuk.', 'error');
+      return { success: false, message: 'Email sudah terdaftar. Silakan langsung masuk melalui tab "Masuk".' };
+    }
+
+    if (!cleanPass || cleanPass.length < 6) {
+      showToast('Kata sandi minimal harus 6 karakter.', 'error');
+      return { success: false, message: 'Kata sandi minimal harus 6 karakter.' };
+    }
+
     const newUser = {
       role: 'customer',
       roleName: 'Pelanggan',
-      name: registerData.name || (registerData.fullName ? registerData.fullName.split(' ')[0] : 'Pelanggan'),
-      fullName: registerData.fullName || 'Pelanggan Baru CLAYÉ',
-      email: registerData.email,
-      phone: registerData.phone || '+62 812-0000-0000',
-      address: registerData.address || 'Jl. Sejuta Kenangan, Palembang',
-      city: registerData.city || 'Palembang',
+      name: fullName.split(' ')[0] || 'Pelanggan',
+      fullName: fullName,
+      email: cleanEmail,
+      password: cleanPass,
+      phone: phone || '-',
+      address: '',
+      city: 'Palembang',
       province: 'Sumatera Selatan',
-      postalCode: registerData.postalCode || '30138',
+      postalCode: '30138',
       country: 'Indonesia',
-      patronSince: '2026',
-      cohort: 'Angkatan Batch 05'
+      patronSince: new Date().getFullYear().toString(),
+      cohort: 'Pelanggan Baru'
     };
-    setUser(newUser);
-    showToast(`Pendaftaran akun pembeli berhasil. Selamat bergabung, ${newUser.name}.`, 'success');
-    navigate('/');
+
+    setRegisteredUsers(prev => [...prev, newUser]);
+
+    // Kosongkan keranjang & favorit untuk akun baru ini (kondisi bersih / fresh awal mula)
+    try {
+      localStorage.removeItem(`claye_cart_${cleanEmail}`);
+      localStorage.removeItem(`claye_wishlist_${cleanEmail}`);
+    } catch {
+      // ignore
+    }
+
+    // Sesuai permintaan: setelah daftar JANGAN langsung login, balik ke tab login
+    showToast('Pendaftaran akun berhasil! Silakan masuk menggunakan email dan kata sandi Anda.', 'success');
+    return {
+      success: true,
+      registeredEmail: cleanEmail,
+      message: 'Pendaftaran akun berhasil! Silakan masukkan kata sandi untuk login.'
+    };
   };
 
   const logout = () => {
     setUser(null);
+    localStorage.removeItem('claye_user_active_v8');
+    setCart([]);
+    setWishlist([]);
     showToast('Anda telah keluar dari akun.', 'info');
     navigate('/login');
   };
 
   const updateProfile = (updatedFields) => {
-    setUser(prev => ({ ...prev, ...updatedFields }));
+    setUser(prev => {
+      const updated = { ...prev, ...updatedFields };
+      localStorage.setItem('claye_user_active_v8', JSON.stringify(updated));
+      return updated;
+    });
+    // Update juga di registeredUsers jika itu pelanggan
+    setRegisteredUsers(prev =>
+      prev.map(u => u.email.toLowerCase() === user.email.toLowerCase() ? { ...u, ...updatedFields } : u)
+    );
     showToast('Data akun berhasil diperbarui.', 'success');
   };
 
   const createOrder = (orderData) => {
     const randNum = Math.floor(100 + Math.random() * 900);
     const orderId = `#CLY-2026-${randNum}`;
-    const patronName = orderData.patron || (user ? (user.fullName || user.name) : 'Arumi');
+    const patronName = orderData.patron || (user ? (user.fullName || user.name) : 'Pelanggan');
     const userCity = orderData.city || (user ? user.city : 'Palembang');
     const userAddress = orderData.address || orderData.shippingAddress || (user ? `${user.address}, ${user.city}` : 'Jl. Sejuta Kenangan No. 12, Palembang');
-    const userEmail = orderData.email || (user ? user.email : 'arumi@example.com');
-    const userPhone = orderData.phone || (user ? user.phone : '+62 812-3456-7890');
+    const userEmail = orderData.email || (user ? user.email : 'pelanggan@claye.id');
+    const userPhone = orderData.phone || (user ? user.phone : '-');
 
     const targetItems = cart.filter(i => i.selected !== false);
     const itemsToOrder = targetItems.length > 0 ? targetItems : cart;

@@ -7,30 +7,35 @@ export default function DashboardPage() {
   const [activeMenu, setActiveMenu] = useState('overview');
   const [selectedOrderModal, setSelectedOrderModal] = useState(null);
   const [isEditProfileModal, setIsEditProfileModal] = useState(false);
+  const currentUser = user || {
+    name: 'Pelanggan',
+    fullName: 'Pelanggan CLAYÉ',
+    email: '',
+    phone: '',
+    address: '',
+    city: 'Palembang',
+    postalCode: '30138',
+    patronSince: '2026',
+    cohort: 'Pelanggan Baru'
+  };
+
   const [editFormData, setEditFormData] = useState({
-    name: user ? user.name : 'Arumi',
-    fullName: user ? user.fullName : 'Arumi',
-    email: user ? user.email : 'arumi@example.com',
-    phone: user ? user.phone : '+62 812-3456-7890',
-    address: user ? user.address : 'Jl. Sejuta Kenangan No. 12',
-    city: user ? user.city : 'Palembang',
-    postalCode: user ? user.postalCode : '30138'
+    name: user?.name || 'Pelanggan',
+    fullName: user?.fullName || 'Pelanggan CLAYÉ',
+    email: user?.email || '',
+    phone: user?.phone || '',
+    address: user?.address || '',
+    city: user?.city || 'Palembang',
+    postalCode: user?.postalCode || '30138'
   });
 
   const [isAddressModal, setIsAddressModal] = useState(false);
   const [careModalOpen, setCareModalOpen] = useState(false);
 
-  const currentUser = user || {
-    name: 'Arumi',
-    fullName: 'Arumi',
-    email: 'arumi@example.com',
-    phone: '+62 812-3456-7890',
-    address: 'Jl. Sejuta Kenangan No. 12',
-    city: 'Palembang',
-    postalCode: '30138',
-    patronSince: '2024',
-    cohort: 'Pelanggan Tetap'
-  };
+  // Filter pesanan KHUSUS milik akun yang sedang login (Akun baru = 0 pesanan / kondisi kosongan)
+  const myOrders = orders.filter(ord =>
+    ord.email && currentUser.email && ord.email.toLowerCase() === currentUser.email.toLowerCase()
+  );
 
   const handleProfileSubmit = (e) => {
     e.preventDefault();
@@ -482,7 +487,7 @@ export default function DashboardPage() {
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
                 </span>
                 <span className="pnav-text">Pesanan Saya</span>
-                <span className="pnav-counter-pill">{orders.length + 2}</span>
+                {myOrders.length > 0 && <span className="pnav-counter-pill">{myOrders.length}</span>}
               </button>
 
               <button
@@ -639,42 +644,53 @@ export default function DashboardPage() {
                   </div>
 
                   <div className="acquisitions-table-wrap">
-                    <table className="claye-patron-table">
-                      <thead>
-                        <tr>
-                          <th>NO. PESANAN</th>
-                          <th>TANGGAL</th>
-                          <th>PRODUK KERAMIK</th>
-                          <th>TOTAL</th>
-                          <th>STATUS</th>
-                          <th style={{ textAlign: 'right' }}>RINCIAN</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {orders.slice(0, 3).map((ord) => (
-                          <tr key={ord.id}>
-                            <td className="cell-order-ref"><strong>{ord.id}</strong></td>
-                            <td className="cell-date">{ord.date}</td>
-                            <td className="cell-pieces">
-                              <div className="pieces-item-preview">
-                                <img src={ord.image || '/assets/images/product_mug.jpg'} alt="Foto produk" />
-                                <div>
-                                  <strong className="piece-title">{ord.itemsSummary || 'The Sunday Mug'}</strong>
-                                  <span className="piece-variant">{ord.variantSummary || 'Batu Pasir & Gading'}</span>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="cell-total">Rp {ord.total.toLocaleString('id-ID')}</td>
-                            <td className="cell-fulfillment">
-                              <span className={`status-pill ${ord.fulfillment === 'SELESAI' ? 'pill-completed' : 'pill-processing'}`}>• {ord.fulfillment}</span>
-                            </td>
-                            <td className="cell-details" style={{ textAlign: 'right' }}>
-                              <button onClick={() => setSelectedOrderModal(ord)} className="order-view-btn">LIHAT ›</button>
-                            </td>
+                    {myOrders.length === 0 ? (
+                      <div style={{ textAlign: 'center', padding: '3rem 1rem', backgroundColor: '#FAF8F5', borderRadius: '6px', border: '1px dashed #DED8CF' }}>
+                        <p style={{ fontSize: '0.92rem', color: '#6E6962', marginBottom: '1rem' }}>
+                          Anda belum memiliki riwayat pesanan. Mulai jelajahi karya keramik buatan tangan kami.
+                        </p>
+                        <button onClick={() => navigate('/katalog')} className="claye-terracotta-btn" style={{ padding: '8px 18px', fontSize: '0.85rem' }}>
+                          Jelajahi Koleksi Kurasi →
+                        </button>
+                      </div>
+                    ) : (
+                      <table className="claye-patron-table">
+                        <thead>
+                          <tr>
+                            <th>NO. PESANAN</th>
+                            <th>TANGGAL</th>
+                            <th>PRODUK KERAMIK</th>
+                            <th>TOTAL</th>
+                            <th>STATUS</th>
+                            <th style={{ textAlign: 'right' }}>RINCIAN</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody>
+                          {myOrders.slice(0, 3).map((ord) => (
+                            <tr key={ord.id}>
+                              <td className="cell-order-ref"><strong>{ord.id}</strong></td>
+                              <td className="cell-date">{ord.date}</td>
+                              <td className="cell-pieces">
+                                <div className="pieces-item-preview">
+                                  <img src={ord.image || '/assets/images/product_mug.jpg'} alt="Foto produk" />
+                                  <div>
+                                    <strong className="piece-title">{ord.itemsSummary || 'The Sunday Mug'}</strong>
+                                    <span className="piece-variant">{ord.variantSummary || 'Batu Pasir & Gading'}</span>
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="cell-total">Rp {ord.total.toLocaleString('id-ID')}</td>
+                              <td className="cell-fulfillment">
+                                <span className={`status-pill ${ord.fulfillment === 'SELESAI' ? 'pill-completed' : 'pill-processing'}`}>• {ord.fulfillment}</span>
+                              </td>
+                              <td className="cell-details" style={{ textAlign: 'right' }}>
+                                <button onClick={() => setSelectedOrderModal(ord)} className="order-view-btn">LIHAT ›</button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    )}
                   </div>
                 </div>
 
@@ -705,48 +721,61 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="patron-orders-filter-row">
-                  <button className="patron-filter-chip active">Semua ({orders.length + 2})</button>
-                  <button className="patron-filter-chip">Diproses (1)</button>
-                  <button className="patron-filter-chip">Selesai ({orders.length + 1})</button>
+                  <button className="patron-filter-chip active">Semua ({myOrders.length})</button>
+                  <button className="patron-filter-chip">Diproses ({myOrders.filter(o => o.fulfillment !== 'Selesai').length})</button>
+                  <button className="patron-filter-chip">Selesai ({myOrders.filter(o => o.fulfillment === 'Selesai').length})</button>
                 </div>
 
                 <div className="acquisitions-table-wrap">
-                  <table className="claye-patron-table">
-                    <thead>
-                      <tr>
-                        <th>NO. PESANAN</th>
-                        <th>TANGGAL</th>
-                        <th>PRODUK KERAMIK</th>
-                        <th>TOTAL</th>
-                        <th>STATUS PENGIRIMAN</th>
-                        <th style={{ textAlign: 'right' }}>RINCIAN</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {orders.map((ord) => (
-                        <tr key={ord.id}>
-                          <td className="cell-order-ref"><strong>{ord.id}</strong></td>
-                          <td className="cell-date">{ord.date}</td>
-                          <td className="cell-pieces">
-                            <div className="pieces-item-preview">
-                              <img src={ord.image || '/assets/images/product_mug.jpg'} alt="Foto produk" />
-                              <div>
-                                <strong className="piece-title">{ord.itemsSummary || 'The Sunday Mug'}</strong>
-                                <span className="piece-variant">{ord.variantSummary || 'Batu Pasir & Gading'}</span>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="cell-total">Rp {ord.total.toLocaleString('id-ID')}</td>
-                          <td className="cell-fulfillment">
-                            <span className={`status-pill ${ord.fulfillment === 'SELESAI' ? 'pill-completed' : 'pill-processing'}`}>• {ord.fulfillment}</span>
-                          </td>
-                          <td className="cell-details" style={{ textAlign: 'right' }}>
-                            <button onClick={() => setSelectedOrderModal(ord)} className="order-view-btn">LIHAT ›</button>
-                          </td>
+                  {myOrders.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '3.5rem 1rem', backgroundColor: '#FAF8F5', borderRadius: '6px', border: '1px dashed #DED8CF' }}>
+                      <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>📦</div>
+                      <h3 style={{ fontSize: '1.15rem', color: '#262422', marginBottom: '0.35rem' }}>Belum Ada Riwayat Pesanan</h3>
+                      <p style={{ fontSize: '0.85rem', color: '#8A857F', maxWidth: '420px', margin: '0 auto 1.5rem', lineHeight: '1.5' }}>
+                        Pesanan keramik yang Anda beli akan tercatat di sini lengkap dengan nomor resi dan pelacakan pengiriman.
+                      </p>
+                      <button onClick={() => navigate('/katalog')} className="claye-terracotta-btn">
+                        Mulai Belanja Keramik →
+                      </button>
+                    </div>
+                  ) : (
+                    <table className="claye-patron-table">
+                      <thead>
+                        <tr>
+                          <th>NO. PESANAN</th>
+                          <th>TANGGAL</th>
+                          <th>PRODUK KERAMIK</th>
+                          <th>TOTAL</th>
+                          <th>STATUS PENGIRIMAN</th>
+                          <th style={{ textAlign: 'right' }}>RINCIAN</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {myOrders.map((ord) => (
+                          <tr key={ord.id}>
+                            <td className="cell-order-ref"><strong>{ord.id}</strong></td>
+                            <td className="cell-date">{ord.date}</td>
+                            <td className="cell-pieces">
+                              <div className="pieces-item-preview">
+                                <img src={ord.image || '/assets/images/product_mug.jpg'} alt="Foto produk" />
+                                <div>
+                                  <strong className="piece-title">{ord.itemsSummary || 'The Sunday Mug'}</strong>
+                                  <span className="piece-variant">{ord.variantSummary || 'Batu Pasir & Gading'}</span>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="cell-total">Rp {ord.total.toLocaleString('id-ID')}</td>
+                            <td className="cell-fulfillment">
+                              <span className={`status-pill ${ord.fulfillment === 'SELESAI' ? 'pill-completed' : 'pill-processing'}`}>• {ord.fulfillment}</span>
+                            </td>
+                            <td className="cell-details" style={{ textAlign: 'right' }}>
+                              <button onClick={() => setSelectedOrderModal(ord)} className="order-view-btn">LIHAT ›</button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
                 </div>
 
                 <div className="explore-archive-bottom-btn">
