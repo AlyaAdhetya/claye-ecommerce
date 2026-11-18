@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useShop } from '../context/ShopContext';
+import { supabaseService } from '../services/supabaseService';
 
 export default function AdminPage() {
   const {
@@ -21,8 +22,19 @@ export default function AdminPage() {
     setAdminActivePage,
     adminInventoryView,
     setAdminInventoryView,
-    openAdminStorefront
+    openAdminStorefront,
+    isSupabaseConfigured,
+    registeredUsers
   } = useShop();
+
+  // Konfigurasi Supabase
+  const [supabaseUrlInput, setSupabaseUrlInput] = useState(() => {
+    return localStorage.getItem('claye_supabase_url') || 'https://nzoqrzdpyhhzxuwmrcux.supabase.co';
+  });
+  const [supabaseKeyInput, setSupabaseKeyInput] = useState(() => {
+    return localStorage.getItem('claye_supabase_anon_key') || '';
+  });
+  const [isTestingSupabase, setIsTestingSupabase] = useState(false);
 
   // Active page state for sidebar navigation
   const activePage = adminActivePage;
@@ -116,69 +128,57 @@ export default function AdminPage() {
   // Live orders from ShopContext (unified with checkout & Supabase)
   const adminOrders = orders || [];
 
-  // Mock collector patrons data
-  const collectors = [
-    {
-      name: 'Nadia Putri',
-      initials: 'NP',
-      email: 'nadia.putri@gmail.com',
-      phone: '+62 812-9988-7711',
-      city: 'Jakarta Selatan',
-      tier: 'Patron VIP',
-      totalOrders: 6,
-      totalSpent: 1850000,
-      joinedYear: '2023',
-      favoriteGlaze: 'Matte Sage Ash'
-    },
-    {
-      name: 'Rania Putri',
-      initials: 'RP',
-      email: 'rania.p@outlook.com',
-      phone: '+62 813-2211-4455',
-      city: 'Bandung Barat',
-      tier: 'Pelanggan Setia',
-      totalOrders: 4,
-      totalSpent: 920000,
-      joinedYear: '2024',
-      favoriteGlaze: 'Batu Pasir dan Gading'
-    },
-    {
-      name: 'Bima Satria',
-      initials: 'BS',
-      email: 'bima.satria@corporate.id',
-      phone: '+62 811-7788-9900',
-      city: 'Jakarta Pusat',
-      tier: 'Patron VIP',
-      totalOrders: 9,
-      totalSpent: 3450000,
-      joinedYear: '2022',
-      favoriteGlaze: 'Iron Rust Tenmoku'
-    },
-    {
-      name: 'Dinda Maharani',
-      initials: 'DM',
-      email: 'dinda.m@gmail.com',
-      phone: '+62 821-5566-7788',
-      city: 'Denpasar, Bali',
-      tier: 'Pelanggan Setia',
-      totalOrders: 3,
-      totalSpent: 680000,
-      joinedYear: '2025',
-      favoriteGlaze: 'Wabi Celadon'
-    },
-    {
-      name: 'Alya Safitri',
-      initials: 'AS',
-      email: 'alya.safitri@yahoo.com',
-      phone: '+62 819-3344-5566',
-      city: 'Surabaya Timur',
-      tier: 'Pembeli Baru',
-      totalOrders: 1,
-      totalSpent: 300000,
-      joinedYear: '2026',
-      favoriteGlaze: 'Gading Alami'
-    }
-  ];
+  // Daftar pelanggan riil yang terdaftar dan/atau pernah melakukan transaksi
+  const collectors = (() => {
+    const map = new Map();
+
+    // 1. Pelanggan yang mendaftar akun di tab Register
+    (registeredUsers || []).forEach(u => {
+      if (u.role !== 'admin') {
+        const key = (u.email || u.phone || u.name).toLowerCase();
+        map.set(key, {
+          name: u.fullName || u.name,
+          initials: (u.name || 'PL').substring(0, 2).toUpperCase(),
+          email: u.email || '-',
+          phone: u.phone || '-',
+          city: u.city || 'Kota Palembang',
+          tier: u.cohort || 'Pelanggan Baru',
+          totalOrders: 0,
+          totalSpent: 0,
+          joinedYear: u.patronSince || new Date().getFullYear().toString(),
+          favoriteGlaze: 'Glasir Gading Alami'
+        });
+      }
+    });
+
+    // 2. Pelanggan yang melakukan transaksi COD
+    (adminOrders || []).forEach(ord => {
+      const key = (ord.email || ord.phone || ord.patron).toLowerCase();
+      const existing = map.get(key);
+      const spent = ord.grandTotal || ord.total || 0;
+      if (existing) {
+        existing.totalOrders += 1;
+        existing.totalSpent += spent;
+        if (existing.totalOrders >= 5) existing.tier = 'Patron VIP';
+        else if (existing.totalOrders >= 2) existing.tier = 'Pelanggan Setia';
+      } else {
+        map.set(key, {
+          name: ord.patron || 'Pelanggan',
+          initials: (ord.initials || 'PL').substring(0, 2).toUpperCase(),
+          email: ord.email || '-',
+          phone: ord.phone || '-',
+          city: ord.city || 'Kota Palembang',
+          tier: 'Pembeli Baru',
+          totalOrders: 1,
+          totalSpent: spent,
+          joinedYear: new Date().getFullYear().toString(),
+          favoriteGlaze: ord.items?.[0]?.glaze || 'Glasir Gading Alami'
+        });
+      }
+    });
+
+    return Array.from(map.values());
+  })();
 
   // Mock Glaze Lab Recipes
   const glazeRecipes = [
@@ -319,7 +319,7 @@ export default function AdminPage() {
   });
 
   // Calculate quick stats
-  const totalRevenue = adminOrders.reduce((sum, ord) => sum + ord.total, 0) + 11675000;
+  const totalRevenue = adminOrders.reduce((sum, ord) => sum + (ord.grandTotal || ord.total || 0), 0);
   const totalPhysicalStock = products.reduce((sum, p) => sum + (p.stock || 0), 0);
   const lowStockCount = products.filter(p => (p.stock || 0) < 5).length;
 
@@ -461,7 +461,7 @@ export default function AdminPage() {
               <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
             </svg>
           ),
-          badge: '58',
+          badge: `${collectors.length}`,
           badgeClass: 'badge-count'
         },
         {
@@ -547,29 +547,29 @@ export default function AdminPage() {
               =============================================================== */}
           {activePage === 'overview' && (
             <div className="admin-page-view">
-              {/* PENJELASAN KEGUNAAN HALAMAN */}
-              <div className="admin-purpose-card">
-                <div className="purpose-header">
-                  <div className="purpose-icon-pill">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <line x1="12" y1="16" x2="12" y2="12"></line>
-                      <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                    </svg>
-                    <span>KEGUNAAN HALAMAN RINGKASAN TOKO KURASI</span>
-                  </div>
-                  <span className="purpose-badge-tag">Pusat Pantauan Utama</span>
+              {/* HEADER RINGKASAN TOKO */}
+              <div style={{
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem',
+                borderBottom: '1px solid var(--color-border)', paddingBottom: '1.25rem'
+              }}>
+                <div>
+                  <h2 style={{ fontSize: '1.6rem', fontFamily: 'var(--font-serif)', margin: 0, color: 'var(--color-charcoal)' }}>
+                    Ringkasan Toko CLAYÉ
+                  </h2>
+                  <p style={{ margin: '4px 0 0', fontSize: '0.88rem', color: '#6E6962' }}>
+                    Pantau pesanan masuk, pengantaran mandiri Kota Palembang, dan ketersediaan stok produk keramik.
+                  </p>
                 </div>
-                <h2 className="purpose-title" style={{ marginBottom: '0.25rem' }}>Ikhtisar Operasional Toko Kurasi dan Kesehatan Bisnis</h2>
-                <div className="purpose-quick-nav" style={{ marginTop: '0.85rem', paddingTop: '0.85rem' }}>
-                  <button onClick={() => setIsAddModalOpen(true)} className="purpose-action-btn primary">
-                    tambah produk
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button onClick={() => setIsAddModalOpen(true)} className="purpose-action-btn primary" style={{ textTransform: 'capitalize' }}>
+                    + Tambah Produk
                   </button>
-                  <button onClick={() => setActivePage('orders')} className="purpose-action-btn secondary">
-                    lihat pesanan
+                  <button onClick={() => setActivePage('orders')} className="purpose-action-btn secondary" style={{ textTransform: 'capitalize' }}>
+                    Lihat Pesanan
                   </button>
-                  <button onClick={() => setActivePage('inventory')} className="purpose-action-btn secondary">
-                    cek stok
+                  <button onClick={() => setActivePage('inventory')} className="purpose-action-btn secondary" style={{ textTransform: 'capitalize' }}>
+                    Kelola Stok
                   </button>
                 </div>
               </div>
@@ -582,7 +582,7 @@ export default function AdminPage() {
                   </div>
                   <div className="metric-primary-val">Rp {totalRevenue.toLocaleString('id-ID')}</div>
                   <div className="metric-trend-positive">
-                    +14.2% <span className="trend-text">vs bulan lalu</span>
+                    {adminOrders.length > 0 ? `${adminOrders.length} transaksi COD masuk` : 'Sistem baru & bersih'}
                   </div>
                 </div>
 
@@ -590,9 +590,9 @@ export default function AdminPage() {
                   <div className="metric-header-row">
                     <span className="metric-title">TOTAL PESANAN TERCATAT</span>
                   </div>
-                  <div className="metric-primary-val">86 <span className="val-unit">paket</span></div>
+                  <div className="metric-primary-val">{adminOrders.length} <span className="val-unit">paket</span></div>
                   <div className="metric-alert-pill">
-                    {adminOrders.filter(o => o.fulfillment === 'Diproses').length} menunggu pengemasan
+                    {adminOrders.filter(o => o.fulfillment === 'Diproses').length} menunggu pengantaran mandiri
                   </div>
                 </div>
 
@@ -608,11 +608,11 @@ export default function AdminPage() {
 
                 <div className="admin-metric-card">
                   <div className="metric-header-row">
-                    <span className="metric-title">TOTAL KOLEKTOR SETIA</span>
+                    <span className="metric-title">TOTAL PELANGGAN TERDAFTAR</span>
                   </div>
-                  <div className="metric-primary-val">58 <span className="val-unit">kolektor</span></div>
+                  <div className="metric-primary-val">{collectors.length} <span className="val-unit">pelanggan</span></div>
                   <div className="metric-trend-positive">
-                    +12 kolektor baru bulan ini
+                    {collectors.length > 0 ? `${collectors.length} akun aktif di Palembang` : 'Menunggu pelanggan baru'}
                   </div>
                 </div>
               </div>
@@ -776,32 +776,44 @@ export default function AdminPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {adminOrders.slice(0, 3).map(ord => (
-                        <tr key={ord.id}>
-                          <td><strong>{ord.id.replace('#', '')}</strong></td>
-                          <td><strong>{ord.patron}</strong></td>
-                          <td>{ord.city}</td>
-                          <td style={{ fontSize: '0.78rem', maxWidth: '170px' }} title={ord.itemsSummary}>
-                            <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '170px' }}>
-                              {ord.itemsSummary || 'Karya Keramik Kurasi'}
-                            </div>
-                          </td>
-                          <td style={{ whiteSpace: 'nowrap', minWidth: '100px' }}>Rp {(ord.total || 0).toLocaleString('id-ID')}</td>
-                          <td>
-                            <span className={`status-pill ${ord.fulfillment === 'Selesai' ? 'pill-completed' : ord.fulfillment === 'Diproses' ? 'pill-processing' : 'pill-awaiting'}`}>
-                              {ord.fulfillment}
-                            </span>
-                          </td>
-                          <td style={{ textAlign: 'right' }}>
-                            <button
-                              onClick={() => setInspectOrderData(ord)}
-                              className="admin-inspect-btn"
-                            >
-                              Periksa
-                            </button>
+                      {adminOrders.length === 0 ? (
+                        <tr>
+                          <td colSpan="7" style={{ textAlign: 'center', padding: '2.5rem 1rem', color: '#8A857F' }}>
+                            <div style={{ fontSize: '1.25rem', marginBottom: '0.4rem' }}>📦</div>
+                            <strong>Belum Ada Antrean Pengiriman</strong>
+                            <p style={{ margin: '0.25rem 0 0', fontSize: '0.82rem' }}>
+                              Pesanan baru dari pelanggan di wilayah Palembang akan otomatis muncul di sini.
+                            </p>
                           </td>
                         </tr>
-                      ))}
+                      ) : (
+                        adminOrders.slice(0, 3).map(ord => (
+                          <tr key={ord.id}>
+                            <td><strong>{ord.id.replace('#', '')}</strong></td>
+                            <td><strong>{ord.patron}</strong></td>
+                            <td>{ord.city}</td>
+                            <td style={{ fontSize: '0.78rem', maxWidth: '170px' }} title={ord.itemsSummary}>
+                              <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '170px' }}>
+                                {ord.itemsSummary || 'Karya Keramik Kurasi'}
+                              </div>
+                            </td>
+                            <td style={{ whiteSpace: 'nowrap', minWidth: '100px' }}>Rp {((ord.grandTotal || ord.total) || 0).toLocaleString('id-ID')}</td>
+                            <td>
+                              <span className={`status-pill ${ord.fulfillment === 'Selesai' ? 'pill-completed' : ord.fulfillment === 'Diproses' ? 'pill-processing' : 'pill-awaiting'}`}>
+                                {ord.fulfillment || 'Diproses'}
+                              </span>
+                            </td>
+                            <td style={{ textAlign: 'right' }}>
+                              <button
+                                onClick={() => setInspectOrderData(ord)}
+                                className="admin-inspect-btn"
+                              >
+                                Periksa
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -814,27 +826,51 @@ export default function AdminPage() {
               =============================================================== */}
           {activePage === 'orders' && (
             <div className="admin-page-view">
-              {/* PENJELASAN KEGUNAAN HALAMAN */}
-              <div className="admin-purpose-card">
-                <div className="purpose-header">
-                  <div className="purpose-icon-pill">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="9" cy="21" r="1"></circle>
-                      <circle cx="20" cy="21" r="1"></circle>
-                      <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                    </svg>
-                    <span>KEGUNAAN HALAMAN KELOLA PESANAN</span>
-                  </div>
-                  <span className="purpose-badge-tag">Logistik dan Transaksi</span>
+              {/* HEADER KELOLA PESANAN */}
+              <div style={{
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem',
+                borderBottom: '1px solid var(--color-border)', paddingBottom: '1.25rem'
+              }}>
+                <div>
+                  <h2 style={{ fontSize: '1.6rem', fontFamily: 'var(--font-serif)', margin: 0, color: 'var(--color-charcoal)' }}>
+                    Kelola Pesanan Pelanggan
+                  </h2>
+                  <p style={{ margin: '4px 0 0', fontSize: '0.88rem', color: '#6E6962' }}>
+                    Daftar pesanan COD masuk dan pemantauan pengantaran mandiri tim CLAYÉ di Kota Palembang.
+                  </p>
                 </div>
-                <h2 className="purpose-title" style={{ marginBottom: '0.25rem' }}>Manajemen Pemrosesan Pesanan dan Pengiriman Gudang</h2>
-                <div className="purpose-quick-nav" style={{ marginTop: '0.85rem', paddingTop: '0.85rem' }}>
-                  <button onClick={() => syncOrders && syncOrders()} className="purpose-action-btn secondary">
-                    sinkronkan data
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                  <button
+                    onClick={() => syncOrders && syncOrders()}
+                    className="purpose-action-btn primary"
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', textTransform: 'capitalize' }}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="23 4 23 10 17 10"></polyline>
+                      <polyline points="1 20 1 14 7 14"></polyline>
+                      <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                    </svg>
+                    <span>Sinkronkan Supabase</span>
                   </button>
-                  <button onClick={() => showToast('Seluruh slip label pengemasan siap dicetak.', 'info')} className="purpose-action-btn secondary">
-                    cetak label
+                  <button
+                    onClick={() => showToast(`Data ${adminOrders.length} pesanan siap diekspor.`, 'info')}
+                    className="purpose-action-btn secondary"
+                    style={{ textTransform: 'capitalize' }}
+                  >
+                    Ekspor CSV
                   </button>
+                  <span style={{
+                    fontSize: '0.78rem',
+                    padding: '4px 10px',
+                    borderRadius: '20px',
+                    fontWeight: 600,
+                    backgroundColor: isSupabaseConfigured() ? '#ECFDF5' : '#FEF3C7',
+                    color: isSupabaseConfigured() ? '#047857' : '#92400E',
+                    border: isSupabaseConfigured() ? '1px solid #A7F3D0' : '1px solid #FDE68A'
+                  }}>
+                    {isSupabaseConfigured() ? '● Supabase Terhubung' : '○ Supabase Lokal'}
+                  </span>
                 </div>
               </div>
 
@@ -851,7 +887,7 @@ export default function AdminPage() {
                       <span className="filter-counter-badge">
                         {status === 'Semua'
                           ? adminOrders.length
-                          : adminOrders.filter(o => o.fulfillment.toLowerCase().includes(status.toLowerCase())).length}
+                          : adminOrders.filter(o => (o.fulfillment || '').toLowerCase().includes(status.toLowerCase())).length}
                       </span>
                     </button>
                   ))}
@@ -978,18 +1014,25 @@ export default function AdminPage() {
               =============================================================== */}
           {activePage === 'inventory' && (
             <div className="admin-page-view">
-              {/* PENJELASAN KEGUNAAN HALAMAN */}
-              <div className="admin-purpose-card">
-                <div className="purpose-header">
-                  <div className="purpose-icon-pill">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                    </svg>
-                    <span>KEGUNAAN HALAMAN INVENTARIS PRODUK</span>
-                  </div>
-                  <span className="purpose-badge-tag">Katalog dan Stok Keramik</span>
+              {/* HEADER INVENTARIS PRODUK */}
+              <div style={{
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem',
+                borderBottom: '1px solid var(--color-border)', paddingBottom: '1.25rem'
+              }}>
+                <div>
+                  <h2 style={{ fontSize: '1.6rem', fontFamily: 'var(--font-serif)', margin: 0, color: 'var(--color-charcoal)' }}>
+                    Katalog & Stok Produk
+                  </h2>
+                  <p style={{ margin: '4px 0 0', fontSize: '0.88rem', color: '#6E6962' }}>
+                    Kelola data produk keramik, harga jual, foto, dan ketersediaan stok fisik di gudang.
+                  </p>
                 </div>
-                <h2 className="purpose-title" style={{ marginBottom: '0.25rem' }}>Manajemen Stok Gudang dan Katalog Toko Kurasi</h2>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button onClick={() => setIsAddModalOpen(true)} className="purpose-action-btn primary" style={{ textTransform: 'capitalize' }}>
+                    + Tambah Produk Baru
+                  </button>
+                </div>
               </div>
 
               {/* MINI STAT ROW INVENTORY */}
@@ -1216,7 +1259,7 @@ export default function AdminPage() {
                           <p style={{ fontSize: '0.78rem', color: '#736B63', margin: '0 0 0.75rem 0', flexGrow: 1, lineHeight: 1.4 }}>
                             {p.subtitle}
                           </p>
-                          
+
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #F0ECE4', paddingTop: '0.75rem', marginBottom: '0.75rem' }}>
                             <span style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--color-terracotta)' }}>
                               Rp {p.price.toLocaleString('id-ID')}
@@ -1453,63 +1496,73 @@ export default function AdminPage() {
 
 
           {/* ===============================================================
-              HALAMAN 5: KOLEKTOR & PELANGGAN (CUSTOMERS)
+              HALAMAN 5: DATA PELANGGAN (CUSTOMERS)
               =============================================================== */}
           {activePage === 'customers' && (
             <div className="admin-page-view">
-              {/* PENJELASAN KEGUNAAN HALAMAN */}
-              <div className="admin-purpose-card">
-                <div className="purpose-header">
-                  <div className="purpose-icon-pill">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                      <circle cx="9" cy="7" r="4"></circle>
-                    </svg>
-                    <span>KEGUNAAN HALAMAN PELANGGAN</span>
-                  </div>
-                  <span className="purpose-badge-tag">Manajemen Hubungan Pelanggan (CRM)</span>
+              {/* HEADER DATA PELANGGAN */}
+              <div style={{
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem',
+                borderBottom: '1px solid var(--color-border)', paddingBottom: '1.25rem'
+              }}>
+                <div>
+                  <h2 style={{ fontSize: '1.6rem', fontFamily: 'var(--font-serif)', margin: 0, color: 'var(--color-charcoal)' }}>
+                    Data Pelanggan
+                  </h2>
+                  <p style={{ margin: '4px 0 0', fontSize: '0.88rem', color: '#6E6962' }}>
+                    Daftar akun pelanggan terdaftar dan riwayat pembelian COD di Kota Palembang.
+                  </p>
                 </div>
-                <h2 className="purpose-title" style={{ marginBottom: '0.25rem' }}>Direktori Patronase Kolektor dan Program Loyalitas Studio</h2>
-                <div className="purpose-quick-nav" style={{ marginTop: '0.85rem', paddingTop: '0.85rem' }}>
-                  <button onClick={() => showToast('Katalog pra-rilis edisi Drop 05 dikirimkan ke 12 Patron VIP.', 'success')} className="purpose-action-btn primary">
-                    kirim undangan vip
-                  </button>
-                  <button onClick={() => showToast('Data 58 kolektor keramik berhasil diekspor ke format CSV.', 'info')} className="purpose-action-btn secondary">
-                    ekspor direktori
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button
+                    onClick={() => showToast(`Data ${collectors.length} pelanggan berhasil diekspor ke format CSV.`, 'success')}
+                    className="purpose-action-btn secondary"
+                    style={{ textTransform: 'capitalize' }}
+                  >
+                    Ekspor Data Pelanggan (CSV)
                   </button>
                 </div>
               </div>
 
-              {/* 3 METRIK KOLEKTOR */}
+              {/* 4 METRIK PELANGGAN */}
               <div className="admin-metrics-row">
                 <div className="admin-metric-card">
-                  <span className="metric-title">TOTAL KOLEKTOR TERDAFTAR</span>
-                  <div className="metric-primary-val">58 <span className="val-unit">orang</span></div>
-                  <div className="metric-trend-positive">+14 pelanggan baru bulan ini</div>
+                  <span className="metric-title">TOTAL PELANGGAN TERDAFTAR</span>
+                  <div className="metric-primary-val">{collectors.length} <span className="val-unit">orang</span></div>
+                  <div className="metric-trend-positive">{collectors.length > 0 ? `${collectors.length} akun aktif` : 'Belum ada pelanggan'}</div>
                 </div>
                 <div className="admin-metric-card">
-                  <span className="metric-title">TINGKAT RETENSI (REPEAT BUYER)</span>
-                  <div className="metric-primary-val">42.8%</div>
-                  <div className="metric-trend-positive">Sangat loyal terhadap karya atelier</div>
+                  <span className="metric-title">TOTAL TRANSAKSI PESANAN</span>
+                  <div className="metric-primary-val">{adminOrders.length} <span className="val-unit">pesanan</span></div>
+                  <div className="metric-trend-positive">Pengantaran COD Palembang</div>
                 </div>
                 <div className="admin-metric-card">
-                  <span className="metric-title">RATA-RATA NILAI TRANSAKSI KOLEKTOR</span>
-                  <div className="metric-primary-val">Rp 320.000</div>
-                  <div className="metric-trend-positive">Rata-rata 2.4 keramik per pesanan</div>
+                  <span className="metric-title">RATA-RATA NILAI TRANSAKSI</span>
+                  <div className="metric-primary-val">
+                    Rp {adminOrders.length > 0
+                      ? Math.round(totalRevenue / adminOrders.length).toLocaleString('id-ID')
+                      : '0'}
+                  </div>
+                  <div className="metric-trend-positive">
+                    {adminOrders.length > 0 ? `Dari ${adminOrders.length} pesanan aktif` : 'Menunggu pesanan pertama'}
+                  </div>
                 </div>
                 <div className="admin-metric-card">
-                  <span className="metric-title">PATRON VIP STUDIO</span>
-                  <div className="metric-primary-val">12 <span className="val-unit">kolektor</span></div>
-                  <div className="metric-alert-pill">Akses pre-order batch 05 aktif</div>
+                  <span className="metric-title">TOTAL PENDAPATAN DITERIMA</span>
+                  <div className="metric-primary-val">Rp {totalRevenue.toLocaleString('id-ID')}</div>
+                  <div className="metric-alert-pill">
+                    {adminOrders.filter(o => o.fulfillment === 'Diproses').length} paket menunggu antar
+                  </div>
                 </div>
               </div>
 
-              {/* TABEL KOLEKTOR */}
+              {/* TABEL PELANGGAN */}
               <div className="admin-section-container">
                 <div className="admin-section-top">
                   <div>
-                    <h3 className="section-serif-heading">Daftar Kolektor dan Pembeli Terdaftar</h3>
-                    <p className="section-subtext">Pelanggan yang mengoleksi edisi cangkir, mangkuk, dan vas keramik kurasi CLAYÉ.</p>
+                    <h3 className="section-serif-heading">Daftar Akun Pelanggan</h3>
+                    <p className="section-subtext">Rincian profil, kontak nomor WhatsApp, dan histori pesanan pelanggan.</p>
                   </div>
                 </div>
 
@@ -1517,47 +1570,60 @@ export default function AdminPage() {
                   <table className="claye-patron-table">
                     <thead>
                       <tr>
-                        <th>KOLEKTOR</th>
-                        <th>KOTA</th>
+                        <th>NAMA PELANGGAN</th>
+                        <th>KECAMATAN / KOTA</th>
                         <th>EMAIL</th>
-                        <th>NOMOR</th>
-                        <th>TIER LOYALITAS</th>
+                        <th>NOMOR WHATSAPP</th>
+                        <th>STATUS AKUN</th>
                         <th>TOTAL PESANAN</th>
                         <th>TOTAL BELANJA</th>
-                        <th>GLASIR FAVORIT</th>
                         <th style={{ textAlign: 'right' }}>AKSI</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {collectors.map((c, i) => (
-                        <tr key={i}>
-                          <td className="cell-collector-patron">
-                            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                              <strong>{c.name}</strong>
-                              <span style={{ fontSize: '0.72rem', color: '#8A857F' }}>{c.joinedYear}</span>
-                            </div>
-                          </td>
-                          <td>{c.city}</td>
-                          <td>{c.email}</td>
-                          <td>{c.phone}</td>
-                          <td>
-                            <span className={`status-pill ${c.tier === 'Patron VIP' ? 'pill-completed' : 'pill-processing'}`}>
-                              {c.tier}
-                            </span>
-                          </td>
-                          <td><strong>{c.totalOrders}</strong></td>
-                          <td><strong>Rp {c.totalSpent.toLocaleString('id-ID')}</strong></td>
-                          <td style={{ color: '#6E6962' }}>{c.favoriteGlaze}</td>
-                          <td style={{ textAlign: 'right' }}>
-                            <button
-                              onClick={() => openConcierge(`Hubungi ${c.name} mengenai pemesanan keramik kurasi CLAYÉ`)}
-                              className="admin-inspect-btn"
-                            >
-                              Hubungi
-                            </button>
+                      {collectors.length === 0 ? (
+                        <tr>
+                          <td colSpan="8" style={{ textAlign: 'center', padding: '3.5rem 1rem', color: '#8A857F' }}>
+                            <div style={{ fontSize: '1.4rem', marginBottom: '0.5rem' }}>🍃</div>
+                            <strong>Belum Ada Pelanggan Terdaftar</strong>
+                            <p style={{ margin: '0.25rem 0 0', fontSize: '0.85rem' }}>
+                              Pelanggan baru yang mendaftar atau melakukan checkout pesanan akan otomatis tercatat di sini.
+                            </p>
                           </td>
                         </tr>
-                      ))}
+                      ) : (
+                        collectors.map((c, i) => (
+                          <tr key={i}>
+                            <td className="cell-collector-patron">
+                              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                                <strong>{c.name}</strong>
+                                <span style={{ fontSize: '0.72rem', color: '#8A857F' }}>({c.joinedYear})</span>
+                              </div>
+                            </td>
+                            <td>{c.city}</td>
+                            <td>{c.email}</td>
+                            <td>{c.phone}</td>
+                            <td>
+                              <span className={`status-pill ${c.totalOrders > 0 ? 'pill-completed' : 'pill-processing'}`}>
+                                {c.totalOrders > 0 ? 'Pembeli Aktif' : 'Pelanggan Baru'}
+                              </span>
+                            </td>
+                            <td><strong>{c.totalOrders}</strong></td>
+                            <td><strong>Rp {c.totalSpent.toLocaleString('id-ID')}</strong></td>
+                            <td style={{ textAlign: 'right' }}>
+                              <a
+                                href={`https://wa.me/${(c.phone || '').replace(/[^0-9]/g, '')}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="admin-inspect-btn"
+                                style={{ textDecoration: 'none', display: 'inline-block' }}
+                              >
+                                Hubungi
+                              </a>
+                            </td>
+                          </tr>
+                        ))
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -1570,26 +1636,26 @@ export default function AdminPage() {
               =============================================================== */}
           {activePage === 'analytics' && (
             <div className="admin-page-view">
-              {/* PENJELASAN KEGUNAAN HALAMAN */}
-              <div className="admin-purpose-card">
-                <div className="purpose-header">
-                  <div className="purpose-icon-pill">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <line x1="18" y1="20" x2="18" y2="10"></line>
-                      <line x1="12" y1="20" x2="12" y2="4"></line>
-                      <line x1="6" y1="20" x2="6" y2="14"></line>
-                    </svg>
-                    <span>KEGUNAAN HALAMAN LAPORAN</span>
-                  </div>
-                  <span className="purpose-badge-tag">Laporan dan Efisiensi Studio</span>
+              {/* HEADER LAPORAN & ANALISIS */}
+              <div style={{
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem',
+                borderBottom: '1px solid var(--color-border)', paddingBottom: '1.25rem'
+              }}>
+                <div>
+                  <h2 style={{ fontSize: '1.6rem', fontFamily: 'var(--font-serif)', margin: 0, color: 'var(--color-charcoal)' }}>
+                    Laporan Penjualan
+                  </h2>
+                  <p style={{ margin: '4px 0 0', fontSize: '0.88rem', color: '#6E6962' }}>
+                    Rekapitulasi keuangan toko kurasi, performa transaksi COD, dan efisiensi pengantaran.
+                  </p>
                 </div>
-                <h2 className="purpose-title" style={{ marginBottom: '0.25rem' }}>Analisis Metrik Penjualan, Tren Produk dan Ekspor Laporan</h2>
-                <div className="purpose-quick-nav" style={{ marginTop: '0.85rem', paddingTop: '0.85rem' }}>
-                  <button onClick={() => showToast('Laporan Keuangan Bulanan (.CSV) berhasil diunduh.', 'success')} className="purpose-action-btn primary">
-                    unduh laporan keuangan
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button onClick={() => showToast('Laporan Keuangan Penjualan (.CSV) berhasil diunduh.', 'success')} className="purpose-action-btn primary" style={{ textTransform: 'capitalize' }}>
+                    Unduh Laporan CSV
                   </button>
-                  <button onClick={() => showToast('Data Penjualan Produk (.CSV) berhasil diunduh.', 'info')} className="purpose-action-btn secondary">
-                    unduh data produk
+                  <button onClick={() => showToast('Data Penjualan Produk (.CSV) berhasil diunduh.', 'info')} className="purpose-action-btn secondary" style={{ textTransform: 'capitalize' }}>
+                    Unduh Data Produk
                   </button>
                 </div>
               </div>
@@ -1663,19 +1729,20 @@ export default function AdminPage() {
               =============================================================== */}
           {activePage === 'settings' && (
             <div className="admin-page-view">
-              {/* PENJELASAN KEGUNAAN HALAMAN */}
-              <div className="admin-purpose-card">
-                <div className="purpose-header">
-                  <div className="purpose-icon-pill">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="12" cy="12" r="3"></circle>
-                      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                    </svg>
-                    <span>KEGUNAAN HALAMAN PENGATURAN</span>
-                  </div>
-                  <span className="purpose-badge-tag">Konfigurasi Toko dan Pergudangan</span>
+              {/* HEADER PENGATURAN TOKO */}
+              <div style={{
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem',
+                borderBottom: '1px solid var(--color-border)', paddingBottom: '1.25rem'
+              }}>
+                <div>
+                  <h2 style={{ fontSize: '1.6rem', fontFamily: 'var(--font-serif)', margin: 0, color: 'var(--color-charcoal)' }}>
+                    Pengaturan Toko & Operasional
+                  </h2>
+                  <p style={{ margin: '4px 0 0', fontSize: '0.88rem', color: '#6E6962' }}>
+                    Konfigurasi informasi toko CLAYÉ Studio, kontak admin, dan metode pembayaran COD Palembang.
+                  </p>
                 </div>
-                <h2 className="purpose-title" style={{ marginBottom: '0.25rem' }}>Konfigurasi Profil Toko Kurasi, Pengemasan dan Jalur Pembayaran</h2>
               </div>
 
               {/* FORM PENGATURAN STUDIO */}
@@ -1790,6 +1857,147 @@ export default function AdminPage() {
                         />
                         <span style={{ fontSize: '0.9rem' }}>Transfer Bank Manual (BCA dan Mandiri Rekening Resmi)</span>
                       </label>
+                    </div>
+                  </div>
+
+                  <div style={{ borderTop: '1px solid #EAE6DF', paddingTop: '1.5rem', marginBottom: '2rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '0.4rem' }}>
+                      <h3 className="section-serif-heading" style={{ fontSize: '1.35rem', margin: 0 }}>
+                        4. Integrasi Database Supabase (PostgreSQL Cloud)
+                      </h3>
+                      <span style={{
+                        fontSize: '0.78rem',
+                        padding: '4px 12px',
+                        borderRadius: '20px',
+                        fontWeight: 700,
+                        backgroundColor: isSupabaseConfigured() ? '#ECFDF5' : '#FEF3C7',
+                        color: isSupabaseConfigured() ? '#047857' : '#92400E',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                      }}>
+                        <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: isSupabaseConfigured() ? '#10B981' : '#F59E0B' }}></span>
+                        {isSupabaseConfigured() ? 'Database Supabase Terkoneksi' : 'Siap Dihubungkan (Mode Offline)'}
+                      </span>
+                    </div>
+                    <p className="section-subtext" style={{ marginBottom: '1.25rem' }}>
+                      Hubungkan pesanan pelanggan, inventaris produk, dan akun secara otomatis ke database cloud PostgreSQL Supabase.
+                    </p>
+
+                    <div style={{ backgroundColor: '#FAF8F5', border: '1px solid #EAE6DF', borderRadius: '8px', padding: '1.25rem' }}>
+                      <div className="form-group-claye" style={{ marginBottom: '1rem' }}>
+                        <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#4A4641', display: 'block', marginBottom: '6px' }}>
+                          SUPABASE PROJECT URL *
+                        </label>
+                        <input
+                          type="text"
+                          value={supabaseUrlInput}
+                          onChange={(e) => setSupabaseUrlInput(e.target.value)}
+                          placeholder="https://nzoqrzdpyhhzxuwmrcux.supabase.co"
+                          style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid #DED8CF', backgroundColor: '#FFFFFF', fontSize: '0.88rem' }}
+                        />
+                      </div>
+
+                      <div className="form-group-claye" style={{ marginBottom: '1rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                          <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#4A4641', margin: 0 }}>
+                            SUPABASE ANON / PUBLIC KEY (JWT) *
+                          </label>
+                          <span style={{ fontSize: '0.72rem', color: '#8A857F' }}>
+                            Dapatkan di Supabase Dashboard → Project Settings → API
+                          </span>
+                        </div>
+                        <input
+                          type="text"
+                          value={supabaseKeyInput}
+                          onChange={(e) => setSupabaseKeyInput(e.target.value)}
+                          placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                          style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid #DED8CF', backgroundColor: '#FFFFFF', fontSize: '0.88rem', fontFamily: 'monospace' }}
+                        />
+                      </div>
+
+                      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '1rem' }}>
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            if (!supabaseKeyInput.trim()) {
+                              showToast('Harap masukkan Supabase Anon Key terlebih dahulu.', 'error');
+                              return;
+                            }
+                            localStorage.setItem('claye_supabase_url', supabaseUrlInput.trim());
+                            localStorage.setItem('claye_supabase_anon_key', supabaseKeyInput.trim());
+                            showToast('Menyimpan kredensial dan menguji koneksi...', 'info');
+                            setIsTestingSupabase(true);
+                            const res = await supabaseService.testConnection();
+                            setIsTestingSupabase(false);
+                            if (res.success) {
+                              showToast('Koneksi ke Supabase berhasil aktif!', 'success');
+                              if (syncOrders) await syncOrders();
+                            } else {
+                              showToast(`Respon database: ${res.message}`, 'error');
+                            }
+                          }}
+                          disabled={isTestingSupabase}
+                          style={{
+                            padding: '10px 18px',
+                            backgroundColor: '#B87355',
+                            color: '#FFFFFF',
+                            border: 'none',
+                            borderRadius: '6px',
+                            fontWeight: 600,
+                            fontSize: '0.85rem',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          {isTestingSupabase ? 'Menghubungkan...' : 'Simpan & Hubungkan Supabase'}
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            setIsTestingSupabase(true);
+                            const res = await supabaseService.testConnection();
+                            setIsTestingSupabase(false);
+                            if (res.success) {
+                              showToast('Tes koneksi sukses: Database Supabase aktif!', 'success');
+                            } else {
+                              showToast(`Gagal: ${res.message}`, 'error');
+                            }
+                          }}
+                          disabled={isTestingSupabase}
+                          style={{
+                            padding: '10px 16px',
+                            backgroundColor: 'transparent',
+                            color: '#4A4641',
+                            border: '1px solid #DED8CF',
+                            borderRadius: '6px',
+                            fontWeight: 600,
+                            fontSize: '0.85rem',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          Uji Koneksi
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            if (syncOrders) await syncOrders();
+                          }}
+                          style={{
+                            padding: '10px 16px',
+                            backgroundColor: 'transparent',
+                            color: '#0369A1',
+                            border: '1px solid #BAE6FD',
+                            borderRadius: '6px',
+                            fontWeight: 600,
+                            fontSize: '0.85rem',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          Tarik Pesanan dari Supabase
+                        </button>
+                      </div>
                     </div>
                   </div>
 

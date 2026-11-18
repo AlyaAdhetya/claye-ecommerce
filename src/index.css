@@ -2469,18 +2469,39 @@ input, select, textarea {
   margin-bottom: 0.45rem;
 }
 
-.checkout-form-group input {
+.checkout-form-group input,
+.checkout-form-group textarea,
+.checkout-form-group select {
   width: 100%;
-  padding: 0.75rem 0.95rem;
+  padding: 0.85rem 1rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xs);
   background-color: #FFFFFF;
-  font-size: 0.88rem;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: var(--color-charcoal);
   outline: none;
+  box-sizing: border-box;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
-.checkout-form-group input:focus {
-  border-color: var(--color-charcoal);
+.checkout-form-group textarea {
+  min-height: 110px;
+  resize: vertical;
+  line-height: 1.55;
+  width: 100%;
+  display: block;
+}
+
+.checkout-form-group select {
+  cursor: pointer;
+}
+
+.checkout-form-group input:focus,
+.checkout-form-group textarea:focus,
+.checkout-form-group select:focus {
+  border-color: var(--color-terracotta);
+  box-shadow: 0 0 0 2px rgba(184, 115, 85, 0.15);
 }
 
 .checkout-form-row {

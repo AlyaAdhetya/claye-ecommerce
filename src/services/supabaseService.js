@@ -1,4 +1,4 @@
-import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
+import { supabase, isSupabaseConfigured, getSupabaseConfig } from '../lib/supabaseClient';
 
 /**
  * Service Layer untuk interaksi React dengan PostgreSQL / Supabase
@@ -7,6 +7,20 @@ import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
  */
 
 export const supabaseService = {
+  // 0. Tes Koneksi Supabase
+  async testConnection() {
+    if (!isSupabaseConfigured() || !supabase) {
+      return { success: false, message: 'Supabase belum dikonfigurasi (URL / Anon Key kosong).' };
+    }
+    try {
+      const { data, error } = await supabase.from('store_settings').select('id, store_name').limit(1);
+      if (error) throw error;
+      return { success: true, message: 'Koneksi ke Supabase berhasil!', data };
+    } catch (err) {
+      return { success: false, message: err.message || 'Gagal terhubung ke Supabase.' };
+    }
+  },
+
   // 1. Ambil Semua Produk Kurasi
   async getProducts() {
     if (!isSupabaseConfigured() || !supabase) return null;
@@ -75,40 +89,66 @@ export const supabaseService = {
     }
   },
 
-  // 4. Simpan Transaksi Pesanan Baru
+  // 4. Simpan Transaksi Pesanan Baru dari Pelanggan
   async createOrder(orderData, items) {
     if (!isSupabaseConfigured() || !supabase) return null;
     try {
-      // Simpan master order
+      // Pemetaan status pembayaran sesuai CHECK constraint PostgreSQL Supabase
+      let dbPaymentStatus = 'LUNAS';
+      const pLower = (orderData.paymentStatus || '').toLowerCase();
+      if (pLower.includes('menunggu')) {
+        dbPaymentStatus = 'MENUNGGU_PEMBAYARAN';
+      } else if (pLower.includes('batal')) {
+        dbPaymentStatus = 'DIBATALKAN';
+      }
+
+      // Pemetaan status fulfillment sesuai CHECK constraint PostgreSQL Supabase
+      let dbFulfillmentStatus = 'DIPROSES_KURASI';
+      const fLower = (orderData.fulfillment || '').toLowerCase();
+      if (fLower.includes('selesai')) {
+        dbFulfillmentStatus = 'SELESAI';
+      } else if (fLower.includes('kirim')) {
+        dbFulfillmentStatus = 'DIKIRIM';
+      } else if (fLower.includes('menunggu')) {
+        dbFulfillmentStatus = 'MENUNGGU_KONFIRMASI';
+      }
+
+      const recipientName = orderData.patron || orderData.customerName || 'Pelanggan CLAYÉ';
+      const recipientPhone = orderData.phone || orderData.customerPhone || '-';
+      const shippingAddress = orderData.address || orderData.shippingAddress || 'Kota Palembang';
+      const city = orderData.city || 'Palembang';
+
       const { data: order, error: orderErr } = await supabase
         .from('orders')
         .insert([{
-          order_number: orderData.id || `CLY-EXP-${Math.floor(10000 + Math.random() * 90000)}-PLM`,
-          user_id: orderData.userId || 2,
+          order_number: orderData.id || `CLY-COD-${Math.floor(10000 + Math.random() * 90000)}-PLM`,
+          user_id: orderData.userId || 1, // Hubungkan ke relasi users(id) di Supabase
           total_items_amount: orderData.total,
-          shipping_fee: orderData.shippingFee || 15000,
-          grand_total: orderData.grandTotal || (orderData.total + (orderData.shippingFee || 15000)),
-          payment_status: orderData.paymentStatus || 'LUNAS',
-          payment_method: orderData.paymentMethod || 'Virtual Account (BCA)',
-          fulfillment_status: orderData.fulfillment || 'DIPROSES_KURASI',
-          courier_name: orderData.courier || 'Pengiriman Reguler (Eco Shield)',
-          tracking_number: orderData.trackingNumber,
-          recipient_name: orderData.customerName || 'Pelanggan CLAYÉ',
-          recipient_phone: orderData.customerPhone || '+62 812-3456-7890',
-          shipping_address: orderData.shippingAddress || 'Jl. Sejuta Kenangan, Palembang',
-          shipping_city: orderData.city || 'Palembang',
+          shipping_fee: orderData.shippingFee || 8000,
+          grand_total: orderData.grandTotal || (orderData.total + (orderData.shippingFee || 8000)),
+          payment_status: dbPaymentStatus,
+          payment_method: orderData.paymentMethod || 'COD (Bayar Tunai di Tempat)',
+          fulfillment_status: dbFulfillmentStatus,
+          courier_name: orderData.courier || 'Antar Mandiri Tim CLAYÉ',
+          tracking_number: orderData.trackingNumber || orderData.id,
+          recipient_name: recipientName,
+          recipient_phone: recipientPhone,
+          shipping_address: shippingAddress,
+          shipping_city: city,
           shipping_postal_code: orderData.postalCode || '30138'
         }])
         .select()
         .single();
 
-      if (orderErr) throw orderErr;
+      if (orderErr) {
+        console.warn('Supabase insert orders gagal:', orderErr.message);
+        throw orderErr;
+      }
 
-      // Simpan rincian order items
-      if (items && items.length > 0) {
+      if (items && items.length > 0 && order) {
         const orderItemsPayload = items.map(item => ({
           order_id: order.id,
-          product_id: item.id,
+          product_id: typeof item.id === 'number' ? item.id : null,
           product_name_snapshot: item.name,
           glaze_name_snapshot: item.selectedGlaze || 'Default',
           custom_stamp_snapshot: item.stamp || null,
@@ -127,7 +167,7 @@ export const supabaseService = {
     }
   },
 
-  // 5. Ambil Riwayat Pesanan
+  // 5. Ambil Semua Pesanan (Terintegrasi Admin & Pelanggan)
   async getOrders() {
     if (!isSupabaseConfigured() || !supabase) return null;
     try {
@@ -184,4 +224,3 @@ export const supabaseService = {
     }
   }
 };
-

@@ -25,106 +25,7 @@ export const ADMIN_CREDENTIALS = {
 const INITIAL_USER = null;
 const INITIAL_CART = [];
 const INITIAL_WISHLIST = [];
-
-const INITIAL_ORDERS = [
-  {
-    id: '#CLY-2026-021',
-    patron: 'Nadia Putri',
-    initials: 'NP',
-    email: 'nadia.putri@gmail.com',
-    phone: '+62 812-9988-7711',
-    city: 'Jakarta Selatan',
-    address: 'Jl. Senopati No. 44, Kebayoran Baru, Jakarta Selatan',
-    date: '20 Okt 2026',
-    itemsSummary: 'The Sunday Mug (Glasir Batu Pasir)',
-    variantSummary: 'Batu Pasir & Gading',
-    items: [
-      { name: 'The Sunday Mug', glaze: 'Batu Pasir', quantity: 1, price: 125000 }
-    ],
-    total: 250000,
-    shippingFee: 15000,
-    grandTotal: 265000,
-    paymentStatus: 'Lunas',
-    paymentMethod: 'Transfer BCA',
-    fulfillment: 'Diproses',
-    courier: 'JNE Eco-Shield (Garansi Pecah Belah)',
-    trackingNumber: 'CLY-EXP-99201-BDG',
-    image: '/assets/images/product_mug.jpg'
-  },
-  {
-    id: '#CLY-2026-022',
-    patron: 'Rania Putri',
-    initials: 'RP',
-    email: 'rania.p@outlook.com',
-    phone: '+62 813-2211-4455',
-    city: 'Bandung Barat',
-    address: 'Komp. Setiabudi Regency No. 12, Bandung Barat',
-    date: '21 Okt 2026',
-    itemsSummary: 'The Everyday Plate (Glasir Gading)',
-    variantSummary: 'Gading (Ivory) • Jml: 1',
-    items: [
-      { name: 'The Everyday Plate', glaze: 'Gading (Ivory)', quantity: 1, price: 125000 }
-    ],
-    total: 125000,
-    shippingFee: 15000,
-    grandTotal: 140000,
-    paymentStatus: 'Lunas',
-    paymentMethod: 'QRIS Instan',
-    fulfillment: 'Selesai',
-    courier: 'Kurir Pengiriman Ekstra Proteksi (Same Day)',
-    trackingNumber: 'CLY-EXP-99202-BDG',
-    image: '/assets/images/product_plate.jpg'
-  },
-  {
-    id: '#CLY-2026-023',
-    patron: 'Alya Safitri',
-    initials: 'AS',
-    email: 'alya.safitri@yahoo.com',
-    phone: '+62 819-3344-5566',
-    city: 'Surabaya Timur',
-    address: 'Jl. Kertajaya Indah No. 88, Surabaya Timur',
-    date: '22 Okt 2026',
-    itemsSummary: 'Kyoto Pourer Vessel + Mangkuk Solace',
-    variantSummary: 'Stoneware Alami',
-    items: [
-      { name: 'Kyoto Pourer Vessel', glaze: 'Alami', quantity: 1, price: 185000 },
-      { name: 'Mangkuk Solace', glaze: 'Gading', quantity: 1, price: 115000 }
-    ],
-    total: 300000,
-    shippingFee: 20000,
-    grandTotal: 320000,
-    paymentStatus: 'Menunggu',
-    paymentMethod: 'Virtual Account Mandiri',
-    fulfillment: 'Menunggu Pembayaran',
-    courier: 'J&T Cargo Wood Crate',
-    trackingNumber: 'CLY-EXP-99203-BDG',
-    image: '/assets/images/product_bowl.jpg'
-  },
-  {
-    id: '#CLY-2026-024',
-    patron: 'Dinda Maharani',
-    initials: 'DM',
-    email: 'dinda.m@gmail.com',
-    phone: '+62 821-5566-7788',
-    city: 'Denpasar, Bali',
-    address: 'Jl. Danau Tamblingan No. 17, Sanur, Denpasar, Bali',
-    date: '23 Okt 2026',
-    itemsSummary: 'Wabi Matcha Chawan Vessel',
-    variantSummary: 'Abu Kayu & Besi Matte',
-    items: [
-      { name: 'Wabi Matcha Chawan Vessel', glaze: 'Celadon', quantity: 1, price: 150000 }
-    ],
-    total: 150000,
-    shippingFee: 20000,
-    grandTotal: 170000,
-    paymentStatus: 'Lunas',
-    paymentMethod: 'Transfer BCA',
-    fulfillment: 'Diproses',
-    courier: 'SiCepat Best Eco Shield',
-    trackingNumber: 'CLY-EXP-99204-BDG',
-    image: '/assets/images/product_bowl.jpg'
-  }
-];
+const INITIAL_ORDERS = [];
 
 export function ShopProvider({ children }) {
   const [products, setProducts] = useState(() => {
@@ -142,9 +43,15 @@ export function ShopProvider({ children }) {
     }
   });
 
-  // Registry akun terdaftar (Hanya akun yang benar-benar mendaftar yang bisa login)
+  // Registry akun terdaftar (bersih tanpa dummy, pengguna baru mendaftar di tab Register)
   const [registeredUsers, setRegisteredUsers] = useState(() => {
     try {
+      const isClean = localStorage.getItem('claye_clean_reset_v3');
+      if (!isClean) {
+        localStorage.removeItem('claye_registered_users_v5');
+        localStorage.removeItem('claye_registered_users_v4');
+        return [];
+      }
       const saved = localStorage.getItem('claye_registered_users_v5');
       return saved ? JSON.parse(saved) : [];
     } catch {
@@ -163,6 +70,11 @@ export function ShopProvider({ children }) {
   // Status user aktif
   const [user, setUser] = useState(() => {
     try {
+      const isClean = localStorage.getItem('claye_clean_reset_v3');
+      if (!isClean) {
+        localStorage.removeItem('claye_user_active_v8');
+        return INITIAL_USER;
+      }
       const saved = localStorage.getItem('claye_user_active_v8');
       return saved ? JSON.parse(saved) : INITIAL_USER;
     } catch {
@@ -241,16 +153,33 @@ export function ShopProvider({ children }) {
 
   const [orders, setOrders] = useState(() => {
     try {
-      const saved = localStorage.getItem('claye_orders_id_v5');
+      const isClean = localStorage.getItem('claye_clean_reset_v3');
+      if (!isClean) {
+        localStorage.removeItem('claye_orders_id_v6');
+        localStorage.removeItem('claye_orders_id_v5');
+        localStorage.removeItem('claye_orders_id_v4');
+        localStorage.setItem('claye_clean_reset_v3', 'true');
+        return [];
+      }
+      const saved = localStorage.getItem('claye_orders_id_v6');
       if (saved) {
         const parsed = JSON.parse(saved);
-        const existingIds = new Set(parsed.map(o => o.id));
-        const missingOrders = INITIAL_ORDERS.filter(o => !existingIds.has(o.id));
-        return [...parsed, ...missingOrders];
+        // Pastikan tidak ada data dummy lawas yang tersisa
+        const cleanOrders = parsed.filter(o =>
+          !o.id?.includes('021') &&
+          !o.id?.includes('022') &&
+          !o.id?.includes('023') &&
+          !o.id?.includes('024') &&
+          o.patron !== 'Nadia Putri' &&
+          o.patron !== 'Rania Putri' &&
+          o.patron !== 'Alya Safitri' &&
+          o.patron !== 'Dinda Maharani'
+        );
+        return cleanOrders;
       }
-      return INITIAL_ORDERS;
+      return [];
     } catch {
-      return INITIAL_ORDERS;
+      return [];
     }
   });
 
@@ -258,6 +187,106 @@ export function ShopProvider({ children }) {
   const [chatInitialPrompt, setChatInitialPrompt] = useState('');
   const [isCartDrawerOpen, setIsCartDrawerOpen] = useState(false);
   const [toasts, setToasts] = useState([]);
+
+  // ── KUPON & ZONA PENGIRIMAN KOTA PALEMBANG (Antar Mandiri Tim CLAYÉ & COD) ──
+  const [appliedCoupon, setAppliedCoupon] = useState('');
+  const [discountPercent, setDiscountPercent] = useState(0);
+  const [shippingZone, setShippingZoneState] = useState('plb_pusat');
+  const [selectedKecamatan, setSelectedKecamatan] = useState('Ilir Barat I');
+
+  const COUPON_LIST = {
+    'CLAYE10': 10,
+    'WABI10': 10,
+    'CLAYE15': 15,
+    'GRATIS': 100,
+  };
+
+  // Pembagian zona khusus internal Kota Palembang (antar mandiri langsung oleh tim CLAYÉ)
+  const SHIPPING_ZONES = [
+    {
+      id: 'plb_pusat',
+      label: 'Palembang Pusat (Ilir Barat & IT I)',
+      desc: 'Demang Lebar Daun, Bukit Lama/Baru, Lorok Pakjo, Kampus, Duku, Sudirman & sekitarnya',
+      price: 8000,
+      estimate: 'Antar Langsung Tim CLAYÉ (1–2 Jam)',
+      kecamatan: ['Ilir Barat I', 'Ilir Barat II', 'Bukit Kecil', 'Ilir Timur I']
+    },
+    {
+      id: 'plb_utara_timur',
+      label: 'Palembang Utara & Timur (Kemuning, Sukarami, Sako, Kalidoni)',
+      desc: 'Sekip, Pipa Reja, Km 5–12, Talang Kelapa, Kenten, Kalidoni, Gandus',
+      price: 12000,
+      estimate: 'Antar Langsung Tim CLAYÉ (2–3 Jam)',
+      kecamatan: ['Kemuning', 'Sukarami', 'Alang-Alang Lebar', 'Ilir Timur II', 'Ilir Timur III', 'Sako', 'Kalidoni', 'Sematang Borang', 'Gandus']
+    },
+    {
+      id: 'plb_seberang_ulu',
+      label: 'Palembang Seberang Ulu & Jakabaring',
+      desc: 'Jakabaring, Plaju, Kertapati, Tangga Takat, Silaberanti, SU I & SU II',
+      price: 15000,
+      estimate: 'Antar Langsung Tim CLAYÉ (Hari yang Sama)',
+      kecamatan: ['Seberang Ulu I', 'Seberang Ulu II', 'Jakabaring', 'Plaju', 'Kertapati']
+    },
+  ];
+
+  const PALEMBANG_KECAMATAN = [
+    { name: 'Ilir Barat I', zoneId: 'plb_pusat' },
+    { name: 'Ilir Barat II', zoneId: 'plb_pusat' },
+    { name: 'Bukit Kecil', zoneId: 'plb_pusat' },
+    { name: 'Ilir Timur I', zoneId: 'plb_pusat' },
+    { name: 'Kemuning', zoneId: 'plb_utara_timur' },
+    { name: 'Sukarami', zoneId: 'plb_utara_timur' },
+    { name: 'Alang-Alang Lebar', zoneId: 'plb_utara_timur' },
+    { name: 'Ilir Timur II', zoneId: 'plb_utara_timur' },
+    { name: 'Ilir Timur III', zoneId: 'plb_utara_timur' },
+    { name: 'Sako', zoneId: 'plb_utara_timur' },
+    { name: 'Kalidoni', zoneId: 'plb_utara_timur' },
+    { name: 'Sematang Borang', zoneId: 'plb_utara_timur' },
+    { name: 'Gandus', zoneId: 'plb_utara_timur' },
+    { name: 'Seberang Ulu I', zoneId: 'plb_seberang_ulu' },
+    { name: 'Seberang Ulu II', zoneId: 'plb_seberang_ulu' },
+    { name: 'Jakabaring', zoneId: 'plb_seberang_ulu' },
+    { name: 'Plaju', zoneId: 'plb_seberang_ulu' },
+    { name: 'Kertapati', zoneId: 'plb_seberang_ulu' },
+  ];
+
+  // Sinkronisasi otomatis: pilih kecamatan -> otomatis setting zona & ongkir
+  const setKecamatan = (kecName) => {
+    setSelectedKecamatan(kecName);
+    const foundKec = PALEMBANG_KECAMATAN.find(k => k.name.toLowerCase() === (kecName || '').toLowerCase());
+    if (foundKec) {
+      setShippingZoneState(foundKec.zoneId);
+    }
+  };
+
+  // Sinkronisasi otomatis: pilih zona -> otomatis sesuaikan kecamatan pertama di zona tsb
+  const setShippingZone = (zoneId) => {
+    setShippingZoneState(zoneId);
+    const targetZone = SHIPPING_ZONES.find(z => z.id === zoneId);
+    if (targetZone && targetZone.kecamatan && !targetZone.kecamatan.includes(selectedKecamatan)) {
+      setSelectedKecamatan(targetZone.kecamatan[0]);
+    }
+  };
+
+  const applyCoupon = (code) => {
+    const clean = (code || '').trim().toUpperCase();
+    if (!clean) return { success: false, message: 'Kode kupon tidak boleh kosong.' };
+    const pct = COUPON_LIST[clean];
+    if (pct !== undefined) {
+      setAppliedCoupon(clean);
+      setDiscountPercent(pct);
+      showToast(`Kupon ${clean} berhasil digunakan. Diskon ${pct}% diterapkan.`, 'success');
+      return { success: true, percent: pct };
+    }
+    showToast('Kupon tidak valid. Coba gunakan: CLAYE10', 'error');
+    return { success: false, message: 'Kupon tidak ditemukan.' };
+  };
+
+  const removeCoupon = () => {
+    setAppliedCoupon('');
+    setDiscountPercent(0);
+    showToast('Kupon berhasil dihapus.', 'info');
+  };
 
   // Jika belum login, rute awal wajib /login
   const [currentRoute, setCurrentRoute] = useState(() => {
@@ -321,7 +350,13 @@ export function ShopProvider({ children }) {
   }, [user]);
 
   useEffect(() => {
-    localStorage.setItem('claye_orders_id_v4', JSON.stringify(orders));
+    try {
+      localStorage.setItem('claye_orders_id_v6', JSON.stringify(orders));
+      localStorage.setItem('claye_orders_id_v5', JSON.stringify(orders));
+      localStorage.setItem('claye_orders_id_v4', JSON.stringify(orders));
+    } catch (e) {
+      console.warn('Gagal menyimpan pesanan:', e);
+    }
   }, [orders]);
 
   useEffect(() => {
@@ -413,11 +448,11 @@ export function ShopProvider({ children }) {
     const finalPrice = product.price + addCost;
 
     setCart(prev => {
-      const existingIndex = prev.findIndex(item => 
+      const existingIndex = prev.findIndex(item =>
         item.id === productId && item.selectedGlaze === glaze && item.stamp === stamp
       );
       if (existingIndex > -1) {
-        return prev.map((item, idx) => 
+        return prev.map((item, idx) =>
           idx === existingIndex ? { ...item, quantity: item.quantity + quantity, selected: true } : item
         );
       }
@@ -505,7 +540,7 @@ export function ShopProvider({ children }) {
 
     // 1. Verifikasi Akun Admin Resmi
     if (cleanEmail === 'admin@claye.id' || cleanEmail === 'admin') {
-      if (cleanPass === 'admin123' || cleanPass === 'claye2026' || cleanPass === 'admin') {
+      if (cleanPass === 'admin123' || cleanPass === 'claye2026' || cleanPass === 'admin' || cleanPass === 'atelier2026') {
         const adminUser = { ...ADMIN_CREDENTIALS };
         setUser(adminUser);
         localStorage.setItem('claye_user_active_v8', JSON.stringify(adminUser));
@@ -632,6 +667,174 @@ export function ShopProvider({ children }) {
     showToast('Data akun berhasil diperbarui.', 'success');
   };
 
+  // ── MANAJEMEN BUKU ALAMAT PENGGUNA (TERHUBUNG KE CHECKOUT COD) ──
+  const [addresses, setAddresses] = useState(() => {
+    try {
+      const savedUser = localStorage.getItem('claye_user_active_v8');
+      if (savedUser) {
+        const u = JSON.parse(savedUser);
+        if (u && u.email) {
+          const savedAddr = localStorage.getItem(`claye_addresses_${u.email.toLowerCase()}`);
+          if (savedAddr) return JSON.parse(savedAddr);
+          return [
+            {
+              id: 'addr_1',
+              label: 'Rumah Pribadi',
+              recipientName: u.fullName || u.name || 'Pelanggan',
+              phone: u.phone || '',
+              address: u.address || '',
+              kecamatan: u.kecamatan || 'Ilir Barat I',
+              city: 'Kota Palembang',
+              province: 'Sumatera Selatan',
+              postalCode: u.postalCode || '30138',
+              patokan: u.patokan || '',
+              isPrimary: true
+            }
+          ];
+        }
+      }
+      return [];
+    } catch {
+      return [];
+    }
+  });
+
+  // Sinkronkan alamat saat user berganti akun
+  useEffect(() => {
+    if (user && user.email) {
+      try {
+        const savedAddr = localStorage.getItem(`claye_addresses_${user.email.toLowerCase()}`);
+        if (savedAddr) {
+          setAddresses(JSON.parse(savedAddr));
+        } else {
+          const defaultList = [
+            {
+              id: 'addr_1',
+              label: 'Rumah Pribadi',
+              recipientName: user.fullName || user.name || 'Pelanggan',
+              phone: user.phone || '',
+              address: user.address || '',
+              kecamatan: user.kecamatan || 'Ilir Barat I',
+              city: 'Kota Palembang',
+              province: 'Sumatera Selatan',
+              postalCode: user.postalCode || '30138',
+              patokan: user.patokan || '',
+              isPrimary: true
+            }
+          ];
+          setAddresses(defaultList);
+          localStorage.setItem(`claye_addresses_${user.email.toLowerCase()}`, JSON.stringify(defaultList));
+        }
+      } catch (e) {
+        console.warn('Gagal memuat buku alamat:', e);
+      }
+    } else {
+      setAddresses([]);
+    }
+  }, [user?.email]);
+
+  const saveAddressesToStorage = (newAddresses) => {
+    setAddresses(newAddresses);
+    if (user && user.email) {
+      try {
+        localStorage.setItem(`claye_addresses_${user.email.toLowerCase()}`, JSON.stringify(newAddresses));
+      } catch (e) {
+        console.warn('Gagal menyimpan buku alamat:', e);
+      }
+    }
+  };
+
+  const saveAddress = (addressData) => {
+    let updated;
+    const isNew = !addressData.id;
+    const addressId = addressData.id || `addr_${Date.now()}`;
+    const newEntry = {
+      ...addressData,
+      id: addressId,
+      city: 'Kota Palembang',
+      province: 'Sumatera Selatan',
+      postalCode: addressData.postalCode || '30138'
+    };
+
+    if (isNew) {
+      const willBePrimary = addressData.isPrimary || addresses.length === 0;
+      newEntry.isPrimary = willBePrimary;
+      if (willBePrimary) {
+        updated = addresses.map(a => ({ ...a, isPrimary: false })).concat([newEntry]);
+      } else {
+        updated = [...addresses, newEntry];
+      }
+      showToast(`Alamat "${newEntry.label}" berhasil ditambahkan.`, 'success');
+    } else {
+      if (addressData.isPrimary) {
+        updated = addresses.map(a => a.id === addressId ? { ...newEntry, isPrimary: true } : { ...a, isPrimary: false });
+      } else {
+        const hadPrimary = addresses.some(a => a.id !== addressId && a.isPrimary);
+        if (!hadPrimary) newEntry.isPrimary = true;
+        updated = addresses.map(a => a.id === addressId ? newEntry : a);
+      }
+      showToast(`Alamat "${newEntry.label}" berhasil diperbarui.`, 'success');
+    }
+
+    saveAddressesToStorage(updated);
+
+    if (newEntry.isPrimary) {
+      if (newEntry.kecamatan) {
+        setKecamatan(newEntry.kecamatan);
+      }
+      updateProfile({
+        address: newEntry.address,
+        kecamatan: newEntry.kecamatan,
+        phone: newEntry.phone || user?.phone,
+        patokan: newEntry.patokan
+      });
+    }
+
+    return newEntry;
+  };
+
+  const setPrimaryAddress = (addressId) => {
+    const target = addresses.find(a => a.id === addressId);
+    if (!target) return;
+
+    const updated = addresses.map(a => ({
+      ...a,
+      isPrimary: a.id === addressId
+    }));
+    saveAddressesToStorage(updated);
+
+    if (target.kecamatan) {
+      setKecamatan(target.kecamatan);
+    }
+    updateProfile({
+      address: target.address,
+      kecamatan: target.kecamatan,
+      phone: target.phone || user?.phone,
+      patokan: target.patokan
+    });
+
+    showToast(`"${target.label}" ditetapkan sebagai alamat utama pengiriman COD.`, 'success');
+  };
+
+  const deleteAddress = (addressId) => {
+    const target = addresses.find(a => a.id === addressId);
+    if (!target) return;
+
+    if (target.isPrimary && addresses.length > 1) {
+      showToast('Alamat utama tidak dapat dihapus. Silakan pilih alamat lain sebagai utama terlebih dahulu.', 'error');
+      return;
+    }
+
+    const updated = addresses.filter(a => a.id !== addressId);
+    if (updated.length > 0 && !updated.some(a => a.isPrimary)) {
+      updated[0].isPrimary = true;
+    }
+    saveAddressesToStorage(updated);
+    showToast(`Alamat "${target.label}" berhasil dihapus.`, 'info');
+  };
+
+  const primaryAddress = addresses.find(a => a.isPrimary) || addresses[0] || null;
+
   const createOrder = (orderData) => {
     const randNum = Math.floor(100 + Math.random() * 900);
     const orderId = `#CLY-2026-${randNum}`;
@@ -644,6 +847,14 @@ export function ShopProvider({ children }) {
     const targetItems = cart.filter(i => i.selected !== false);
     const itemsToOrder = targetItems.length > 0 ? targetItems : cart;
     const itemsTotal = itemsToOrder.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+    const discountAmount = orderData.discountAmount !== undefined
+      ? orderData.discountAmount
+      : (discountPercent > 0 ? Math.round((itemsTotal * discountPercent) / 100) : 0);
+    const shippingFee = orderData.shippingFee !== undefined ? orderData.shippingFee : 10000;
+    const computedGrandTotal = orderData.grandTotal !== undefined
+      ? orderData.grandTotal
+      : Math.max(0, itemsTotal - discountAmount + shippingFee);
 
     const newOrder = {
       id: orderId,
@@ -664,18 +875,30 @@ export function ShopProvider({ children }) {
         price: i.price
       })),
       total: itemsTotal,
-      shippingFee: orderData.shippingFee || 15000,
-      grandTotal: itemsTotal + (orderData.shippingFee || 15000),
-      fulfillment: orderData.fulfillment || (orderData.paymentStatus === 'Menunggu Pembayaran' ? 'Menunggu' : 'Diproses'),
+      discount: discountAmount,
+      couponCode: orderData.couponCode || appliedCoupon || null,
+      shippingFee: shippingFee,
+      grandTotal: computedGrandTotal,
+      fulfillment: orderData.fulfillment || 'Diproses',
       paymentStatus: orderData.paymentStatus || 'Lunas',
-      paymentMethod: orderData.paymentMethod || 'Transfer Bank (BCA)',
-      courier: orderData.courier || 'Pengiriman Reguler (Eco Shield)',
-      trackingNumber: `CLY-EXP-${randNum}-PLM`,
+      paymentMethod: orderData.paymentMethod || 'COD (Bayar di Tempat)',
+      courier: orderData.courier || 'Kurir CLAYÉ – Dalam Kota Palembang',
+      trackingNumber: `CLY-COD-${randNum}-PLM`,
       image: itemsToOrder[0]?.image || '/assets/images/product_mug.jpg',
       shippingAddress: userAddress
     };
 
-    setOrders(prev => [newOrder, ...prev]);
+    setOrders(prev => {
+      const updated = [newOrder, ...prev];
+      try {
+        localStorage.setItem('claye_orders_id_v6', JSON.stringify(updated));
+        localStorage.setItem('claye_orders_id_v5', JSON.stringify(updated));
+        localStorage.setItem('claye_orders_id_v4', JSON.stringify(updated));
+      } catch (e) {
+        console.warn('Gagal menyimpan pesanan baru:', e);
+      }
+      return updated;
+    });
 
     // Hapus hanya barang yang fix dibeli; barang yang tidak dicentang tetap tersimpan di keranjang
     setCart(prev => prev.filter(i => i.selected === false));
@@ -873,7 +1096,25 @@ export function ShopProvider({ children }) {
       setAdminActivePage,
       adminInventoryView,
       setAdminInventoryView,
-      openAdminStorefront
+      openAdminStorefront,
+      appliedCoupon,
+      discountPercent,
+      shippingZone,
+      setShippingZone,
+      selectedKecamatan,
+      setSelectedKecamatan,
+      setKecamatan,
+      SHIPPING_ZONES,
+      PALEMBANG_KECAMATAN,
+      applyCoupon,
+      removeCoupon,
+      registeredUsers,
+      isSupabaseConfigured,
+      addresses,
+      saveAddress,
+      setPrimaryAddress,
+      deleteAddress,
+      primaryAddress
     }}>
       {children}
     </ShopContext.Provider>

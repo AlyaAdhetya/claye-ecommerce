@@ -1,46 +1,208 @@
 import React, { useState } from 'react';
 import { useShop } from '../context/ShopContext';
-import MidtransSnapModal from '../components/MidtransSnapModal';
 
 export default function CheckoutPage() {
-  const { cart, user, createOrder, updateOrderPayment, navigate, openConcierge, showToast } = useShop();
+  const {
+    cart,
+    user,
+    createOrder,
+    navigate,
+    openConcierge,
+    showToast,
+    // ── Global State Kupon & Pengiriman dari ShopContext ──
+    appliedCoupon,
+    discountPercent,
+    shippingZone,
+    setShippingZone,
+    selectedKecamatan,
+    setKecamatan,
+    SHIPPING_ZONES,
+    PALEMBANG_KECAMATAN,
+    applyCoupon,
+    removeCoupon,
+    addresses,
+    primaryAddress
+  } = useShop();
+
+  // Ambil alamat aktif: utamakan primaryAddress dari Buku Alamat
+  const activeAddr = primaryAddress || (addresses && addresses.find(a => a.isPrimary)) || (addresses && addresses[0]) || null;
 
   const [formData, setFormData] = useState({
-    fullName: user ? (user.fullName || user.name) : 'Raden Ayu Paramitha',
-    email: user ? user.email : 'paramitha@example.com',
-    phone: user ? user.phone : '+62 812 3456 7890',
-    address: user ? user.address : 'Jl. Sejuta Kenangan No. 12',
-    city: user ? user.city : 'Palembang',
-    postalCode: user ? user.postalCode : '30138',
-    instructions: 'Titipkan di pos keamanan atau hubungi interkom rumah.'
+    fullName: activeAddr ? (activeAddr.recipientName || user?.fullName || user?.name || '') : (user ? (user.fullName || user.name) : ''),
+    email: user ? (user.email || '') : '',
+    phone: activeAddr ? (activeAddr.phone || user?.phone || '') : (user ? (user.phone || '') : ''),
+    address: activeAddr ? (activeAddr.address || user?.address || '') : (user ? (user.address || '') : ''),
+    city: 'Kota Palembang',
+    postalCode: activeAddr ? (activeAddr.postalCode || '30138') : (user ? (user.postalCode || '30138') : '30138'),
+    kecamatan: activeAddr ? (activeAddr.kecamatan || selectedKecamatan || 'Ilir Barat I') : (selectedKecamatan || 'Ilir Barat I'),
+    patokan: activeAddr ? (activeAddr.patokan || '') : '',
+    instructions: ''
   });
 
-  const [shippingMethod, setShippingMethod] = useState('regular');
-  const [paymentMethod, setPaymentMethod] = useState('midtrans');
-  const [copiedBank, setCopiedBank] = useState(false);
+  // Sinkronkan ongkos kirim dan zona ke alamat utama saat pertama masuk ke checkout
+  useEffect(() => {
+    if (activeAddr && activeAddr.kecamatan) {
+      setKecamatan(activeAddr.kecamatan);
+    }
+  }, [activeAddr?.id]);
+
+  const [checkoutCouponInput, setCheckoutCouponInput] = useState('');
   const [orderCompleteData, setOrderCompleteData] = useState(null);
-  const [isMidtransOpen, setIsMidtransOpen] = useState(false);
-  const [pendingOrder, setPendingOrder] = useState(null);
+
+  const selectedZone = SHIPPING_ZONES?.find(z => z.id === shippingZone) || SHIPPING_ZONES?.[0] || {
+    id: 'plb_pusat',
+    label: 'Palembang Pusat (Ilir Barat & IT I)',
+    price: 8000,
+    estimate: 'Antar Langsung Tim CLAYÉ (1–2 Jam)'
+  };
+  const shippingCost = selectedZone.price;
 
   const checkoutItems = cart.filter(item => item.selected !== false);
   const itemsToProcess = checkoutItems.length > 0 ? checkoutItems : (cart.length > 0 ? cart : []);
-  const shippingCost = shippingMethod === 'express' ? 25000 : 15000;
   const subtotal = itemsToProcess.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const totalWithShipping = subtotal + shippingCost;
+  const discountAmount = Math.round((subtotal * discountPercent) / 100);
+  const totalWithShipping = Math.max(0, subtotal - discountAmount + shippingCost);
   const totalPieces = itemsToProcess.reduce((sum, item) => sum + item.quantity, 0);
 
-  const handleCopyAccount = () => {
-    navigator.clipboard?.writeText('8092 1190 44');
-    setCopiedBank(true);
-    showToast('Nomor rekening BCA CLAYÉ berhasil disalin.', 'success');
-    setTimeout(() => setCopiedBank(false), 2500);
+  // Auto-detect kecamatan dari teks alamat secara cerdas jika pengguna mengetik nama area/kelurahan/jalan
+  const detectKecamatanFromAddress = (text) => {
+    if (!text || text.length < 3) return null;
+    const lower = text.toLowerCase();
+
+    // 1. Cek nama kecamatan resmi
+    for (const kec of (PALEMBANG_KECAMATAN || [])) {
+      if (lower.includes(kec.name.toLowerCase())) {
+        return kec.name;
+      }
+    }
+
+    // 2. Cek kata kunci area / landmark / jalan populer di Kota Palembang
+    const KEYWORDS_MAP = [
+      { kw: 'demang lebar daun', kec: 'Ilir Barat I' },
+      { kw: 'demang', kec: 'Ilir Barat I' },
+      { kw: 'lorok pakjo', kec: 'Ilir Barat I' },
+      { kw: 'bukit lama', kec: 'Ilir Barat I' },
+      { kw: 'bukit baru', kec: 'Ilir Barat I' },
+      { kw: 'bukit besar', kec: 'Ilir Barat I' },
+      { kw: 'kampus', kec: 'Ilir Barat I' },
+      { kw: 'bukit kecil', kec: 'Bukit Kecil' },
+      { kw: 'tangga buntung', kec: 'Ilir Barat II' },
+      { kw: '35 ilir', kec: 'Ilir Barat II' },
+      { kw: 'sudirman', kec: 'Ilir Timur I' },
+      { kw: 'cinde', kec: 'Ilir Timur I' },
+      { kw: 'duku', kec: 'Ilir Timur I' },
+      { kw: 'rajawali', kec: 'Ilir Timur I' },
+      { kw: 'sekip', kec: 'Kemuning' },
+      { kw: 'pipa reja', kec: 'Kemuning' },
+      { kw: 'basuki rahmat', kec: 'Kemuning' },
+      { kw: 'sukarami', kec: 'Sukarami' },
+      { kw: 'talang buruk', kec: 'Sukarami' },
+      { kw: 'km 5', kec: 'Sukarami' },
+      { kw: 'km 6', kec: 'Sukarami' },
+      { kw: 'km 7', kec: 'Sukarami' },
+      { kw: 'km 8', kec: 'Sukarami' },
+      { kw: 'km 9', kec: 'Sukarami' },
+      { kw: 'km 10', kec: 'Sukarami' },
+      { kw: 'km 11', kec: 'Alang-Alang Lebar' },
+      { kw: 'km 12', kec: 'Alang-Alang Lebar' },
+      { kw: 'alang alang lebar', kec: 'Alang-Alang Lebar' },
+      { kw: 'talang kelapa', kec: 'Alang-Alang Lebar' },
+      { kw: 'kenten', kec: 'Sako' },
+      { kw: 'perumnas sako', kec: 'Sako' },
+      { kw: 'sako', kec: 'Sako' },
+      { kw: 'kalidoni', kec: 'Kalidoni' },
+      { kw: 'pusri', kec: 'Kalidoni' },
+      { kw: 'lemabang', kec: 'Ilir Timur II' },
+      { kw: 'sematang borang', kec: 'Sematang Borang' },
+      { kw: 'gandus', kec: 'Gandus' },
+      { kw: 'jakabaring', kec: 'Jakabaring' },
+      { kw: 'silaberanti', kec: 'Jakabaring' },
+      { kw: 'plaju', kec: 'Plaju' },
+      { kw: 'kertapati', kec: 'Kertapati' },
+      { kw: 'seberang ulu', kec: 'Seberang Ulu I' },
+      { kw: '7 ulu', kec: 'Seberang Ulu I' },
+      { kw: '14 ulu', kec: 'Seberang Ulu II' },
+    ];
+
+    for (const item of KEYWORDS_MAP) {
+      if (lower.includes(item.kw)) {
+        return item.kec;
+      }
+    }
+    return null;
+  };
+
+  // Handler saat customer mengetik alamat lengkap (auto-detect kecamatan & zona)
+  const handleAddressTextChange = (text) => {
+    setFormData(prev => ({ ...prev, address: text }));
+    const detectedKec = detectKecamatanFromAddress(text);
+    if (detectedKec && detectedKec !== formData.kecamatan) {
+      handleKecamatanChange(detectedKec, true);
+    }
+  };
+
+  // Ketika customer memilih kecamatan di Palembang, otomatis tentukan zona & sesuaikan ongkir
+  const handleKecamatanChange = (kecName, fromAddressDetect = false) => {
+    const foundKec = PALEMBANG_KECAMATAN?.find(k => k.name === kecName);
+    setFormData(prev => ({ ...prev, kecamatan: kecName }));
+    if (foundKec) {
+      setKecamatan(kecName);
+      const matchedZone = SHIPPING_ZONES?.find(z => z.id === foundKec.zoneId);
+      if (matchedZone) {
+        showToast(
+          fromAddressDetect
+            ? `Alamat terdeteksi di Kec. ${kecName}: Zona & ongkir otomatis diatur ke ${matchedZone.label} (Rp ${matchedZone.price.toLocaleString('id-ID')})`
+            : `Kecamatan ${kecName}: Zona otomatis terkoneksi ke ${matchedZone.label} (Ongkir Rp ${matchedZone.price.toLocaleString('id-ID')})`,
+          'info'
+        );
+      }
+    }
+  };
+
+  // Ketika customer memilih salah satu kartu zona di Step 2, sinkronkan otomatis kecamatannya
+  const handleZoneCardSelect = (zoneId) => {
+    setShippingZone(zoneId);
+    const targetZone = SHIPPING_ZONES?.find(z => z.id === zoneId);
+    if (targetZone) {
+      // Jika kecamatan saat ini tidak termasuk dalam zona yang dipilih, sesuaikan kecamatan ke opsi pertama
+      if (!targetZone.kecamatan.includes(formData.kecamatan)) {
+        const newKec = targetZone.kecamatan[0];
+        setFormData(prev => ({ ...prev, kecamatan: newKec }));
+        showToast(`Zona pengantaran dialihkan ke ${targetZone.label}. Kecamatan Anda disesuaikan otomatis ke Kec. ${newKec}.`, 'info');
+      } else {
+        showToast(`Zona pengantaran: ${targetZone.label} (Ongkir Rp ${targetZone.price.toLocaleString('id-ID')})`, 'info');
+      }
+    }
+  };
+
+  // Terapkan alamat dari Buku Alamat ke formulir checkout
+  const handleSelectSavedAddress = (addr) => {
+    setFormData(prev => ({
+      ...prev,
+      fullName: addr.recipientName || prev.fullName,
+      phone: addr.phone || prev.phone,
+      address: addr.address || prev.address,
+      kecamatan: addr.kecamatan || prev.kecamatan,
+      postalCode: addr.postalCode || prev.postalCode,
+      patokan: addr.patokan || prev.patokan
+    }));
+    if (addr.kecamatan) {
+      handleKecamatanChange(addr.kecamatan);
+    }
+    showToast(`Alamat "${addr.label}" diterapkan ke formulir pengiriman.`, 'info');
+  };
+
+  const handleApplyCheckoutCoupon = (e) => {
+    e.preventDefault();
+    applyCoupon(checkoutCouponInput);
+    setCheckoutCouponInput('');
   };
 
   const handlePlaceOrder = (e) => {
     e.preventDefault();
 
-    if (!formData.fullName || !formData.email || !formData.phone || !formData.address) {
-      showToast('Harap lengkapi semua kolom rincian pengiriman bertanda bintang (*)', 'error');
+    if (!formData.fullName.trim() || !formData.phone.trim() || !formData.address.trim()) {
+      showToast('Harap lengkapi nama penerima, nomor HP/WhatsApp, dan alamat lengkap tujuan (*)', 'error');
       return;
     }
 
@@ -50,213 +212,157 @@ export default function CheckoutPage() {
       return;
     }
 
-    const courierLabel = shippingMethod === 'express'
-      ? 'Pengiriman Kilat (Prioritas)'
-      : 'Pengiriman Reguler (Eco Shield)';
-
-    const isMidtrans = paymentMethod === 'midtrans' || paymentMethod === 'qris' || paymentMethod === 'va';
-    const initialPaymentStatus = isMidtrans ? 'Menunggu Pembayaran' : 'Menunggu Pembayaran';
-    const paymentLabel = isMidtrans
-      ? 'Midtrans Snap Gateway (QRIS/VA)'
-      : 'Transfer Bank (BCA Manual)';
+    const fullShippingAddress = `${formData.address.trim()}${formData.patokan ? ' (Patokan: ' + formData.patokan.trim() + ')' : ''}, Kec. ${formData.kecamatan || 'Ilir Barat I'}, Kota Palembang ${formData.postalCode}`;
 
     const newOrder = createOrder({
       shippingFee: shippingCost,
-      paymentMethod: paymentLabel,
-      paymentStatus: initialPaymentStatus,
-      courier: courierLabel,
-      shippingAddress: `${formData.address}, ${formData.city} ${formData.postalCode}`,
-      patron: formData.fullName || (user ? (user.fullName || user.name) : 'Arumi'),
-      email: formData.email || (user ? user.email : 'arumi@example.com'),
-      phone: formData.phone || (user ? user.phone : '+62 812-3456-7890'),
-      city: formData.city || (user ? user.city : 'Palembang'),
-      address: formData.address || (user ? user.address : 'Jl. Sejuta Kenangan No. 12'),
-      postalCode: formData.postalCode || '30138'
+      discountAmount: discountAmount,
+      couponCode: appliedCoupon || null,
+      grandTotal: totalWithShipping,
+      paymentMethod: 'COD (Bayar Tunai di Tempat ke Tim CLAYÉ)',
+      paymentStatus: 'Lunas',
+      fulfillment: 'Diproses Tim CLAYÉ',
+      courier: `Antar Langsung Tim CLAYÉ Studio – ${selectedZone.label} (${selectedZone.estimate})`,
+      shippingAddress: fullShippingAddress,
+      patron: formData.fullName,
+      email: formData.email || (user ? user.email : ''),
+      phone: formData.phone,
+      city: 'Kota Palembang',
+      address: fullShippingAddress,
+      postalCode: formData.postalCode
     });
 
-    if (isMidtrans) {
-      setPendingOrder(newOrder);
-      setIsMidtransOpen(true);
-      showToast('Membuka gerbang pembayaran Midtrans Snap (Sandbox)...', 'info');
-    } else {
-      setOrderCompleteData(newOrder);
-      showToast('Pesanan berhasil dibuat. Silakan selesaikan pembayaran.', 'success');
-    }
+    setOrderCompleteData(newOrder);
+    showToast('Pesanan COD berhasil dibuat! Tim CLAYÉ akan mengantar langsung ke alamat Anda.', 'success');
   };
 
-  const handleMidtransSuccess = (paymentDetails) => {
-    if (pendingOrder) {
-      updateOrderPayment(pendingOrder.id, 'Lunas', paymentDetails.paymentMethod);
-      setOrderCompleteData({
-        ...pendingOrder,
-        paymentStatus: 'Lunas',
-        paymentMethod: paymentDetails.paymentMethod,
-        fulfillment: 'Diproses'
-      });
-      setIsMidtransOpen(false);
-      showToast('Pembayaran Midtrans berhasil diverifikasi!', 'success');
-    }
-  };
-
-  const handleMidtransClose = () => {
-    setIsMidtransOpen(false);
-    if (pendingOrder) {
-      setOrderCompleteData(pendingOrder);
-      showToast('Pesanan disimpan dengan status Menunggu Pembayaran.', 'info');
-    }
-  };
-
+  // ── HALAMAN SUKSES PEMESANAN COD ─────────────────────────────────────────────
   if (orderCompleteData) {
-    const isPaid = orderCompleteData.paymentStatus === 'Lunas';
-
     return (
       <div className="claye-checkout-page" style={{ padding: '4rem 0 6rem' }}>
         <div className="container" style={{ maxWidth: '640px' }}>
           <div className="checkout-success-card" style={{
             backgroundColor: '#FFFFFF',
-            borderRadius: '8px',
+            borderRadius: '10px',
             border: '1px solid #EAE6DF',
             padding: '2.5rem 2rem',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
+            boxShadow: '0 4px 24px rgba(0,0,0,0.06)'
           }}>
-            <div className="success-icon-badge" style={{
-              backgroundColor: isPaid ? '#10B981' : '#F59E0B',
+            {/* Icon sukses */}
+            <div style={{
+              backgroundColor: '#10B981',
               color: '#FFFFFF',
-              width: '56px',
-              height: '56px',
+              width: '58px', height: '58px',
               borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
               margin: '0 auto 1.25rem'
             }}>
-              {isPaid ? (
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              ) : (
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-              )}
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
             </div>
 
-            <span className="order-received-tag" style={{
+            <span style={{
               display: 'inline-block',
-              backgroundColor: isPaid ? '#ECFDF5' : '#FEF3C7',
-              color: isPaid ? '#047857' : '#92400E',
-              fontSize: '0.72rem',
-              fontWeight: 800,
-              padding: '4px 10px',
-              borderRadius: '4px',
-              letterSpacing: '0.08em',
-              marginBottom: '0.75rem'
+              backgroundColor: '#ECFDF5',
+              color: '#047857',
+              fontSize: '0.74rem', fontWeight: 800,
+              padding: '4px 12px', borderRadius: '4px',
+              letterSpacing: '0.08em', marginBottom: '0.75rem',
+              textAlign: 'center'
             }}>
-              {isPaid ? 'PEMBAYARAN DIVERIFIKASI (LUNAS)' : 'PESANAN DIDAFTARKAN (MENUNGGU PEMBAYARAN)'}
+              PESANAN COD KOTA PALEMBANG DITERIMA ✓
             </span>
 
-            <h1 className="success-title" style={{ fontSize: '1.65rem', marginBottom: '0.75rem', color: '#262422' }}>
-              {isPaid ? 'Terima Kasih, Pesanan Telah Dibayar!' : 'Pesanan Anda Siap Dibayar'}
+            <h1 style={{ fontSize: '1.65rem', marginBottom: '0.75rem', color: '#262422', textAlign: 'center' }}>
+              Pesanan Anda Siap Diantar Sendiri oleh Tim CLAYÉ
             </h1>
-            <p className="success-body" style={{ color: '#6E6962', lineHeight: '1.6', marginBottom: '1.5rem' }}>
-              Nomor referensi pesanan Anda adalah <strong>{orderCompleteData.id}</strong>.
-              {isPaid
-                ? ' Tim kurasi CLAYÉ segera mengemas karya keramik Anda dengan proteksi double-box ramah lingkungan.'
-                : ' Silakan selesaikan pembayaran agar pesanan segera masuk ke antrean pengemasan gudang.'}
+            <p style={{ color: '#6E6962', lineHeight: '1.6', marginBottom: '1.5rem', textAlign: 'center', fontSize: '0.9rem' }}>
+              Nomor referensi pesanan: <strong>{orderCompleteData.id}</strong>.<br />
+              Pengrajin/tim CLAYÉ Studio akan segera menghubungi WhatsApp <strong>{orderCompleteData.phone}</strong> untuk konfirmasi titik temu & waktu pengantaran langsung ke alamat Anda.
             </p>
 
-            <div className="success-summary-box" style={{
-              backgroundColor: '#FAF8F5',
-              borderRadius: '6px',
-              border: '1px solid #EAE6DF',
-              padding: '1.25rem',
-              marginBottom: '1.75rem'
+            {/* Kotak Instruksi COD Mandiri */}
+            <div style={{
+              backgroundColor: '#FFF9F3',
+              border: '1.5px solid #F3D5C0',
+              borderRadius: '8px',
+              padding: '1.1rem 1.25rem',
+              marginBottom: '1.5rem',
+              textAlign: 'left'
             }}>
-              <div className="summary-line" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <span style={{ color: '#8A857F', fontSize: '0.85rem' }}>Total Pembayaran:</span>
-                <strong style={{ fontSize: '1.05rem', color: '#262422' }}>Rp {orderCompleteData.grandTotal?.toLocaleString('id-ID')}</strong>
-              </div>
-              <div className="summary-line" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <span style={{ color: '#8A857F', fontSize: '0.85rem' }}>Status Pembayaran:</span>
-                <strong style={{ color: isPaid ? '#10B981' : '#D97706', fontSize: '0.88rem' }}>
-                  {orderCompleteData.paymentStatus}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                <span style={{ fontSize: '1.1rem' }}>🤝</span>
+                <strong style={{ fontSize: '0.86rem', color: '#7C4A2D' }}>
+                  SERAH TERIMA KERAMIK & PEMBAYARAN COD MANDIRI
                 </strong>
               </div>
-              <div className="summary-line" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <span style={{ color: '#8A857F', fontSize: '0.85rem' }}>Metode Pembayaran:</span>
-                <strong style={{ fontSize: '0.88rem', color: '#262422' }}>{orderCompleteData.paymentMethod}</strong>
+              <p style={{ fontSize: '0.84rem', color: '#6A3E24', margin: 0, lineHeight: '1.6' }}>
+                Siapkan uang tunai sebesar <strong>Rp {orderCompleteData.grandTotal?.toLocaleString('id-ID')}</strong>. Uang dibayarkan langsung secara tunai kepada tim CLAYÉ yang datang mengantar keramik Anda. Tanpa pihak ketiga, aman dan dipantau mandiri.
+              </p>
+            </div>
+
+            <div style={{
+              backgroundColor: '#FAF8F5', borderRadius: '8px',
+              border: '1px solid #EAE6DF', padding: '1.25rem',
+              marginBottom: '1.75rem'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <span style={{ color: '#8A857F', fontSize: '0.84rem' }}>Subtotal Keramik:</span>
+                <strong style={{ fontSize: '0.86rem', color: '#262422' }}>Rp {orderCompleteData.total?.toLocaleString('id-ID')}</strong>
               </div>
-              <div className="summary-line" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ color: '#8A857F', fontSize: '0.85rem' }}>Metode Pengiriman:</span>
-                <strong style={{ fontSize: '0.88rem', color: '#262422' }}>{orderCompleteData.courier}</strong>
+
+              {orderCompleteData.discount > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#2B613B' }}>
+                  <span style={{ fontSize: '0.84rem' }}>Potongan Kupon ({orderCompleteData.couponCode}):</span>
+                  <strong style={{ fontSize: '0.86rem' }}>−Rp {orderCompleteData.discount?.toLocaleString('id-ID')}</strong>
+                </div>
+              )}
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <span style={{ color: '#8A857F', fontSize: '0.84rem' }}>Ongkos Antar ({orderCompleteData.courier}):</span>
+                <strong style={{ fontSize: '0.86rem', color: '#262422' }}>Rp {orderCompleteData.shippingFee?.toLocaleString('id-ID')}</strong>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <span style={{ color: '#8A857F', fontSize: '0.84rem' }}>Metode Pembayaran:</span>
+                <strong style={{ fontSize: '0.86rem', color: '#B87355' }}>COD (Bayar Tunai di Tempat)</strong>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', paddingTop: '10px', borderTop: '1px dashed #DED8CF' }}>
+                <span style={{ color: '#262422', fontSize: '0.94rem', fontWeight: 700 }}>Total Uang Tunai yang Disiapkan:</span>
+                <strong style={{ fontSize: '1.15rem', color: '#B87355', fontWeight: 800 }}>
+                  Rp {orderCompleteData.grandTotal?.toLocaleString('id-ID')}
+                </strong>
+              </div>
+
+              <div style={{ fontSize: '0.82rem', color: '#6E6962', paddingTop: '8px', borderTop: '1px solid #EAE6DF' }}>
+                <span style={{ color: '#8A857F' }}>Alamat Pengantaran:</span><br />
+                <strong style={{ color: '#262422' }}>{orderCompleteData.address}</strong>
               </div>
             </div>
 
-            {!isPaid && (
-              <div style={{ marginBottom: '1.5rem' }}>
-                <button
-                  type="button"
-                  onClick={() => setIsMidtransOpen(true)}
-                  style={{
-                    width: '100%',
-                    padding: '14px',
-                    backgroundColor: '#00ADEF',
-                    color: '#FFFFFF',
-                    border: 'none',
-                    borderRadius: '6px',
-                    fontSize: '0.95rem',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    boxShadow: '0 4px 12px rgba(0, 173, 239, 0.3)'
-                  }}
-                >
-                  ⚡ Bayar Sekarang via Midtrans Snap (Sandbox)
-                </button>
-              </div>
-            )}
-
-            <div className="success-actions-row" style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
               <button
                 onClick={() => navigate('/dashboard')}
-                className="btn-success-primary"
-                style={{
-                  padding: '12px 20px',
-                  backgroundColor: '#B87355',
-                  color: '#FFFFFF',
-                  borderRadius: '6px',
-                  border: 'none',
-                  fontWeight: 600,
-                  cursor: 'pointer'
-                }}
+                style={{ padding: '12px 22px', backgroundColor: '#B87355', color: '#FFFFFF', borderRadius: '6px', border: 'none', fontWeight: 600, cursor: 'pointer' }}
               >
-                Lihat di Akun Saya (Dashboard) →
+                Lihat di Akun Saya →
               </button>
               <button
                 onClick={() => navigate('/katalog')}
-                className="btn-success-secondary"
-                style={{
-                  padding: '12px 20px',
-                  backgroundColor: 'transparent',
-                  color: '#6E6962',
-                  borderRadius: '6px',
-                  border: '1px solid #DED8CF',
-                  fontWeight: 600,
-                  cursor: 'pointer'
-                }}
+                style={{ padding: '12px 22px', backgroundColor: 'transparent', color: '#6E6962', borderRadius: '6px', border: '1px solid #DED8CF', fontWeight: 600, cursor: 'pointer' }}
               >
-                Jelajahi Koleksi Kurasi
+                Jelajahi Koleksi Lain
               </button>
             </div>
           </div>
         </div>
-
-        {/* MIDTRANS MODAL PADA HALAMAN SELESAI JIKA INGIN BAYAR ULANG */}
-        <MidtransSnapModal
-          isOpen={isMidtransOpen}
-          onClose={handleMidtransClose}
-          onSuccess={handleMidtransSuccess}
-          orderData={orderCompleteData}
-        />
       </div>
     );
   }
 
+  // ── HALAMAN CHECKOUT UTAMA ──────────────────────────────────────────────────
   return (
     <div className="claye-checkout-page">
       <div className="container">
@@ -267,286 +373,465 @@ export default function CheckoutPage() {
             <span className="bc-sep">/</span>
             <button onClick={() => navigate('/keranjang')}>KERANJANG BELANJA</button>
             <span className="bc-sep">/</span>
-            <span className="bc-current">PEMBAYARAN</span>
+            <span className="bc-current">PENGANTARAN & COD KOTA PALEMBANG</span>
           </div>
         </div>
 
-        {/* HEADER PEMBAYARAN */}
+        {/* HEADER CHECKOUT */}
         <div className="checkout-page-header">
           <div>
-            <div className="checkout-dispatch-tag">PENGIRIMAN GUDANG PUSAT CLAYÉ</div>
-            <h1 className="checkout-main-title">Pembayaran</h1>
+            <div className="checkout-dispatch-tag" style={{ letterSpacing: '0.12em' }}>
+              KHUSUS KOTA PALEMBANG • DIANTAR LANGSUNG OLEH TIM CLAYÉ
+            </div>
+            <h1 className="checkout-main-title">Pengantaran & Pembayaran COD</h1>
           </div>
           <div className="checkout-header-right-note">
-            Satu langkah lagi menuju produk keramik kurasi pilihan Anda yang dikemas dengan rapi dan bergaransi aman.
+            Kami mengantar pesanan Anda sendiri langsung dari studio tembikar kami di Palembang. Tanpa kurir ekspedisi pihak ketiga — pembayaran uang tunai diperiksa mandiri di tempat.
           </div>
         </div>
 
-        {/* 2-KOLOM TATA LETAK PEMBAYARAN */}
         <div className="checkout-split-layout">
-          {/* KOLOM KIRI: 3 TAHAP FORMULIR */}
+          {/* KOLOM KIRI: FORMULIR RINCIAN */}
           <div className="checkout-steps-column">
-            {/* TAHAP 1: DATA PENGIRIMAN */}
+
+            {/* STEP 1: DATA PENERIMA & ALAMAT LENGKAP */}
             <div className="checkout-step-card">
               <div className="step-card-header">
                 <div className="step-title-group">
                   <span className="step-number-pill">1</span>
-                  <h2 className="step-title-text">Rincian Pengiriman</h2>
+                  <h2 className="step-title-text">Rincian Penerima & Alamat di Kota Palembang</h2>
                 </div>
                 <span className="required-tag">• KOLOM WAJIB DIISI</span>
               </div>
 
               <div className="step-form-body">
+                {/* PILIH ALAMAT DARI BUKU ALAMAT PENGGUNA */}
+                {addresses && addresses.length > 0 && (
+                  <div style={{
+                    backgroundColor: '#FAF7F2',
+                    border: '1.5px solid #EAE4DC',
+                    borderRadius: '8px',
+                    padding: '12px 14px',
+                    marginBottom: '1.25rem'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '6px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span style={{ fontSize: '1rem' }}>📍</span>
+                        <strong style={{ fontSize: '0.8rem', color: '#262422', letterSpacing: '0.04em' }}>
+                          PILIH DARI BUKU ALAMAT ANDA:
+                        </strong>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => navigate('/akun')}
+                        style={{
+                          fontSize: '0.74rem',
+                          color: '#B87355',
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          fontWeight: 700,
+                          textDecoration: 'underline'
+                        }}
+                      >
+                        Kelola di Buku Alamat →
+                      </button>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                      {addresses.map(addr => {
+                        const isCurrent = formData.address === addr.address && formData.kecamatan === addr.kecamatan;
+                        return (
+                          <button
+                            key={addr.id}
+                            type="button"
+                            onClick={() => handleSelectSavedAddress(addr)}
+                            style={{
+                              padding: '7px 14px',
+                              borderRadius: '20px',
+                              border: isCurrent ? '1.5px solid #B87355' : '1px solid #D8D2C6',
+                              backgroundColor: isCurrent ? '#FFF8F3' : '#FFFFFF',
+                              color: isCurrent ? '#B87355' : '#4A4641',
+                              fontWeight: isCurrent ? 700 : 500,
+                              fontSize: '0.82rem',
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              boxShadow: isCurrent ? '0 1px 3px rgba(184,115,85,0.2)' : 'none'
+                            }}
+                          >
+                            <span>{isCurrent ? '✓' : '•'}</span>
+                            <span>{addr.label}</span>
+                            {addr.isPrimary && (
+                              <span style={{
+                                backgroundColor: isCurrent ? '#B87355' : '#EAE6DF',
+                                color: isCurrent ? '#FFFFFF' : '#6E6962',
+                                fontSize: '0.65rem',
+                                padding: '1px 6px',
+                                borderRadius: '10px',
+                                fontWeight: 700
+                              }}>
+                                Utama
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Nama Penerima */}
                 <div className="checkout-form-group">
-                  <label>NAMA LENGKAP *</label>
+                  <label>NAMA LENGKAP PENERIMA *</label>
                   <input
                     type="text"
                     value={formData.fullName}
                     onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                    placeholder="Raden Ayu Paramitha"
+                    placeholder="contoh: Raden Ayu Paramitha"
                     required
                   />
                 </div>
 
+                {/* No Telepon & Email */}
                 <div className="checkout-form-row">
                   <div className="checkout-form-group">
-                    <label>ALAMAT EMAIL *</label>
-                    <input
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      placeholder="paramitha@example.com"
-                      required
-                    />
-                  </div>
-
-                  <div className="checkout-form-group">
-                    <label>NOMOR TELEPON *</label>
+                    <label>NOMOR HP / WHATSAPP AKTIF *</label>
                     <input
                       type="tel"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      placeholder="+62 812 3456 7890"
+                      placeholder="contoh: 0812-3456-7890 (untuk konfirmasi serah terima)"
                       required
+                    />
+                  </div>
+                  <div className="checkout-form-group">
+                    <label>ALAMAT EMAIL (OPSIONAL)</label>
+                    <input
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      placeholder="email@contoh.com"
                     />
                   </div>
                 </div>
 
-                <div className="checkout-form-group">
-                  <label>ALAMAT LENGKAP RUMAH / TUJUAN *</label>
+                {/* Pilih Kecamatan di Kota Palembang (Otomatis menyesuaikan ongkir) */}
+                <div className="checkout-form-row" style={{ alignItems: 'flex-start' }}>
+                  <div className="checkout-form-group" style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.45rem' }}>
+                      <label style={{ margin: 0 }}>KECAMATAN DI KOTA PALEMBANG *</label>
+                      <span style={{ fontSize: '0.72rem', color: '#2E6930', fontWeight: 700 }}>
+                        ✓ Ongkir otomatis: Rp {selectedZone.price.toLocaleString('id-ID')}
+                      </span>
+                    </div>
+                    <select
+                      value={formData.kecamatan}
+                      onChange={(e) => handleKecamatanChange(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '0.85rem 1rem',
+                        borderRadius: '6px',
+                        border: '1.5px solid #B87355',
+                        backgroundColor: '#FCFAF7',
+                        fontSize: '0.92rem',
+                        fontWeight: 700,
+                        color: 'var(--color-charcoal)'
+                      }}
+                    >
+                      {PALEMBANG_KECAMATAN?.map(kec => (
+                        <option key={kec.name} value={kec.name}>
+                          Kec. {kec.name}
+                        </option>
+                      ))}
+                    </select>
+                    <div style={{
+                      display: 'flex', alignItems: 'center', gap: '6px', marginTop: '6px',
+                      backgroundColor: '#F0FDF4', border: '1px solid #DCFCE7',
+                      borderRadius: '5px', padding: '6px 10px'
+                    }}>
+                      <span style={{ color: '#16A34A', fontSize: '0.82rem', fontWeight: 700 }}>✓</span>
+                      <span style={{ fontSize: '0.75rem', color: '#166534', fontWeight: 600 }}>
+                        Terhubung otomatis ke <strong>{selectedZone.label}</strong> (Ongkos kirim otomatis: <strong>Rp {selectedZone.price.toLocaleString('id-ID')}</strong>)
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="checkout-form-group" style={{ width: '130px' }}>
+                    <label>KOTA</label>
+                    <input
+                      type="text"
+                      value="Kota Palembang"
+                      disabled
+                      style={{
+                        backgroundColor: '#F7F5F0',
+                        color: '#6E6962',
+                        cursor: 'not-allowed',
+                        fontWeight: 600
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* ── BLOK ALAMAT LENGKAP: DIBESARKAN, RAPI, DAN NYAMAN ── */}
+                <div className="checkout-form-group" style={{
+                  backgroundColor: '#FCFAF7',
+                  border: '1.5px solid #E8E2D7',
+                  borderRadius: '8px',
+                  padding: '1.15rem 1.25rem',
+                  marginTop: '0.5rem',
+                  marginBottom: '1.25rem'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                    <label style={{ margin: 0, fontSize: '0.74rem', color: '#262422', fontWeight: 800, letterSpacing: '0.08em' }}>
+                      ALAMAT LENGKAP TUJUAN PENGANTARAN *
+                    </label>
+                    <span style={{ fontSize: '0.72rem', color: '#8A857F' }}>
+                      Kecamatan & tarif terhubung otomatis
+                    </span>
+                  </div>
+
                   <textarea
-                    rows="3"
+                    rows={4}
                     value={formData.address}
-                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                    placeholder="Nama Jalan, Nomor Rumah, RT/RW, Kecamatan"
+                    onChange={(e) => handleAddressTextChange(e.target.value)}
+                    placeholder="Tuliskan nama jalan, nomor rumah/toko, RT/RW, kelurahan, blok perumahan, atau nama gang. Contoh: Jl. Demang Lebar Daun No. 42, RT 15 RW 04, Kel. Lorok Pakjo (Pagar hitam samping minimarket)"
                     required
+                    style={{
+                      width: '100%',
+                      minHeight: '115px',
+                      padding: '12px 14px',
+                      fontSize: '0.92rem',
+                      lineHeight: '1.6',
+                      borderRadius: '6px',
+                      border: '1px solid #D8D2C6',
+                      backgroundColor: '#FFFFFF',
+                      boxSizing: 'border-box',
+                      color: '#262422',
+                      resize: 'vertical',
+                      display: 'block'
+                    }}
                   />
-                </div>
 
-                <div className="checkout-form-row">
-                  <div className="checkout-form-group">
-                    <label>KOTA / KABUPATEN *</label>
+                  {/* Patokan / Landmark opsional untuk memudahkan tim yang mengantar */}
+                  <div style={{ marginTop: '0.85rem' }}>
+                    <label style={{ fontSize: '0.7rem', color: '#6E6962', fontWeight: 600, marginBottom: '0.3rem', display: 'block' }}>
+                      PATOKAN KHUSUS / PETUNJUK LOKASI (MEMBANTU TIM MENEMUKAN RUMAH)
+                    </label>
                     <input
                       type="text"
-                      value={formData.city}
-                      onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                      placeholder="Palembang"
-                      required
-                    />
-                  </div>
-
-                  <div className="checkout-form-group">
-                    <label>KODE POS</label>
-                    <input
-                      type="text"
-                      value={formData.postalCode}
-                      onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
-                      placeholder="30138"
+                      value={formData.patokan}
+                      onChange={(e) => setFormData({ ...formData, patokan: e.target.value })}
+                      placeholder="contoh: Seberang Masjid Al-Ikhlas / depan pagar ada pohon mangga"
+                      style={{
+                        width: '100%',
+                        padding: '9px 12px',
+                        fontSize: '0.85rem',
+                        borderRadius: '5px',
+                        border: '1px solid #D8D2C6',
+                        backgroundColor: '#FFFFFF',
+                        boxSizing: 'border-box'
+                      }}
                     />
                   </div>
                 </div>
 
+                {/* Catatan khusus waktu antar */}
                 <div className="checkout-form-group">
-                  <label>CATATAN KHUSUS PENGIRIMAN (OPSIONAL)</label>
+                  <label>CATATAN JADWAL ANTAR (OPSIONAL)</label>
                   <input
                     type="text"
                     value={formData.instructions}
                     onChange={(e) => setFormData({ ...formData, instructions: e.target.value })}
-                    placeholder="Contoh: Titipkan di pos satpam / hubungi via WA"
+                    placeholder="contoh: Bisa diantar sore setelah jam 16.00 WIB / hubungi sebelum jalan"
                   />
                 </div>
               </div>
             </div>
 
-            {/* TAHAP 2: METODE PENGIRIMAN */}
+            {/* STEP 2: WILAYAH KOTA PALEMBANG & ONGKIR OTOMATIS */}
             <div className="checkout-step-card">
               <div className="step-card-header">
                 <div className="step-title-group">
                   <span className="step-number-pill">2</span>
-                  <h2 className="step-title-text">Opsi Pengiriman</h2>
+                  <h2 className="step-title-text">Zona Pengantaran Mandiri di Kota Palembang</h2>
                 </div>
               </div>
 
-              <div className="shipping-options-list">
-                {/* Opsi 1: Reguler */}
-                <label
-                  className={`shipping-option-card ${shippingMethod === 'regular' ? 'selected' : ''}`}
-                  onClick={() => setShippingMethod('regular')}
-                >
-                  <div className="shipping-radio-left">
-                    <input
-                      type="radio"
-                      name="shipping"
-                      checked={shippingMethod === 'regular'}
-                      onChange={() => setShippingMethod('regular')}
-                    />
-                    <div className="shipping-desc-wrap">
-                      <div className="shipping-name-row">
-                        <strong>Pengiriman Standar</strong>
-                        <span className="method-pill standard-pill">STANDAR</span>
+              <div style={{ padding: '0 1.5rem 1.5rem' }}>
+                {/* STATUS KONEKSI OTOMATIS ANTARA ALAMAT & ONGKIR */}
+                <div style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  backgroundColor: '#FCFAF7', border: '1.5px solid #E5C3B3',
+                  borderRadius: '8px', padding: '14px 18px', marginBottom: '1.25rem',
+                  gap: '12px', flexWrap: 'wrap'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{
+                      width: '40px', height: '40px', borderRadius: '50%',
+                      backgroundColor: '#B87355', color: '#FFFFFF',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: '1.2rem', flexShrink: 0
+                    }}>
+                      🛵
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '0.92rem', fontWeight: 700, color: '#24201D' }}>
+                        Terkoneksi Otomatis: Kec. {formData.kecamatan || 'Ilir Barat I'}
                       </div>
-                      <p className="shipping-subtext">
-                        Kardus berdinding ganda dengan pelindung sarang lebah (honeycomb) ramah lingkungan.
-                      </p>
+                      <div style={{ fontSize: '0.8rem', color: '#6E6962', marginTop: '2px' }}>
+                        Tarif pengantaran mandiri disinkronkan langsung: <strong style={{ color: '#B87355' }}>{selectedZone.label} — Rp {selectedZone.price.toLocaleString('id-ID')}</strong>
+                      </div>
                     </div>
                   </div>
-                  <div className="shipping-price-tag">Rp15.000</div>
-                </label>
+                  <div style={{
+                    display: 'inline-flex', alignItems: 'center', gap: '6px',
+                    backgroundColor: '#EAF3E9', color: '#2E6930',
+                    border: '1px solid #C4DFC1', padding: '6px 12px',
+                    borderRadius: '20px', fontSize: '0.76rem', fontWeight: 700
+                  }}>
+                    <span>✓</span> Terhubung Otomatis
+                  </div>
+                </div>
 
-                {/* Opsi 2: Prioritas */}
-                <label
-                  className={`shipping-option-card ${shippingMethod === 'express' ? 'selected' : ''}`}
-                  onClick={() => setShippingMethod('express')}
-                >
-                  <div className="shipping-radio-left">
-                    <input
-                      type="radio"
-                      name="shipping"
-                      checked={shippingMethod === 'express'}
-                      onChange={() => setShippingMethod('express')}
-                    />
-                    <div className="shipping-desc-wrap">
-                      <div className="shipping-name-row">
-                        <strong>Pengiriman Kilat</strong>
-                        <span className="method-pill priority-pill">PRIORITAS</span>
-                      </div>
-                      <p className="shipping-subtext">
-                        Pengiriman prioritas langsung dari gudang distribusi pusat CLAYÉ ke alamat tujuan Anda.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="shipping-price-tag">Rp25.000</div>
-                </label>
+                <div className="shipping-options-list">
+                  {SHIPPING_ZONES?.map((zone) => {
+                    const isSelected = shippingZone === zone.id;
+                    return (
+                      <label
+                        key={zone.id}
+                        className={`shipping-option-card ${isSelected ? 'selected' : ''}`}
+                        onClick={() => handleZoneCardSelect(zone.id)}
+                        style={{
+                          cursor: 'pointer',
+                          border: isSelected ? '2px solid #B87355' : '1px solid #EAE6DF',
+                          backgroundColor: isSelected ? '#FFF8F3' : '#FFFFFF',
+                          transition: 'all 0.2s ease'
+                        }}
+                      >
+                        <div className="shipping-radio-left">
+                          <input
+                            type="radio"
+                            name="shipping_option"
+                            checked={isSelected}
+                            onChange={() => handleZoneCardSelect(zone.id)}
+                          />
+                          <div className="shipping-desc-wrap">
+                            <div className="shipping-name-row" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                              <strong style={{ color: isSelected ? '#262422' : '#4A4641' }}>
+                                {zone.label}
+                              </strong>
+                              {isSelected && (
+                                <span style={{
+                                  backgroundColor: '#EAF3E9',
+                                  color: '#2E6930',
+                                  fontSize: '0.68rem',
+                                  fontWeight: 700,
+                                  padding: '2px 8px',
+                                  borderRadius: '4px',
+                                  border: '1px solid #C4DFC1'
+                                }}>
+                                  ✓ Sesuai Alamat (Kec. {formData.kecamatan})
+                                </span>
+                              )}
+                              <span className="method-pill standard-pill" style={{
+                                fontSize: '0.68rem',
+                                backgroundColor: isSelected ? '#FEF3C7' : '#F3F0EA',
+                                color: isSelected ? '#92400E' : '#6E6962'
+                              }}>
+                                {zone.estimate}
+                              </span>
+                            </div>
+                            <p className="shipping-subtext" style={{ fontSize: '0.78rem', color: '#8A857F', marginTop: '3px', marginBottom: 0 }}>
+                              {zone.desc}
+                            </p>
+                            {!isSelected && (
+                              <p style={{ fontSize: '0.72rem', color: '#B87355', margin: '4px 0 0', fontWeight: 600 }}>
+                                ⇄ Klik untuk mengalihkan ke zona ini (kecamatan alamat akan disesuaikan otomatis)
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="shipping-price-tag" style={{
+                          fontSize: '1rem',
+                          fontWeight: 700,
+                          color: isSelected ? '#B87355' : '#262422'
+                        }}>
+                          Rp {zone.price.toLocaleString('id-ID')}
+                        </div>
+                      </label>
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
-            {/* TAHAP 3: METODE PEMBAYARAN */}
+            {/* STEP 3: METODE PEMBAYARAN COD MANDIRI */}
             <div className="checkout-step-card">
               <div className="step-card-header">
                 <div className="step-title-group">
                   <span className="step-number-pill">3</span>
-                  <h2 className="step-title-text">Metode Pembayaran</h2>
+                  <h2 className="step-title-text">Metode Pembayaran COD (Tunai di Tempat)</h2>
                 </div>
               </div>
 
-              <div className="payment-options-container">
-                {/* 1. MIDTRANS PAYMENT GATEWAY (RECOMMENDED / SANDBOX) */}
-                <div
-                  className={`payment-option-card ${paymentMethod === 'midtrans' ? 'selected' : ''}`}
-                  onClick={() => setPaymentMethod('midtrans')}
-                  style={{
-                    border: paymentMethod === 'midtrans' ? '2px solid #00ADEF' : '1px solid #E2E8F0',
-                    backgroundColor: paymentMethod === 'midtrans' ? '#F0F9FF' : '#FFFFFF',
-                    position: 'relative'
-                  }}
-                >
+              <div style={{ padding: '0 1.5rem 1.5rem' }}>
+                <div style={{
+                  border: '2px solid #B87355',
+                  borderRadius: '10px',
+                  backgroundColor: '#FFF8F3',
+                  padding: '1.25rem 1.5rem',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '14px'
+                }}>
                   <div style={{
-                    position: 'absolute',
-                    top: '-10px',
-                    right: '16px',
-                    backgroundColor: '#00ADEF',
-                    color: '#FFFFFF',
-                    fontSize: '0.68rem',
-                    fontWeight: 800,
-                    padding: '2px 8px',
-                    borderRadius: '10px',
-                    letterSpacing: '0.05em'
+                    flexShrink: 0,
+                    width: '46px', height: '46px',
+                    backgroundColor: '#B87355',
+                    borderRadius: '50%',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center'
                   }}>
-                    OTOMATIS • MIDTRANS SANDBOX
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="2" y="6" width="20" height="12" rx="2"></rect>
+                      <circle cx="12" cy="12" r="2"></circle>
+                      <path d="M6 12h.01M18 12h.01"></path>
+                    </svg>
                   </div>
-
-                  <div className="payment-header-row">
-                    <div className="payment-radio-title">
-                      <input
-                        type="radio"
-                        name="payment"
-                        checked={paymentMethod === 'midtrans'}
-                        onChange={() => setPaymentMethod('midtrans')}
-                      />
-                      <strong>Midtrans Snap (QRIS, GoPay, VA BCA/Mandiri, Kartu)</strong>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                      <strong style={{ fontSize: '1.02rem', color: '#262422' }}>Cash on Delivery (COD) Mandiri</strong>
+                      <span style={{
+                        backgroundColor: '#B87355', color: '#FFFFFF',
+                        fontSize: '0.65rem', fontWeight: 800,
+                        padding: '2px 8px', borderRadius: '20px',
+                        letterSpacing: '0.06em'
+                      }}>
+                        BAYAR TUNAI KE TIM CLAYÉ
+                      </span>
                     </div>
-                    <div className="bank-badges-row">
-                      <span className="bank-tag" style={{ backgroundColor: '#E0F2FE', color: '#0369A1' }}>QRIS</span>
-                      <span className="bank-tag" style={{ backgroundColor: '#E0F2FE', color: '#0369A1' }}>GOPAY</span>
-                      <span className="bank-tag" style={{ backgroundColor: '#E0F2FE', color: '#0369A1' }}>BCA VA</span>
-                      <span className="bank-tag" style={{ backgroundColor: '#E0F2FE', color: '#0369A1' }}>MANDIRI</span>
-                    </div>
-                  </div>
-                  <p className="payment-desc-text">
-                    Gerbang pembayaran resmi Indonesia dengan verifikasi instan. Dilengkapi simulator pembayaran sandbox untuk pengujian dan demo mata kuliah.
-                  </p>
-                </div>
-
-                {/* 2. TRANSFER BANK MANUAL */}
-                <div
-                  className={`payment-option-card ${paymentMethod === 'bank' ? 'selected' : ''}`}
-                  onClick={() => setPaymentMethod('bank')}
-                >
-                  <div className="payment-header-row">
-                    <div className="payment-radio-title">
-                      <input
-                        type="radio"
-                        name="payment"
-                        checked={paymentMethod === 'bank'}
-                        onChange={() => setPaymentMethod('bank')}
-                      />
-                      <strong>Transfer Bank Langsung (BCA Manual)</strong>
-                    </div>
-                    <div className="bank-badges-row">
-                      <span className="bank-tag">BCA</span>
-                      <span className="bank-tag">MANUAL</span>
+                    <p style={{ margin: 0, fontSize: '0.85rem', color: '#6E6962', lineHeight: '1.55' }}>
+                      Anda membayar uang tunai langsung kepada pengrajin/tim CLAYÉ yang tiba di rumah Anda. Kami memeriksa produk bersama Anda di tempat untuk memastikan keramik tiba dalam kondisi sempurna tanpa cacat.
+                    </p>
+                    <div style={{
+                      marginTop: '12px',
+                      backgroundColor: '#FEF3C7',
+                      border: '1px solid #FDE68A',
+                      borderRadius: '6px',
+                      padding: '9px 12px',
+                      fontSize: '0.82rem',
+                      color: '#92400E'
+                    }}>
+                      💡 Siapkan uang tunai sebesar <strong>Rp {totalWithShipping.toLocaleString('id-ID')}</strong> saat tim kami tiba.
                     </div>
                   </div>
-                  <p className="payment-desc-text">
-                    Transfer langsung ke rekening resmi CLAYÉ Studio. Verifikasi pembayaran dilakukan oleh Admin toko.
-                  </p>
-
-                  {paymentMethod === 'bank' && (
-                    <div className="copyable-account-box" onClick={(e) => e.stopPropagation()}>
-                      <div className="account-details-text">
-                        <span>Rekening BCA CLAYÉ:</span> <strong>8092 1190 44</strong> <span>(a.n. CLAYÉ Kurasi Keramik)</span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={handleCopyAccount}
-                        className="copy-btn-pill"
-                        style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
-                      >
-                        {copiedBank ? (
-                          <>
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            TERSALIN
-                          </>
-                        ) : 'SALIN'}
-                      </button>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
           </div>
 
-          {/* KOLOM KANAN: RINGKASAN PESANAN */}
+          {/* KOLOM KANAN: RINGKASAN PESANAN & TOTAL COD */}
           <div className="checkout-summary-column">
             <div className="checkout-order-summary-card">
               <div className="summary-card-header">
@@ -574,16 +859,108 @@ export default function CheckoutPage() {
                 ))}
               </div>
 
-              {/* RINCIAN BIAYA */}
+              {/* FORM KUPON PROMO */}
+              <div style={{ padding: '0.85rem 0', borderTop: '1px solid #EAE6DF', borderBottom: '1px solid #EAE6DF', margin: '0.75rem 0' }}>
+                <form onSubmit={handleApplyCheckoutCoupon} style={{ display: 'flex', gap: '8px' }}>
+                  <input
+                    type="text"
+                    placeholder="Kode kupon (contoh: CLAYE10)"
+                    value={checkoutCouponInput}
+                    onChange={(e) => setCheckoutCouponInput(e.target.value)}
+                    style={{
+                      flex: 1,
+                      padding: '8px 10px',
+                      borderRadius: '4px',
+                      border: '1px solid #DED8CF',
+                      fontSize: '0.84rem'
+                    }}
+                    disabled={!!appliedCoupon}
+                  />
+                  {appliedCoupon ? (
+                    <button
+                      type="button"
+                      onClick={removeCoupon}
+                      style={{
+                        padding: '8px 12px',
+                        backgroundColor: '#6B6560',
+                        color: '#FFFFFF',
+                        border: 'none',
+                        borderRadius: '4px',
+                        fontSize: '0.8rem',
+                        fontWeight: 600,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Hapus
+                    </button>
+                  ) : (
+                    <button
+                      type="submit"
+                      style={{
+                        padding: '8px 14px',
+                        backgroundColor: '#262422',
+                        color: '#FFFFFF',
+                        border: 'none',
+                        borderRadius: '4px',
+                        fontSize: '0.8rem',
+                        fontWeight: 600,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Terapkan
+                    </button>
+                  )}
+                </form>
+
+                {appliedCoupon && (
+                  <div style={{
+                    marginTop: '8px',
+                    backgroundColor: '#ECFDF5',
+                    color: '#047857',
+                    padding: '6px 10px',
+                    borderRadius: '4px',
+                    fontSize: '0.78rem',
+                    fontWeight: 600,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
+                  }}>
+                    <span>✓ Kupon {appliedCoupon} aktif (Diskon {discountPercent}%)</span>
+                    <button
+                      type="button"
+                      onClick={removeCoupon}
+                      style={{ background: 'none', border: 'none', color: '#047857', cursor: 'pointer', fontWeight: 700 }}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* RINCIAN BIAYA OTOMATIS */}
               <div className="summary-cost-breakdown">
                 <div className="cost-row">
-                  <span>Subtotal</span>
+                  <span>Subtotal ({totalPieces} produk)</span>
                   <strong>Rp {subtotal.toLocaleString('id-ID')}</strong>
                 </div>
+
+                {discountAmount > 0 && (
+                  <div className="cost-row" style={{ color: '#2B613B' }}>
+                    <span>Diskon Kupon ({appliedCoupon})</span>
+                    <strong>−Rp {discountAmount.toLocaleString('id-ID')}</strong>
+                  </div>
+                )}
+
                 <div className="cost-row">
-                  <span>Ongkos Kirim ({shippingMethod === 'express' ? 'Pengiriman Kilat' : 'Pengiriman Reguler'})</span>
+                  <span style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span>Ongkos Antar ({selectedZone.label})</span>
+                    <span style={{ fontSize: '0.72rem', color: '#166534', fontWeight: 600 }}>
+                      ✓ Terkoneksi ke Kec. {formData.kecamatan || 'Ilir Barat I'}
+                    </span>
+                  </span>
                   <strong>Rp {shippingCost.toLocaleString('id-ID')}</strong>
                 </div>
+
                 <div className="cost-row">
                   <span>Kemasan Protektif CLAYÉ</span>
                   <strong className="free-tag">Gratis</strong>
@@ -591,8 +968,8 @@ export default function CheckoutPage() {
 
                 <div className="cost-total-row">
                   <div>
-                    <span className="total-label">Total Pembayaran</span>
-                    <span className="total-tax-note">SUDAH TERMASUK PAJAK</span>
+                    <span className="total-label">Total COD Tunai</span>
+                    <span className="total-tax-note">DIBAYAR KE TIM CLAYÉ</span>
                   </div>
                   <div className="total-big-amount">
                     Rp {totalWithShipping.toLocaleString('id-ID')}
@@ -600,7 +977,6 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              {/* TOMBOL BAYAR SEKARANG */}
               <button
                 type="button"
                 onClick={handlePlaceOrder}
@@ -609,55 +985,44 @@ export default function CheckoutPage() {
                 Buat Pesanan Sekarang →
               </button>
               <p className="order-disclaimer-note">
-                Harap periksa kembali rincian data Anda sebelum menyelesaikan pesanan.
+                Pesanan akan langsung dipersiapkan dan diantar oleh pengrajin/tim CLAYÉ Palembang.
               </p>
             </div>
 
-            {/* JAMINAN KUALITAS & KEAMANAN */}
+            {/* JAMINAN PELAYANAN MANDIRI */}
             <div className="studio-trust-badges-card">
               <div className="trust-badge-item">
                 <div>
-                  <strong>ENKRIPSI DATA 256-BIT AMAN</strong>
-                  <p>Data pribadi dan informasi pembayaran Anda terlindungi dengan standar keamanan perbankan.</p>
+                  <strong>🛵 DIANTAR LANGSUNG TIM CLAYÉ</strong>
+                  <p>Bukan kurir pihak ketiga — kami mengantar sendiri pesanan keramik Anda agar garansi bebas pecah 100% terjaga.</p>
                 </div>
               </div>
-
               <div className="trust-badge-item">
                 <div>
-                  <strong>KEMASAN RAMAH LINGKUNGAN BERGARANSI</strong>
-                  <p>100% pembungkus sarang lebah dapat terurai alami dan bebas butiran plastik sintetis.</p>
+                  <strong>💵 PEMBAYARAN COD MANDIRI</strong>
+                  <p>Uang tunai diterima langsung oleh tim kami saat serah terima di depan rumah Anda.</p>
                 </div>
               </div>
-
               <div className="trust-badge-item">
                 <div>
-                  <strong>JAMINAN KERAJINAN ASLI PENGRAJIN</strong>
-                  <p>Setiap produk keramik dikurasi langsung dari mitra pengrajin tembikar, diuji food-safe, dan diinspeksi kualitasnya sebelum dikemas.</p>
+                  <strong>📦 KEMASAN RAMAH LINGKUNGAN</strong>
+                  <p>100% pelindung sarang lebah (honeycomb) ramah lingkungan tanpa butiran styrofoam sintetis.</p>
                 </div>
               </div>
             </div>
 
-            {/* BANTUAN ASISTEN KURASI */}
             <div className="checkout-concierge-callout">
-              Butuh bantuan penataan atau pesanan kado khusus?<br />
+              Ada pertanyaan seputar lokasi antar di Palembang?<br />
               <button
-                onClick={() => openConcierge('Halo, saya sedang berada di halaman checkout dan butuh bantuan pemesanan')}
+                onClick={() => openConcierge('Halo tim CLAYÉ, saya ingin bertanya tentang jadwal antar mandiri di Palembang')}
                 className="concierge-link-action"
               >
-                Hubungi tim asisten kurasi kami
+                Hubungi asisten kurasi CLAYÉ Studio
               </button>
             </div>
           </div>
         </div>
       </div>
-
-      {/* POPUP MODAL GERBANG PEMBAYARAN MIDTRANS SNAP */}
-      <MidtransSnapModal
-        isOpen={isMidtransOpen}
-        onClose={handleMidtransClose}
-        onSuccess={handleMidtransSuccess}
-        orderData={pendingOrder}
-      />
     </div>
   );
 }
