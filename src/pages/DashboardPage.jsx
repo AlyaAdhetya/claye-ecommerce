@@ -757,7 +757,7 @@ export default function DashboardPage() {
                                   </div>
                                 </div>
                               </td>
-                              <td className="cell-total">Rp {ord.total.toLocaleString('id-ID')}</td>
+                              <td className="cell-total">Rp {((ord.grandTotal !== undefined ? ord.grandTotal : (ord.total + (ord.shippingFee || 0))) || 0).toLocaleString('id-ID')}</td>
                               <td className="cell-fulfillment">
                                 <span className={`status-pill ${ord.fulfillment === 'SELESAI' ? 'pill-completed' : 'pill-processing'}`}>• {ord.fulfillment}</span>
                               </td>
@@ -842,7 +842,7 @@ export default function DashboardPage() {
                                 </div>
                               </div>
                             </td>
-                            <td className="cell-total">Rp {ord.total.toLocaleString('id-ID')}</td>
+                            <td className="cell-total">Rp {((ord.grandTotal !== undefined ? ord.grandTotal : (ord.total + (ord.shippingFee || 0))) || 0).toLocaleString('id-ID')}</td>
                             <td className="cell-fulfillment">
                               <span className={`status-pill ${ord.fulfillment === 'SELESAI' ? 'pill-completed' : 'pill-processing'}`}>• {ord.fulfillment}</span>
                             </td>
@@ -1163,13 +1163,13 @@ export default function DashboardPage() {
                   </div>
                 ))}
                 <div className="modal-item-row" style={{ borderTop: '1px solid #EAE6DF', paddingTop: '0.75rem', marginTop: '0.75rem' }}>
-                  <span>Ongkos Kirim (Proteksi Kemasan Ekstra)</span>
-                  <strong>Rp 15.000</strong>
+                  <span>Ongkos Antar ({selectedOrderModal.courier || 'Antar Langsung Tim CLAYÉ'})</span>
+                  <strong>Rp {(selectedOrderModal.shippingFee !== undefined ? selectedOrderModal.shippingFee : 10000).toLocaleString('id-ID')}</strong>
                 </div>
                 <div className="modal-item-row total-row">
-                  <span>Total Pembayaran</span>
+                  <span>Total Pembayaran (COD)</span>
                   <strong style={{ fontSize: '1.2rem', color: '#24201D' }}>
-                    Rp {(selectedOrderModal.total + 15000).toLocaleString('id-ID')}
+                    Rp {((selectedOrderModal.grandTotal !== undefined ? selectedOrderModal.grandTotal : (selectedOrderModal.total + (selectedOrderModal.shippingFee || 0))) || 0).toLocaleString('id-ID')}
                   </strong>
                 </div>
               </div>

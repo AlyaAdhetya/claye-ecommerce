@@ -992,7 +992,7 @@ export default function AdminPage() {
                               </div>
                             </td>
                             <td className="cell-total" style={{ whiteSpace: 'nowrap', minWidth: '120px' }}>
-                              Rp {(ord.total || 0).toLocaleString('id-ID')}
+                              Rp {((ord.grandTotal !== undefined ? ord.grandTotal : (ord.total + (ord.shippingFee || 0))) || 0).toLocaleString('id-ID')}
                             </td>
                             <td className="cell-payment-status">
                               <span className={`status-pill ${ord.paymentStatus === 'Lunas' ? 'pill-completed' : 'pill-pending'}`}>
@@ -2520,6 +2520,22 @@ export default function AdminPage() {
                     <strong>Rp {(inspectOrderData.total || 0).toLocaleString('id-ID')}</strong>
                   </div>
                 )}
+                <div style={{ marginTop: '0.5rem', padding: '0.75rem', backgroundColor: '#FAF8F5', border: '1px solid #EAE6DF', borderRadius: '4px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', marginBottom: '4px' }}>
+                    <span style={{ color: '#8A857F' }}>Subtotal Keramik:</span>
+                    <span>Rp {(inspectOrderData.total || 0).toLocaleString('id-ID')}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', marginBottom: '6px' }}>
+                    <span style={{ color: '#8A857F' }}>Ongkos Antar ({inspectOrderData.courier || 'Antar Langsung Tim CLAYÉ'}):</span>
+                    <span>Rp {(inspectOrderData.shippingFee !== undefined ? inspectOrderData.shippingFee : 10000).toLocaleString('id-ID')}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.92rem', fontWeight: 800, borderTop: '1px dashed #DED8CF', paddingTop: '6px' }}>
+                    <span style={{ color: '#262422' }}>Total Tagihan COD:</span>
+                    <span style={{ color: '#B87355' }}>
+                      Rp {((inspectOrderData.grandTotal !== undefined ? inspectOrderData.grandTotal : (inspectOrderData.total + (inspectOrderData.shippingFee || 0))) || 0).toLocaleString('id-ID')}
+                    </span>
+                  </div>
+                </div>
               </div>
 
               <div className="form-group-claye">
