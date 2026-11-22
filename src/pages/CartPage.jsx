@@ -14,20 +14,14 @@ export default function CartPage() {
     navigate,
     showToast,
     openConcierge,
-    // ── kupon & pengiriman dari context ──
-    appliedCoupon,
-    discountPercent,
+    // ── pengiriman Palembang dari context ──
     shippingZone,
     setShippingZone,
     selectedKecamatan,
     setKecamatan,
     SHIPPING_ZONES,
     PALEMBANG_KECAMATAN,
-    applyCoupon,
-    removeCoupon,
   } = useShop();
-
-  const [couponInput, setCouponInput] = useState('');
 
   const selectedItems = cart.filter(item => item.selected !== false);
   const allSelected = cart.length > 0 && cart.every(item => item.selected !== false);
@@ -35,11 +29,9 @@ export default function CartPage() {
   const totalPieces = selectedItems.reduce((sum, item) => sum + item.quantity, 0);
   const allTotalPieces = cart.reduce((sum, item) => sum + item.quantity, 0);
   const subtotal = selectedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const discountAmount = Math.round((subtotal * discountPercent) / 100);
-  const afterDiscount = subtotal - discountAmount;
   const selectedZone = SHIPPING_ZONES.find(z => z.id === shippingZone) || SHIPPING_ZONES[0];
   const shippingCost = selectedCount > 0 ? selectedZone.price : 0;
-  const finalTotal = afterDiscount + shippingCost;
+  const finalTotal = subtotal + shippingCost;
 
   const getAvailableGlazes = (item) => {
     const prod = products?.find(p => p.id === item.id || p.name === item.name);
@@ -53,12 +45,6 @@ export default function CartPage() {
       'Glasir Biru Samudra (Neko)',
       'Glasir Hitam Arang Tenmoku'
     ];
-  };
-
-  const handleApplyCoupon = (e) => {
-    e.preventDefault();
-    applyCoupon(couponInput);
-    setCouponInput('');
   };
 
   if (cart.length === 0) {
@@ -212,87 +198,39 @@ export default function CartPage() {
             <div className="order-summary-card">
               <h2 className="summary-title" style={{ marginBottom: '1.25rem' }}>Ringkasan Biaya</h2>
 
-              {/* FORM KUPON */}
-              <form onSubmit={handleApplyCoupon} className="coupon-form-wrap">
-                <input
-                  type="text"
-                  placeholder="Kode Kupon (contoh: CLAYE10)"
-                  value={couponInput}
-                  onChange={(e) => setCouponInput(e.target.value)}
-                  className="coupon-input-field"
-                  disabled={!!appliedCoupon}
-                />
-                {appliedCoupon ? (
-                  <button type="button" onClick={removeCoupon} className="coupon-apply-btn" style={{ backgroundColor: '#6B6560' }}>
-                    Hapus
-                  </button>
-                ) : (
-                  <button type="submit" className="coupon-apply-btn">Terapkan</button>
-                )}
-              </form>
-
-              {appliedCoupon && (
-                <div className="applied-coupon-pill">
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    {appliedCoupon} (Diskon {discountPercent}%)
-                  </span>
-                  <button onClick={removeCoupon} aria-label="Hapus kupon" style={{ display: 'inline-flex', alignItems: 'center' }}>
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                  </button>
-                </div>
-              )}
-
-              {/* ZONA PENGANTARAN KOTA PALEMBANG */}
-              <div style={{ marginTop: '1.25rem', marginBottom: '0.5rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                  <label style={{ fontSize: '0.78rem', fontWeight: 700, letterSpacing: '0.05em', color: '#4A4641', margin: 0 }}>
-                    KECAMATAN PENGANTARAN (KOTA PALEMBANG)
-                  </label>
-                  <span style={{ fontSize: '0.72rem', color: '#2E6930', fontWeight: 700 }}>
-                    ✓ Antar Mandiri Tim CLAYÉ
+              {/* INFO PENGANTARAN KOTA PALEMBANG */}
+              <div style={{
+                marginBottom: '1rem',
+                padding: '12px 14px',
+                backgroundColor: '#FAF8F5',
+                border: '1px solid #EAE6DF',
+                borderRadius: '8px'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ fontSize: '1rem' }}>🛵</span>
+                    <strong style={{ fontSize: '0.82rem', color: '#262422' }}>
+                      Pengantaran Mandiri Kota Palembang
+                    </strong>
+                  </div>
+                  <span style={{ fontSize: '0.74rem', color: '#B87355', fontWeight: 700 }}>
+                    Mulai Rp 8.000
                   </span>
                 </div>
-                <select
-                  value={selectedKecamatan}
-                  onChange={(e) => setKecamatan(e.target.value)}
-                  style={{
-                    width: '100%', padding: '10px 12px', borderRadius: '6px',
-                    border: '1.5px solid #B87355', fontSize: '0.88rem', fontWeight: 600,
-                    backgroundColor: '#FAF8F5', color: '#262422', cursor: 'pointer'
-                  }}
-                >
-                  {PALEMBANG_KECAMATAN?.map(kec => (
-                    <option key={kec.name} value={kec.name}>
-                      Kec. {kec.name} — Rp {SHIPPING_ZONES.find(z => z.id === kec.zoneId)?.price.toLocaleString('id-ID')}
-                    </option>
-                  ))}
-                </select>
-                <div style={{
-                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                  fontSize: '0.75rem', color: '#6E6962', marginTop: '6px'
-                }}>
-                  <span>Zona: <strong>{selectedZone.label}</strong></span>
-                  <span style={{ color: '#B87355', fontWeight: 700 }}>Ongkir otomatis: Rp {selectedZone.price.toLocaleString('id-ID')}</span>
-                </div>
+                <p style={{ margin: '6px 0 0', fontSize: '0.75rem', color: '#6E6962', lineHeight: '1.45' }}>
+                  Diantar langsung oleh tim internal CLAYÉ Studio. Rincian alamat & kecamatan tujuan diisi langsung di halaman berikutnya.
+                </p>
               </div>
 
               {/* RINCIAN BIAYA */}
-              <div className="summary-cost-breakdown" style={{ marginTop: '1rem' }}>
+              <div className="summary-cost-breakdown">
                 <div className="cost-row">
                   <span>Subtotal ({totalPieces} produk terpilih)</span>
                   <strong>Rp {subtotal.toLocaleString('id-ID')}</strong>
                 </div>
 
-                {discountAmount > 0 && (
-                  <div className="cost-row" style={{ color: '#2B613B' }}>
-                    <span>Diskon Kupon {appliedCoupon} ({discountPercent}%)</span>
-                    <strong>−Rp {discountAmount.toLocaleString('id-ID')}</strong>
-                  </div>
-                )}
-
                 <div className="cost-row">
-                  <span>Ongkos Kirim ({selectedZone.label})</span>
+                  <span>Estimasi Ongkos Kirim (Palembang)</span>
                   <strong>{selectedCount > 0 ? `Rp ${shippingCost.toLocaleString('id-ID')}` : 'Rp 0'}</strong>
                 </div>
 
