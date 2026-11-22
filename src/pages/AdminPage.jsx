@@ -2539,8 +2539,137 @@ export default function AdminPage() {
                 <button
                   type="button"
                   onClick={() => {
-                    showToast(`Slip label pengemasan untuk ${inspectOrderData.id} siap dicetak.`, 'success');
-                    setInspectOrderData(null);
+                    const printWindow = window.open('', '_blank', 'width=750,height=850');
+                    if (!printWindow) {
+                      showToast('Popup diblokir browser. Izinkan popup untuk mencetak label.', 'error');
+                      return;
+                    }
+                    const itemsHtml = (inspectOrderData.items && inspectOrderData.items.length > 0)
+                      ? inspectOrderData.items.map(it => `
+                        <tr>
+                          <td style="padding: 8px 10px; border-bottom: 1px solid #ddd; font-weight: bold;">${it.name}</td>
+                          <td style="padding: 8px 10px; border-bottom: 1px solid #ddd; color: #555;">${it.glaze || 'Alami'}</td>
+                          <td style="padding: 8px 10px; border-bottom: 1px solid #ddd; text-align: center;">${it.quantity || 1}</td>
+                          <td style="padding: 8px 10px; border-bottom: 1px solid #ddd; text-align: right;">Rp ${((it.price || 0) * (it.quantity || 1)).toLocaleString('id-ID')}</td>
+                        </tr>
+                      `).join('')
+                      : `<tr><td colspan="4" style="padding: 8px 10px;">${inspectOrderData.itemsSummary || 'Karya Keramik Kurasi'}</td></tr>`;
+
+                    const grandTotal = (inspectOrderData.grandTotal || inspectOrderData.total || 0).toLocaleString('id-ID');
+                    const shippingFee = (inspectOrderData.shippingFee || 0).toLocaleString('id-ID');
+                    const subtotal = (inspectOrderData.total || 0).toLocaleString('id-ID');
+
+                    printWindow.document.write(`
+                      <!DOCTYPE html>
+                      <html>
+                      <head>
+                        <title>Label Pengemasan & Surat Jalan - ${inspectOrderData.id}</title>
+                        <style>
+                          body { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; padding: 25px; color: #222; margin: 0; }
+                          .label-card { border: 2px dashed #444; border-radius: 8px; padding: 22px; max-width: 620px; margin: 0 auto; }
+                          .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #222; padding-bottom: 12px; margin-bottom: 15px; }
+                          .brand { font-size: 24px; font-weight: 800; letter-spacing: 2px; }
+                          .badge { background: #b87355; color: #fff; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; }
+                          .cod-banner { background: #fff4eb; border: 1.5px solid #d97736; border-radius: 6px; padding: 12px 14px; margin: 14px 0; display: flex; justify-content: space-between; align-items: center; }
+                          .cod-amount { font-size: 20px; font-weight: 900; color: #b87355; }
+                          .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; font-size: 13px; line-height: 1.5; }
+                          .info-box { background: #fafafa; border: 1px solid #e0e0e0; border-radius: 6px; padding: 12px; }
+                          .table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 14px 0; }
+                          .table th { background: #f0ede8; padding: 8px 10px; text-align: left; font-size: 11px; text-transform: uppercase; border-bottom: 1.5px solid #ccc; }
+                          .footer-note { font-size: 11px; color: #666; text-align: center; border-top: 1px solid #ddd; padding-top: 12px; margin-top: 15px; }
+                          @media print {
+                            body { padding: 0; }
+                            .no-print { display: none; }
+                          }
+                        </style>
+                      </head>
+                      <body>
+                        <div class="no-print" style="text-align: center; margin-bottom: 16px;">
+                          <button onclick="window.print()" style="background: #b87355; color: #fff; border: none; padding: 10px 24px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 14px;">
+                            Cetak Label Sekarang
+                          </button>
+                        </div>
+                        <div class="label-card">
+                          <div class="header">
+                            <div>
+                              <div class="brand">CLAYÉ</div>
+                              <div style="font-size: 11px; color: #666; letter-spacing: 1px;">KURASI KERAMIK NUSANTARA • PALEMBANG</div>
+                            </div>
+                            <div style="text-align: right;">
+                              <span class="badge">SURAT JALAN & LABEL RESI</span>
+                              <div style="font-size: 14px; font-weight: bold; margin-top: 5px;">${inspectOrderData.id}</div>
+                              <div style="font-size: 11px; color: #777;">${inspectOrderData.date}</div>
+                            </div>
+                          </div>
+
+                          <div class="cod-banner">
+                            <div>
+                              <div style="font-size: 12px; font-weight: 800; color: #7c4a2d; text-transform: uppercase;">
+                                METODE: COD (BAYAR TUNAI DI TEMPAT)
+                              </div>
+                              <div style="font-size: 11px; color: #6a3e24;">Tagih uang tunai pas saat keramik diserahterimakan ke pemesan.</div>
+                            </div>
+                            <div class="cod-amount">Rp ${grandTotal}</div>
+                          </div>
+
+                          <div class="info-grid">
+                            <div class="info-box">
+                              <strong style="color: #666; font-size: 11px; text-transform: uppercase; display: block; margin-bottom: 4px;">PENGIRIM (STUDIO):</strong>
+                              <div style="font-weight: bold;">CLAYÉ Studio Palembang</div>
+                              <div>Jl. Sejuta Kenangan, Ilir Barat I</div>
+                              <div>Kota Palembang, Sumatera Selatan</div>
+                              <div>WhatsApp: +62 811-2233-4455</div>
+                            </div>
+
+                            <div class="info-box">
+                              <strong style="color: #666; font-size: 11px; text-transform: uppercase; display: block; margin-bottom: 4px;">PENERIMA (TUJUAN):</strong>
+                              <div style="font-weight: bold; font-size: 14px;">${inspectOrderData.patron}</div>
+                              <div style="color: #b87355; font-weight: 700; margin-bottom: 2px;">Telp/WA: ${inspectOrderData.phone || '-'}</div>
+                              <div>${inspectOrderData.address || inspectOrderData.shippingAddress || inspectOrderData.city}</div>
+                            </div>
+                          </div>
+
+                          <div style="font-size: 11px; color: #555; margin-bottom: 4px;">
+                            <strong>LAYANAN PENGANTARAN:</strong> ${inspectOrderData.courier || 'Antar Langsung Tim CLAYÉ Studio'}
+                          </div>
+
+                          <table class="table">
+                            <thead>
+                              <tr>
+                                <th>Karya Keramik</th>
+                                <th>Varian Glasir</th>
+                                <th style="text-align: center;">Qty</th>
+                                <th style="text-align: right;">Total</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              ${itemsHtml}
+                            </tbody>
+                            <tfoot>
+                              <tr>
+                                <td colspan="3" style="text-align: right; padding: 6px 10px; font-size: 11px; color: #666;">Subtotal Produk:</td>
+                                <td style="text-align: right; padding: 6px 10px; font-weight: bold;">Rp ${subtotal}</td>
+                              </tr>
+                              <tr>
+                                <td colspan="3" style="text-align: right; padding: 6px 10px; font-size: 11px; color: #666;">Ongkos Antar:</td>
+                                <td style="text-align: right; padding: 6px 10px; font-weight: bold;">Rp ${shippingFee}</td>
+                              </tr>
+                              <tr style="border-top: 1.5px solid #222;">
+                                <td colspan="3" style="text-align: right; padding: 8px 10px; font-size: 13px; font-weight: 900;">TOTAL COD DITAGIH:</td>
+                                <td style="text-align: right; padding: 8px 10px; font-size: 14px; font-weight: 900; color: #b87355;">Rp ${grandTotal}</td>
+                              </tr>
+                            </tfoot>
+                          </table>
+
+                          <div class="footer-note">
+                            DIPROTEKSI PACKING HONEYCOMB KRAFT & GARANSI GANTI BARU CLAYÉ STUDIO PALEMBANG
+                          </div>
+                        </div>
+                      </body>
+                      </html>
+                    `);
+                    printWindow.document.close();
+                    printWindow.focus();
                   }}
                   className="btn-modal-action"
                 >
