@@ -294,7 +294,12 @@ export default function AdminPage() {
       updateOrderFulfillment(orderId, newStatus);
     }
     if (inspectOrderData && inspectOrderData.id === orderId) {
-      setInspectOrderData(prev => ({ ...prev, fulfillment: newStatus }));
+      const updatedPayment = newStatus === 'Selesai' ? 'Lunas' : (inspectOrderData.paymentMethod?.includes('COD') ? 'Menunggu Pembayaran' : inspectOrderData.paymentStatus);
+      setInspectOrderData(prev => ({
+        ...prev,
+        fulfillment: newStatus,
+        paymentStatus: updatedPayment
+      }));
     }
   };
 
@@ -942,6 +947,37 @@ export default function AdminPage() {
                             </td>
                             <td className="cell-collector-patron">
                               <strong>{ord.patron}</strong>
+                              {ord.phone && ord.phone !== '-' && (
+                                <a
+                                  href={(() => {
+                                    const cleanNum = ord.phone.replace(/[^0-9]/g, '');
+                                    const formattedNum = cleanNum.startsWith('0') ? '62' + cleanNum.slice(1) : (cleanNum.startsWith('62') ? cleanNum : '62' + cleanNum);
+                                    const orderIdClean = (ord.id || '').replace('#', '');
+                                    const patronName = ord.patron || 'Pelanggan';
+                                    const grandTotal = (ord.grandTotal || ord.total || 0).toLocaleString('id-ID');
+                                    const message = `Halo Kak ${patronName}! 👋\nKami dari *CLAYÉ Curated Ceramics* ingin menginformasikan bahwa pesanan keramik Anda dengan nomor ref *#${orderIdClean}* sedang kami siapkan dan kemas rapi dengan garansi bubble wrap.\n\nPesanan akan segera kami antar langsung ke alamat Anda (COD Rp ${grandTotal}). Mohon konfirmasi ketersediaan di lokasi ya Kak. Terima kasih! ✨`;
+                                    return `https://wa.me/${formattedNum}?text=${encodeURIComponent(message)}`;
+                                  })()}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '4px',
+                                    fontSize: '0.72rem',
+                                    color: '#128C7E',
+                                    marginTop: '3px',
+                                    textDecoration: 'none',
+                                    fontWeight: 600
+                                  }}
+                                  title="Chat WhatsApp Pelanggan"
+                                >
+                                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.072-2.131-.497-1.745-.692-2.875-2.456-2.963-2.573-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.861.174.086.275.073.376-.044.101-.116.433-.506.549-.68.116-.173.231-.145.39-.086s1.011.477 1.184.564.289.13.332.202c.043.073.043.419-.101.824z"/>
+                                  </svg>
+                                  {ord.phone}
+                                </a>
+                              )}
                             </td>
                             <td>{ord.city}</td>
                             <td className="cell-date">{ord.date}</td>
@@ -2431,10 +2467,55 @@ export default function AdminPage() {
                   <span style={{ fontSize: '0.8rem', color: '#8A857F' }}>NAMA PEMESAN</span>
                   <strong>{inspectOrderData.patron}</strong>
                 </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+                  <span style={{ fontSize: '0.8rem', color: '#8A857F' }}>NO. WHATSAPP</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <strong style={{ color: '#262422' }}>{inspectOrderData.phone || '-'}</strong>
+                    {inspectOrderData.phone && inspectOrderData.phone !== '-' && (
+                      <a
+                        href={(() => {
+                          const cleanNum = (inspectOrderData.phone || '').replace(/[^0-9]/g, '');
+                          const formattedNum = cleanNum.startsWith('0') ? '62' + cleanNum.slice(1) : (cleanNum.startsWith('62') ? cleanNum : '62' + cleanNum);
+                          const orderIdClean = (inspectOrderData.id || '').replace('#', '');
+                          const patronName = inspectOrderData.patron || 'Pelanggan';
+                          const grandTotal = (inspectOrderData.grandTotal || inspectOrderData.total || 0).toLocaleString('id-ID');
+                          const message = `Halo Kak ${patronName}! 👋\nKami dari *CLAYÉ Curated Ceramics* ingin menginformasikan bahwa pesanan keramik Anda dengan nomor ref *#${orderIdClean}* sedang kami siapkan dan kemas rapi dengan garansi bubble wrap.\n\nPesanan akan segera kami antar langsung ke alamat Anda (COD Rp ${grandTotal}). Mohon konfirmasi ketersediaan di lokasi ya Kak. Terima kasih! ✨`;
+                          return `https://wa.me/${formattedNum}?text=${encodeURIComponent(message)}`;
+                        })()}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '5px',
+                          backgroundColor: '#25D366',
+                          color: '#FFFFFF',
+                          padding: '4px 10px',
+                          borderRadius: '20px',
+                          fontSize: '0.74rem',
+                          fontWeight: 700,
+                          textDecoration: 'none'
+                        }}
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.312.045-.694.072-2.131-.497-1.745-.692-2.875-2.456-2.963-2.573-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.861.174.086.275.073.376-.044.101-.116.433-.506.549-.68.116-.173.231-.145.39-.086s1.011.477 1.184.564.289.13.332.202c.043.073.043.419-.101.824z"/>
+                        </svg>
+                        Hubungi WhatsApp
+                      </a>
+                    )}
+                  </div>
+                </div>
+
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
-                  <span style={{ fontSize: '0.8rem', color: '#8A857F' }}>ALAMAT PENGIRIMAN</span>
-                  <span style={{ fontSize: '0.85rem', textAlign: 'right', maxWidth: '60%' }}>
-                    {inspectOrderData.address || inspectOrderData.city}
+                  <span style={{ fontSize: '0.8rem', color: '#8A857F' }}>EMAIL</span>
+                  <span style={{ fontSize: '0.85rem' }}>{inspectOrderData.email || '-'}</span>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
+                  <span style={{ fontSize: '0.8rem', color: '#8A857F' }}>ALAMAT LENGKAP PENGIRIMAN</span>
+                  <span style={{ fontSize: '0.85rem', textAlign: 'right', maxWidth: '65%', color: '#262422', fontWeight: 500 }}>
+                    {inspectOrderData.address || inspectOrderData.shippingAddress || inspectOrderData.city}
                   </span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
@@ -2443,11 +2524,13 @@ export default function AdminPage() {
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
                   <span style={{ fontSize: '0.8rem', color: '#8A857F' }}>METODE PEMBAYARAN</span>
-                  <span>{inspectOrderData.paymentMethod || 'Transfer Bank'} (<strong>{inspectOrderData.paymentStatus}</strong>)</span>
+                  <span>{inspectOrderData.paymentMethod || 'COD'} (<strong>{inspectOrderData.paymentStatus}</strong>)</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: '0.8rem', color: '#8A857F' }}>EKSPEDISI DAN RESI</span>
-                  <span>{inspectOrderData.courier || 'Eco Shield'} ({inspectOrderData.trackingNumber || 'CLY-EXP-BDG'})</span>
+                  <span style={{ fontSize: '0.8rem', color: '#8A857F' }}>EKSPEDISI & PENGANTARAN</span>
+                  <span style={{ fontSize: '0.82rem', textAlign: 'right', maxWidth: '65%' }}>
+                    {inspectOrderData.courier || 'Antar Langsung Tim CLAYÉ'} ({inspectOrderData.trackingNumber || 'CLY-COD-PLM'})
+                  </span>
                 </div>
               </div>
 

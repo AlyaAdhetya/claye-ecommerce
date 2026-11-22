@@ -67,6 +67,9 @@ export default function LoginPage() {
           // Balik lagi ke menu login setelah daftar sesuai instruksi
           setIsRegister(false);
           setPassword('');
+          setEmail(res.registeredEmail || '');
+          setFullName('');
+          setPhone('');
         }
       } else {
         if (!email || !password) {
@@ -295,7 +298,13 @@ export default function LoginPage() {
                 Sudah memiliki akun terdaftar?{' '}
                 <button
                   type="button"
-                  onClick={() => setIsRegister(false)}
+                  onClick={() => {
+                    setIsRegister(false);
+                    setEmail('');
+                    setPassword('');
+                    setFullName('');
+                    setPhone('');
+                  }}
                   style={{ background: 'none', border: 'none', color: '#B87355', cursor: 'pointer', fontWeight: 600, textDecoration: 'underline' }}
                 >
                   Masuk di sini
@@ -306,7 +315,13 @@ export default function LoginPage() {
                 Belum memiliki akun pelanggan?{' '}
                 <button
                   type="button"
-                  onClick={() => setIsRegister(true)}
+                  onClick={() => {
+                    setIsRegister(true);
+                    setEmail('');
+                    setPassword('');
+                    setFullName('');
+                    setPhone('');
+                  }}
                   style={{ background: 'none', border: 'none', color: '#B87355', cursor: 'pointer', fontWeight: 600, textDecoration: 'underline' }}
                 >
                   Daftar akun baru

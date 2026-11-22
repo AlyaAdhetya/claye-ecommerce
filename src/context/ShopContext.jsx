@@ -880,7 +880,7 @@ export function ShopProvider({ children }) {
       shippingFee: shippingFee,
       grandTotal: computedGrandTotal,
       fulfillment: orderData.fulfillment || 'Diproses',
-      paymentStatus: orderData.paymentStatus || 'Lunas',
+      paymentStatus: orderData.paymentStatus || 'Menunggu Pembayaran',
       paymentMethod: orderData.paymentMethod || 'COD (Bayar di Tempat)',
       courier: orderData.courier || 'Kurir CLAYÉ – Dalam Kota Palembang',
       trackingNumber: `CLY-COD-${randNum}-PLM`,
@@ -915,7 +915,22 @@ export function ShopProvider({ children }) {
 
   const updateOrderFulfillment = (orderId, newStatus) => {
     setOrders(prev =>
-      prev.map(ord => ord.id === orderId ? { ...ord, fulfillment: newStatus } : ord)
+      prev.map(ord => {
+        if (ord.id === orderId) {
+          const updated = { ...ord, fulfillment: newStatus };
+          // Jika status fulfillment diubah menjadi "Selesai", otomatis tandai pembayaran Lunas (karena COD diserahkan & dibayar)
+          if (newStatus === 'Selesai') {
+            updated.paymentStatus = 'Lunas';
+          } else if (newStatus === 'Diproses' || newStatus === 'Menunggu Pembayaran') {
+            // Jika belum selesai, pembayaran COD masih menunggu pelunasan di tempat
+            if (ord.paymentMethod && ord.paymentMethod.includes('COD')) {
+              updated.paymentStatus = 'Menunggu Pembayaran';
+            }
+          }
+          return updated;
+        }
+        return ord;
+      })
     );
     showToast(`Status pengiriman ${orderId} diubah menjadi "${newStatus}".`, 'success');
   };
