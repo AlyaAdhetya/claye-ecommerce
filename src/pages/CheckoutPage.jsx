@@ -193,7 +193,7 @@ export default function CheckoutPage() {
       grandTotal: totalWithShipping,
       paymentMethod: 'COD (Bayar Tunai di Tempat ke Tim CLAYÉ)',
       paymentStatus: 'Menunggu Pembayaran',
-      fulfillment: 'Diproses',
+      fulfillment: 'Sedang Dikemas',
       courier: `Antar Langsung Tim CLAYÉ Studio – ${selectedZone.label} (${selectedZone.estimate})`,
       shippingAddress: fullShippingAddress,
       patron: formData.fullName,

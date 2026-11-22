@@ -879,7 +879,7 @@ export function ShopProvider({ children }) {
       couponCode: orderData.couponCode || appliedCoupon || null,
       shippingFee: shippingFee,
       grandTotal: computedGrandTotal,
-      fulfillment: orderData.fulfillment || 'Diproses',
+      fulfillment: orderData.fulfillment || 'Sedang Dikemas',
       paymentStatus: orderData.paymentStatus || 'Menunggu Pembayaran',
       paymentMethod: orderData.paymentMethod || 'COD (Bayar di Tempat)',
       courier: orderData.courier || 'Kurir CLAYÉ – Dalam Kota Palembang',
@@ -918,11 +918,11 @@ export function ShopProvider({ children }) {
       prev.map(ord => {
         if (ord.id === orderId) {
           const updated = { ...ord, fulfillment: newStatus };
-          // Jika status fulfillment diubah menjadi "Selesai", otomatis tandai pembayaran Lunas (karena COD diserahkan & dibayar)
-          if (newStatus === 'Selesai') {
+          // Jika status fulfillment diubah menjadi "Selesai (Terkirim & Lunas)", otomatis tandai pembayaran Lunas
+          if (newStatus.startsWith('Selesai')) {
             updated.paymentStatus = 'Lunas';
-          } else if (newStatus === 'Diproses' || newStatus === 'Menunggu Pembayaran') {
-            // Jika belum selesai, pembayaran COD masih menunggu pelunasan di tempat
+          } else {
+            // Jika masih Sedang Dikemas atau Sedang Diantar, COD menunggu pembayaran saat serah terima
             if (ord.paymentMethod && ord.paymentMethod.includes('COD')) {
               updated.paymentStatus = 'Menunggu Pembayaran';
             }

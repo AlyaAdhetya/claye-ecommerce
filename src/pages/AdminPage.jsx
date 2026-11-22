@@ -294,7 +294,7 @@ export default function AdminPage() {
       updateOrderFulfillment(orderId, newStatus);
     }
     if (inspectOrderData && inspectOrderData.id === orderId) {
-      const updatedPayment = newStatus === 'Selesai' ? 'Lunas' : (inspectOrderData.paymentMethod?.includes('COD') ? 'Menunggu Pembayaran' : inspectOrderData.paymentStatus);
+      const updatedPayment = newStatus.startsWith('Selesai') ? 'Lunas' : (inspectOrderData.paymentMethod?.includes('COD') ? 'Menunggu Pembayaran' : inspectOrderData.paymentStatus);
       setInspectOrderData(prev => ({
         ...prev,
         fulfillment: newStatus,
@@ -955,7 +955,7 @@ export default function AdminPage() {
                                     const orderIdClean = (ord.id || '').replace('#', '');
                                     const patronName = ord.patron || 'Pelanggan';
                                     const grandTotal = (ord.grandTotal || ord.total || 0).toLocaleString('id-ID');
-                                    const message = `Halo Kak ${patronName}! 👋\nKami dari *CLAYÉ Curated Ceramics* ingin menginformasikan bahwa pesanan keramik Anda dengan nomor ref *#${orderIdClean}* sedang kami siapkan dan kemas rapi dengan garansi bubble wrap.\n\nPesanan akan segera kami antar langsung ke alamat Anda (COD Rp ${grandTotal}). Mohon konfirmasi ketersediaan di lokasi ya Kak. Terima kasih! ✨`;
+                                    const message = `Halo Kak ${patronName}.\nKami dari CLAYÉ Curated Ceramics ingin menginformasikan bahwa pesanan keramik Anda dengan nomor ref #${orderIdClean} sedang kami siapkan dan kemas rapi dengan garansi bubble wrap.\n\nPesanan akan segera kami antar langsung ke alamat Anda (COD Rp ${grandTotal}). Mohon konfirmasi ketersediaan di lokasi ya Kak. Terima kasih.`;
                                     return `https://wa.me/${formattedNum}?text=${encodeURIComponent(message)}`;
                                   })()}
                                   target="_blank"
@@ -1013,9 +1013,9 @@ export default function AdminPage() {
                                   fontWeight: '600'
                                 }}
                               >
-                                <option value="Diproses">Diproses</option>
-                                <option value="Selesai">Selesai (Terkirim)</option>
-                                <option value="Menunggu Pembayaran">Menunggu Pembayaran</option>
+                                <option value="Sedang Dikemas">Sedang Dikemas</option>
+                                <option value="Sedang Diantar">Sedang Diantar (COD)</option>
+                                <option value="Selesai (Terkirim & Lunas)">Selesai (Terkirim & Lunas)</option>
                               </select>
                             </td>
                             <td style={{ textAlign: 'right' }}>
@@ -1613,13 +1613,12 @@ export default function AdminPage() {
                         <th>STATUS AKUN</th>
                         <th>TOTAL PESANAN</th>
                         <th>TOTAL BELANJA</th>
-                        <th style={{ textAlign: 'right' }}>AKSI</th>
                       </tr>
                     </thead>
                     <tbody>
                       {collectors.length === 0 ? (
                         <tr>
-                          <td colSpan="8" style={{ textAlign: 'center', padding: '3.5rem 1rem', color: '#8A857F' }}>
+                          <td colSpan="7" style={{ textAlign: 'center', padding: '3.5rem 1rem', color: '#8A857F' }}>
                             <div style={{ fontSize: '1.4rem', marginBottom: '0.5rem' }}>🍃</div>
                             <strong>Belum Ada Pelanggan Terdaftar</strong>
                             <p style={{ margin: '0.25rem 0 0', fontSize: '0.85rem' }}>
@@ -1646,17 +1645,6 @@ export default function AdminPage() {
                             </td>
                             <td><strong>{c.totalOrders}</strong></td>
                             <td><strong>Rp {c.totalSpent.toLocaleString('id-ID')}</strong></td>
-                            <td style={{ textAlign: 'right' }}>
-                              <a
-                                href={`https://wa.me/${(c.phone || '').replace(/[^0-9]/g, '')}`}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="admin-inspect-btn"
-                                style={{ textDecoration: 'none', display: 'inline-block' }}
-                              >
-                                Hubungi
-                              </a>
-                            </td>
                           </tr>
                         ))
                       )}
@@ -1847,59 +1835,32 @@ export default function AdminPage() {
 
                   <div style={{ borderTop: '1px solid #EAE6DF', paddingTop: '1.5rem', marginBottom: '2rem' }}>
                     <h3 className="section-serif-heading" style={{ fontSize: '1.35rem', marginBottom: '0.4rem' }}>
-                      2. Standar Logistik Pengemasan dan Garansi Keramik
+                      2. Metode Pengantaran & Pembayaran Toko
                     </h3>
                     <p className="section-subtext" style={{ marginBottom: '1.25rem' }}>
-                      Protokol keamanan pengiriman produk stoneware ke seluruh Indonesia.
+                      Sistem transaksi dan pengantaran resmi studio CLAYÉ di Kota Palembang.
                     </p>
 
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', marginBottom: '1rem' }}>
-                      <input
-                        type="checkbox"
-                        checked={studioSettings.shippingProtection}
-                        onChange={(e) => setStudioSettings({ ...studioSettings, shippingProtection: e.target.checked })}
-                        style={{ width: '18px', height: '18px' }}
-                      />
-                      <span style={{ fontSize: '0.9rem', color: '#24201D' }}>
-                        <strong>Aktifkan Garansi Pecah Belah 100% Ganti Baru</strong> (Wajib menyertakan video unboxing)
-                      </span>
-                    </label>
-                  </div>
-
-                  <div style={{ borderTop: '1px solid #EAE6DF', paddingTop: '1.5rem', marginBottom: '2rem' }}>
-                    <h3 className="section-serif-heading" style={{ fontSize: '1.35rem', marginBottom: '0.4rem' }}>
-                      3. Jalur Pembayaran Toko
-                    </h3>
-                    <p className="section-subtext" style={{ marginBottom: '1.25rem' }}>
-                      Metode pembayaran yang diizinkan saat pelanggan melakukan checkout.
-                    </p>
-
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                      <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
-                        <input
-                          type="checkbox"
-                          checked={studioSettings.qrisActive}
-                          onChange={(e) => setStudioSettings({ ...studioSettings, qrisActive: e.target.checked })}
-                          style={{ width: '18px', height: '18px' }}
-                        />
-                        <span style={{ fontSize: '0.9rem' }}>QRIS Instan (GoPay, OVO, Dana, ShopeePay, Mobile Banking)</span>
-                      </label>
-                      <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
-                        <input
-                          type="checkbox"
-                          checked={studioSettings.bcaActive}
-                          onChange={(e) => setStudioSettings({ ...studioSettings, bcaActive: e.target.checked })}
-                          style={{ width: '18px', height: '18px' }}
-                        />
-                        <span style={{ fontSize: '0.9rem' }}>Transfer Bank Manual (BCA dan Mandiri Rekening Resmi)</span>
-                      </label>
+                    <div style={{ backgroundColor: '#FAF8F5', border: '1px solid #EAE6DF', borderRadius: '8px', padding: '1.1rem 1.25rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                        <span style={{ fontSize: '1rem' }}>🤝</span>
+                        <strong style={{ fontSize: '0.88rem', color: '#7C4A2D' }}>
+                          COD Mandiri (Cash on Delivery)
+                        </strong>
+                        <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: '12px', backgroundColor: '#E8ECE6', color: '#385E3E', fontWeight: 700 }}>
+                          Aktif
+                        </span>
+                      </div>
+                      <p style={{ margin: 0, fontSize: '0.84rem', color: '#6A3E24', lineHeight: '1.5' }}>
+                        Pesanan diantar langsung oleh kurir internal tim CLAYÉ dari studio di Palembang. Pelanggan membayar uang tunai di tempat saat serah terima barang tanpa pihak ketiga.
+                      </p>
                     </div>
                   </div>
 
                   <div style={{ borderTop: '1px solid #EAE6DF', paddingTop: '1.5rem', marginBottom: '2rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '0.4rem' }}>
                       <h3 className="section-serif-heading" style={{ fontSize: '1.35rem', margin: 0 }}>
-                        4. Integrasi Database Supabase (PostgreSQL Cloud)
+                        3. Integrasi Database Supabase (PostgreSQL Cloud)
                       </h3>
                       <span style={{
                         fontSize: '0.78rem',
@@ -2480,7 +2441,7 @@ export default function AdminPage() {
                           const orderIdClean = (inspectOrderData.id || '').replace('#', '');
                           const patronName = inspectOrderData.patron || 'Pelanggan';
                           const grandTotal = (inspectOrderData.grandTotal || inspectOrderData.total || 0).toLocaleString('id-ID');
-                          const message = `Halo Kak ${patronName}! 👋\nKami dari *CLAYÉ Curated Ceramics* ingin menginformasikan bahwa pesanan keramik Anda dengan nomor ref *#${orderIdClean}* sedang kami siapkan dan kemas rapi dengan garansi bubble wrap.\n\nPesanan akan segera kami antar langsung ke alamat Anda (COD Rp ${grandTotal}). Mohon konfirmasi ketersediaan di lokasi ya Kak. Terima kasih! ✨`;
+                          const message = `Halo Kak ${patronName}.\nKami dari CLAYÉ Curated Ceramics ingin menginformasikan bahwa pesanan keramik Anda dengan nomor ref #${orderIdClean} sedang kami siapkan dan kemas rapi dengan garansi bubble wrap.\n\nPesanan akan segera kami antar langsung ke alamat Anda (COD Rp ${grandTotal}). Mohon konfirmasi ketersediaan di lokasi ya Kak. Terima kasih.`;
                           return `https://wa.me/${formattedNum}?text=${encodeURIComponent(message)}`;
                         })()}
                         target="_blank"
@@ -2568,9 +2529,9 @@ export default function AdminPage() {
                   onChange={(e) => handleUpdateFulfillment(inspectOrderData.id, e.target.value)}
                   style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid #EAE6DF' }}
                 >
-                  <option value="Diproses">Diproses (Sedang Dikemas)</option>
-                  <option value="Selesai">Selesai (Terkirim)</option>
-                  <option value="Menunggu Pembayaran">Menunggu Pembayaran</option>
+                  <option value="Sedang Dikemas">Sedang Dikemas</option>
+                  <option value="Sedang Diantar">Sedang Diantar (COD)</option>
+                  <option value="Selesai (Terkirim & Lunas)">Selesai (Terkirim & Lunas)</option>
                 </select>
               </div>
 
