@@ -910,36 +910,6 @@ export default function AdminPage() {
                   </p>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                  <button
-                    onClick={() => syncOrders && syncOrders()}
-                    className="purpose-action-btn primary"
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', textTransform: 'capitalize' }}
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="23 4 23 10 17 10"></polyline>
-                      <polyline points="1 20 1 14 7 14"></polyline>
-                      <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
-                    </svg>
-                    <span>Sinkronkan Supabase</span>
-                  </button>
-                  <button
-                    onClick={() => showToast(`Data ${adminOrders.length} pesanan siap diekspor.`, 'info')}
-                    className="purpose-action-btn secondary"
-                    style={{ textTransform: 'capitalize' }}
-                  >
-                    Ekspor CSV
-                  </button>
-                  <span style={{
-                    fontSize: '0.78rem',
-                    padding: '4px 10px',
-                    borderRadius: '20px',
-                    fontWeight: 600,
-                    backgroundColor: isSupabaseConfigured() ? '#ECFDF5' : '#FEF3C7',
-                    color: isSupabaseConfigured() ? '#047857' : '#92400E',
-                    border: isSupabaseConfigured() ? '1px solid #A7F3D0' : '1px solid #FDE68A'
-                  }}>
-                    {isSupabaseConfigured() ? '● Supabase Terhubung' : '○ Supabase Lokal'}
-                  </span>
                 </div>
               </div>
 
@@ -2274,33 +2244,6 @@ export default function AdminPage() {
                     ))}
                   </div>
 
-                  {/* SELECT PRESET FOTO UTAMA */}
-                  <div style={{ marginBottom: '0.5rem' }}>
-                    <div style={{ fontSize: '0.78rem', color: '#6E6962', marginBottom: '0.35rem', fontWeight: 500 }}>
-                      Pilih Foto dari Galeri Siap Pakai:
-                    </div>
-                    <select
-                      value={newProdImage}
-                      onChange={(e) => {
-                        setNewProdImage(e.target.value);
-                        if (!newProdThumbnails.includes(e.target.value)) {
-                          setNewProdThumbnails(prev => [...prev, e.target.value]);
-                        }
-                      }}
-                      style={{
-                        width: '100%',
-                        padding: '0.55rem 0.8rem',
-                        borderRadius: '6px',
-                        border: '1px solid #D8D2C7',
-                        fontSize: '0.82rem',
-                        backgroundColor: '#FFFFFF'
-                      }}
-                    >
-                      {AVAILABLE_IMAGES.map((img) => (
-                        <option key={img.url} value={img.url}>{img.label}</option>
-                      ))}
-                    </select>
-                  </div>
 
                   {/* TOMBOL UNGGAH MULTI-FOTO */}
                   <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
@@ -2317,12 +2260,7 @@ export default function AdminPage() {
                       border: '1px solid #E4D0C5',
                       borderRadius: '6px'
                     }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="17 8 12 3 7 8"></polyline>
-                        <line x1="12" y1="3" x2="12" y2="15"></line>
-                      </svg>
-                      <span>+ Tambah Banyak Foto Sekaligus (Multi-upload)</span>
+                      <span>Tambah Banyak Foto Sekaligus</span>
                       <input
                         type="file"
                         accept="image/*"
@@ -2595,33 +2533,6 @@ export default function AdminPage() {
                     ))}
                   </div>
 
-                  {/* SELECT PRESET FOTO UTAMA */}
-                  <div style={{ marginBottom: '0.5rem' }}>
-                    <div style={{ fontSize: '0.78rem', color: '#6E6962', marginBottom: '0.35rem', fontWeight: 500 }}>
-                      Pilih Foto dari Galeri Siap Pakai:
-                    </div>
-                    <select
-                      value={editProdImage}
-                      onChange={(e) => {
-                        setEditProdImage(e.target.value);
-                        if (!editProdThumbnails.includes(e.target.value)) {
-                          setEditProdThumbnails(prev => [...prev, e.target.value]);
-                        }
-                      }}
-                      style={{
-                        width: '100%',
-                        padding: '0.55rem 0.8rem',
-                        borderRadius: '6px',
-                        border: '1px solid #D8D2C7',
-                        fontSize: '0.82rem',
-                        backgroundColor: '#FFFFFF'
-                      }}
-                    >
-                      {AVAILABLE_IMAGES.map((img) => (
-                        <option key={img.url} value={img.url}>{img.label}</option>
-                      ))}
-                    </select>
-                  </div>
 
                   {/* TOMBOL UNGGAH MULTI-FOTO */}
                   <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
@@ -2638,12 +2549,7 @@ export default function AdminPage() {
                       border: '1px solid #E4D0C5',
                       borderRadius: '6px'
                     }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="17 8 12 3 7 8"></polyline>
-                        <line x1="12" y1="3" x2="12" y2="15"></line>
-                      </svg>
-                      <span>+ Tambah Banyak Foto Sekaligus (Multi-upload)</span>
+                      <span>Tambah Banyak Foto Sekaligus</span>
                       <input
                         type="file"
                         accept="image/*"
