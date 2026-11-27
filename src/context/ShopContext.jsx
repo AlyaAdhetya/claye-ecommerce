@@ -25,7 +25,157 @@ export const ADMIN_CREDENTIALS = {
 const INITIAL_USER = null;
 const INITIAL_CART = [];
 const INITIAL_WISHLIST = [];
-const INITIAL_ORDERS = [];
+
+export const INITIAL_ORDERS = [
+  {
+    id: '#CLY-2026-129',
+    patron: 'Tasya',
+    initials: 'TA',
+    email: 'tasya.salsabila@gmail.com',
+    phone: '085267123490',
+    city: 'Kota Palembang',
+    address: 'Jl. Demang Lebar Daun No. 88, RT 02 / RW 04, Kec. Ilir Barat I, Kota Palembang',
+    date: '30 Nov 2026',
+    itemsSummary: 'Artisan Floral Ceramic Plates (CER-PLT-003)',
+    variantSummary: 'Kode: CER-PLT-003 • Jml: 1',
+    items: [
+      {
+        name: 'Artisan Floral Ceramic Plates',
+        code: 'CER-PLT-003',
+        selectedCode: 'CER-PLT-003',
+        quantity: 1,
+        price: 48000
+      }
+    ],
+    total: 48000,
+    discount: 0,
+    couponCode: null,
+    shippingFee: 15000,
+    grandTotal: 63000,
+    fulfillment: 'Diproses',
+    paymentStatus: 'Menunggu Pembayaran',
+    paymentMethod: 'COD (Bayar Tunai di Tempat ke Tim CLAYÉ)',
+    courier: 'Antar Langsung Tim CLAYÉ Studio – Palembang Pusat',
+    trackingNumber: 'CLY-COD-129-PLM',
+    image: '/assets/images/katalog_plate_1.jpg',
+    shippingAddress: 'Jl. Demang Lebar Daun No. 88, RT 02 / RW 04, Kec. Ilir Barat I, Kota Palembang'
+  },
+  {
+    id: '#CLY-2026-104',
+    patron: 'Dini',
+    initials: 'DI',
+    email: 'dini.pratiwi@gmail.com',
+    phone: '082188492011',
+    city: 'Kota Palembang',
+    address: 'Jl. Mayor Ruslan No. 45, Kel. 9 Ilir, Kec. Ilir Timur II, Kota Palembang',
+    date: '27 Nov 2026',
+    itemsSummary: 'Artisan Ceramic Bowls Collection (CER-BWL-005) + Artisan Ceramic Bowls Collection (CER-BWL-003)',
+    variantSummary: 'Kode: CER-BWL-005 • Jml: 1, Kode: CER-BWL-003 • Jml: 1',
+    items: [
+      {
+        name: 'Artisan Ceramic Bowls Collection',
+        code: 'CER-BWL-005',
+        selectedCode: 'CER-BWL-005',
+        quantity: 1,
+        price: 45000
+      },
+      {
+        name: 'Artisan Ceramic Bowls Collection',
+        code: 'CER-BWL-003',
+        selectedCode: 'CER-BWL-003',
+        quantity: 1,
+        price: 45000
+      }
+    ],
+    total: 90000,
+    discount: 0,
+    couponCode: null,
+    shippingFee: 15000,
+    grandTotal: 105000,
+    fulfillment: 'Selesai',
+    paymentStatus: 'Lunas',
+    paymentMethod: 'COD (Bayar Tunai di Tempat ke Tim CLAYÉ)',
+    courier: 'Antar Langsung Tim CLAYÉ Studio – Palembang Pusat',
+    trackingNumber: 'CLY-COD-104-PLM',
+    image: '/assets/images/katalog_bowl.jpg',
+    shippingAddress: 'Jl. Mayor Ruslan No. 45, Kel. 9 Ilir, Kec. Ilir Timur II, Kota Palembang'
+  },
+  {
+    id: '#CLY-2026-081',
+    patron: 'Saputri',
+    initials: 'SA',
+    email: 'saputri.rahma@gmail.com',
+    phone: '081273849102',
+    city: 'Kota Palembang',
+    address: 'Jl. Angkatan 45 No. 12, Kel. Demang Lebar Daun, Kec. Ilir Barat I, Kota Palembang',
+    date: '23 Nov 2026',
+    itemsSummary: 'Cat Paw Graphic Mugs (CER-CUP-001)',
+    variantSummary: 'Kode: CER-CUP-001 • Jml: 1',
+    items: [
+      {
+        name: 'Cat Paw Graphic Mugs',
+        code: 'CER-CUP-001',
+        selectedCode: 'CER-CUP-001',
+        quantity: 1,
+        price: 38000
+      }
+    ],
+    total: 38000,
+    discount: 0,
+    couponCode: null,
+    shippingFee: 15000,
+    grandTotal: 53000,
+    fulfillment: 'Selesai',
+    paymentStatus: 'Lunas',
+    paymentMethod: 'COD (Bayar Tunai di Tempat ke Tim CLAYÉ)',
+    courier: 'Antar Langsung Tim CLAYÉ Studio – Palembang Pusat',
+    trackingNumber: 'CLY-COD-081-PLM',
+    image: '/assets/images/katalog_cup.jpg',
+    shippingAddress: 'Jl. Angkatan 45 No. 12, Kel. Demang Lebar Daun, Kec. Ilir Barat I, Kota Palembang'
+  }
+];
+
+export const INITIAL_REGISTERED_USERS = [
+  {
+    name: 'Saputri',
+    fullName: 'Saputri Rahma',
+    email: 'saputri.rahma@gmail.com',
+    phone: '081273849102',
+    password: 'claye123',
+    address: 'Jl. Angkatan 45 No. 12, Kel. Demang Lebar Daun, Kec. Ilir Barat I',
+    city: 'Kota Palembang',
+    postalCode: '30137',
+    patronSince: '2026',
+    cohort: 'Pelanggan Terverifikasi',
+    role: 'customer'
+  },
+  {
+    name: 'Dini',
+    fullName: 'Dini Pratiwi',
+    email: 'dini.pratiwi@gmail.com',
+    phone: '082188492011',
+    password: 'claye123',
+    address: 'Jl. Mayor Ruslan No. 45, Kel. 9 Ilir, Kec. Ilir Timur II',
+    city: 'Kota Palembang',
+    postalCode: '30114',
+    patronSince: '2026',
+    cohort: 'Pelanggan Setia',
+    role: 'customer'
+  },
+  {
+    name: 'Tasya',
+    fullName: 'Tasya Salsabila',
+    email: 'tasya.salsabila@gmail.com',
+    phone: '085267123490',
+    password: 'claye123',
+    address: 'Jl. Demang Lebar Daun No. 88, RT 02 / RW 04, Kec. Ilir Barat I',
+    city: 'Kota Palembang',
+    postalCode: '30138',
+    patronSince: '2026',
+    cohort: 'Pelanggan Baru',
+    role: 'customer'
+  }
+];
 
 export function ShopProvider({ children }) {
   const [products, setProducts] = useState(() => {
@@ -43,24 +193,28 @@ export function ShopProvider({ children }) {
     }
   });
 
-  // Registry akun terdaftar (bersih tanpa dummy, pengguna baru mendaftar di tab Register)
+  // Registry akun terdaftar (termasuk 3 pelanggan riil awal: Saputri, Dini, Tasya)
   const [registeredUsers, setRegisteredUsers] = useState(() => {
     try {
-      const isClean = localStorage.getItem('claye_clean_reset_v3');
-      if (!isClean) {
-        localStorage.removeItem('claye_registered_users_v5');
-        localStorage.removeItem('claye_registered_users_v4');
-        return [];
+      const isSeeded = localStorage.getItem('claye_seed_sales_v1');
+      if (!isSeeded) {
+        localStorage.setItem('claye_registered_users_v6', JSON.stringify(INITIAL_REGISTERED_USERS));
+        return INITIAL_REGISTERED_USERS;
       }
-      const saved = localStorage.getItem('claye_registered_users_v5');
-      return saved ? JSON.parse(saved) : [];
+      const saved = localStorage.getItem('claye_registered_users_v6');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+      return INITIAL_REGISTERED_USERS;
     } catch {
-      return [];
+      return INITIAL_REGISTERED_USERS;
     }
   });
 
   useEffect(() => {
     try {
+      localStorage.setItem('claye_registered_users_v6', JSON.stringify(registeredUsers));
       localStorage.setItem('claye_registered_users_v5', JSON.stringify(registeredUsers));
     } catch (e) {
       console.warn('Gagal menyimpan daftar pengguna:', e);
@@ -153,33 +307,20 @@ export function ShopProvider({ children }) {
 
   const [orders, setOrders] = useState(() => {
     try {
-      const isClean = localStorage.getItem('claye_clean_reset_v3');
-      if (!isClean) {
-        localStorage.removeItem('claye_orders_id_v6');
-        localStorage.removeItem('claye_orders_id_v5');
-        localStorage.removeItem('claye_orders_id_v4');
-        localStorage.setItem('claye_clean_reset_v3', 'true');
-        return [];
+      const isSeeded = localStorage.getItem('claye_seed_sales_v1');
+      if (!isSeeded) {
+        localStorage.setItem('claye_seed_sales_v1', 'true');
+        localStorage.setItem('claye_orders_id_v8', JSON.stringify(INITIAL_ORDERS));
+        return INITIAL_ORDERS;
       }
-      const saved = localStorage.getItem('claye_orders_id_v6');
+      const saved = localStorage.getItem('claye_orders_id_v8');
       if (saved) {
         const parsed = JSON.parse(saved);
-        // Pastikan tidak ada data dummy lawas yang tersisa
-        const cleanOrders = parsed.filter(o =>
-          !o.id?.includes('021') &&
-          !o.id?.includes('022') &&
-          !o.id?.includes('023') &&
-          !o.id?.includes('024') &&
-          o.patron !== 'Nadia Putri' &&
-          o.patron !== 'Rania Putri' &&
-          o.patron !== 'Alya Safitri' &&
-          o.patron !== 'Dinda Maharani'
-        );
-        return cleanOrders;
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
       }
-      return [];
+      return INITIAL_ORDERS;
     } catch {
-      return [];
+      return INITIAL_ORDERS;
     }
   });
 
@@ -351,9 +492,9 @@ export function ShopProvider({ children }) {
 
   useEffect(() => {
     try {
+      localStorage.setItem('claye_orders_id_v8', JSON.stringify(orders));
+      localStorage.setItem('claye_orders_id_v7', JSON.stringify(orders));
       localStorage.setItem('claye_orders_id_v6', JSON.stringify(orders));
-      localStorage.setItem('claye_orders_id_v5', JSON.stringify(orders));
-      localStorage.setItem('claye_orders_id_v4', JSON.stringify(orders));
     } catch (e) {
       console.warn('Gagal menyimpan pesanan:', e);
     }
@@ -890,9 +1031,9 @@ export function ShopProvider({ children }) {
     setOrders(prev => {
       const updated = [newOrder, ...prev];
       try {
+        localStorage.setItem('claye_orders_id_v8', JSON.stringify(updated));
+        localStorage.setItem('claye_orders_id_v7', JSON.stringify(updated));
         localStorage.setItem('claye_orders_id_v6', JSON.stringify(updated));
-        localStorage.setItem('claye_orders_id_v5', JSON.stringify(updated));
-        localStorage.setItem('claye_orders_id_v4', JSON.stringify(updated));
       } catch (e) {
         console.warn('Gagal menyimpan pesanan baru:', e);
       }

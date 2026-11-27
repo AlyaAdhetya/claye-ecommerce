@@ -696,38 +696,38 @@ export default function AdminPage() {
                 <div className="admin-chart-panel">
                   <div className="chart-panel-header">
                     <div>
-                      <span className="chart-panel-tag">PERFORMA PENJUALAN TOKO KURASI</span>
-                      <h3 className="chart-panel-title">Tren Pendapatan dan Pengiriman</h3>
-                      <p className="chart-panel-sub">Arus transaksi harian produk keramik kurasi CLAYÉ Studio di Kota Palembang</p>
+                      <span className="chart-panel-tag">PROGRES BISNIS & TRANSAKSI</span>
+                      <h3 className="chart-panel-title">Grafik Penjualan Toko</h3>
+                      <p className="chart-panel-sub">Arus transaksi penjualan produk keramik kurasi CLAYÉ Studio di Kota Palembang (November 2026)</p>
                     </div>
                     <div className="chart-range-toggle">
                       <button
                         className={`range-btn ${chartRange === '7d' ? 'active' : ''}`}
                         onClick={() => setChartRange('7d')}
                       >
-                        7 Hari Terakhir
+                        Periode November
                       </button>
                       <button
                         className={`range-btn ${chartRange === '30d' ? 'active' : ''}`}
                         onClick={() => setChartRange('30d')}
                       >
-                        30 Hari Terakhir
+                        Bulan Ini
                       </button>
                     </div>
                   </div>
 
                   <div className="chart-metrics-row">
                     <div className="cmetric-col">
-                      <span className="cmetric-label">RATA-RATA PENGIRIMAN HARIAN</span>
-                      <strong className="cmetric-val">Rp1.785.000</strong>
+                      <span className="cmetric-label">TOTAL PENDAPATAN</span>
+                      <strong className="cmetric-val">Rp {totalRevenue.toLocaleString('id-ID')}</strong>
                     </div>
                     <div className="cmetric-col">
                       <span className="cmetric-label">PUNCAK PENJUALAN</span>
-                      <strong className="cmetric-val">Jumat (Rp2.4M)</strong>
+                      <strong className="cmetric-val">27 Nov (Rp105.000)</strong>
                     </div>
                     <div className="cmetric-col">
-                      <span className="cmetric-label">PENGANTARAN TEPAT WAKTU</span>
-                      <strong className="cmetric-val">98.5% Sukses</strong>
+                      <span className="cmetric-label">STATUS PENGIRIMAN</span>
+                      <strong className="cmetric-val">100% Terlayani (COD)</strong>
                     </div>
                   </div>
 
@@ -736,38 +736,36 @@ export default function AdminPage() {
                     <svg viewBox="0 0 540 180" className="sales-chart-svg">
                       <defs>
                         <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#24201D" stopOpacity="0.15" />
-                          <stop offset="100%" stopColor="#24201D" stopOpacity="0.0" />
+                          <stop offset="0%" stopColor="#A85A3C" stopOpacity="0.22" />
+                          <stop offset="100%" stopColor="#A85A3C" stopOpacity="0.0" />
                         </linearGradient>
                       </defs>
                       <line x1="40" y1="30" x2="520" y2="30" stroke="#EAE6DF" strokeDasharray="3 3" />
                       <line x1="40" y1="75" x2="520" y2="75" stroke="#EAE6DF" strokeDasharray="3 3" />
                       <line x1="40" y1="120" x2="520" y2="120" stroke="#EAE6DF" strokeDasharray="3 3" />
-                      <line x1="390" y1="40" x2="390" y2="140" stroke="#8A857F" strokeDasharray="3 3" />
+                      <line x1="330" y1="30" x2="330" y2="140" stroke="#A85A3C" strokeDasharray="3 3" />
                       <path
-                        d="M 50 115 Q 110 118 160 115 T 270 112 T 340 90 T 390 42 T 450 115 T 510 128 L 510 145 L 50 145 Z"
+                        d="M 60 125 C 130 120 160 85 200 85 C 260 85 290 40 330 40 C 370 40 400 70 440 70 C 470 70 500 110 510 110 L 510 145 L 60 145 Z"
                         fill="url(#chartGradient)"
                       />
                       <path
-                        d="M 50 115 Q 110 118 160 115 T 270 112 T 340 90 T 390 42 T 450 115 T 510 128"
+                        d="M 60 125 C 130 120 160 85 200 85 C 260 85 290 40 330 40 C 370 40 400 70 440 70 C 470 70 500 110 510 110"
                         fill="none"
-                        stroke="#24201D"
+                        stroke="#A85A3C"
                         strokeWidth="2.5"
                       />
-                      <circle cx="50" cy="115" r="3.5" fill="#24201D" />
-                      <circle cx="160" cy="115" r="3.5" fill="#24201D" />
-                      <circle cx="270" cy="112" r="3.5" fill="#24201D" />
-                      <circle cx="340" cy="90" r="3.5" fill="#24201D" />
-                      <circle cx="390" cy="42" r="5" fill="#24201D" stroke="#FFFFFF" strokeWidth="2" />
-                      <circle cx="450" cy="115" r="3.5" fill="#24201D" />
-                      <circle cx="510" cy="128" r="3.5" fill="#24201D" />
-                      <text x="50" y="160" fill="#8A857F" fontSize="8" textAnchor="middle">Sen 17</text>
-                      <text x="120" y="160" fill="#8A857F" fontSize="8" textAnchor="middle">Sel 18</text>
-                      <text x="190" y="160" fill="#8A857F" fontSize="8" textAnchor="middle">Rab 19</text>
-                      <text x="270" y="160" fill="#8A857F" fontSize="8" textAnchor="middle">Kam 20</text>
-                      <text x="390" y="160" fill="#24201D" fontSize="8" textAnchor="middle" fontWeight="bold">Jum 21</text>
-                      <text x="450" y="160" fill="#8A857F" fontSize="8" textAnchor="middle">Sab 22</text>
-                      <text x="510" y="160" fill="#8A857F" fontSize="8" textAnchor="middle">Min 23</text>
+                      {/* Titik Transaksi Saputri (23 Nov) */}
+                      <circle cx="200" cy="85" r="4.5" fill="#A85A3C" stroke="#FFFFFF" strokeWidth="2" />
+                      {/* Titik Puncak Transaksi Dini (27 Nov) */}
+                      <circle cx="330" cy="40" r="6" fill="#A85A3C" stroke="#FFFFFF" strokeWidth="2.5" />
+                      {/* Titik Transaksi Tasya (30 Nov) */}
+                      <circle cx="440" cy="70" r="4.5" fill="#A85A3C" stroke="#FFFFFF" strokeWidth="2" />
+
+                      <text x="70" y="160" fill="#8A857F" fontSize="8.5" textAnchor="middle">20 Nov</text>
+                      <text x="200" y="160" fill="#24201D" fontSize="8.5" textAnchor="middle" fontWeight="600">23 Nov (Saputri)</text>
+                      <text x="330" y="160" fill="#A85A3C" fontSize="9" textAnchor="middle" fontWeight="bold">27 Nov (Dini - Puncak)</text>
+                      <text x="440" y="160" fill="#24201D" fontSize="8.5" textAnchor="middle" fontWeight="600">30 Nov (Tasya)</text>
+                      <text x="505" y="160" fill="#8A857F" fontSize="8.5" textAnchor="middle">02 Des</text>
                     </svg>
                   </div>
                 </div>
