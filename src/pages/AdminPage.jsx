@@ -762,9 +762,9 @@ export default function AdminPage() {
                       <circle cx="440" cy="70" r="4.5" fill="#A85A3C" stroke="#FFFFFF" strokeWidth="2" />
 
                       <text x="70" y="160" fill="#8A857F" fontSize="8.5" textAnchor="middle">20 Nov</text>
-                      <text x="200" y="160" fill="#24201D" fontSize="8.5" textAnchor="middle" fontWeight="600">23 Nov (Saputri)</text>
-                      <text x="330" y="160" fill="#A85A3C" fontSize="9" textAnchor="middle" fontWeight="bold">27 Nov (Dini - Puncak)</text>
-                      <text x="440" y="160" fill="#24201D" fontSize="8.5" textAnchor="middle" fontWeight="600">30 Nov (Tasya)</text>
+                      <text x="200" y="160" fill="#24201D" fontSize="8.5" textAnchor="middle" fontWeight="600">23 Nov</text>
+                      <text x="330" y="160" fill="#A85A3C" fontSize="9" textAnchor="middle" fontWeight="bold">27 Nov</text>
+                      <text x="440" y="160" fill="#24201D" fontSize="8.5" textAnchor="middle" fontWeight="600">30 Nov</text>
                       <text x="505" y="160" fill="#8A857F" fontSize="8.5" textAnchor="middle">02 Des</text>
                     </svg>
                   </div>
