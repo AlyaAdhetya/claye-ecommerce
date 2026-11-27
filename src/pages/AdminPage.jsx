@@ -698,7 +698,7 @@ export default function AdminPage() {
                     <div>
                       <span className="chart-panel-tag">PERFORMA PENJUALAN TOKO KURASI</span>
                       <h3 className="chart-panel-title">Tren Pendapatan dan Pengiriman</h3>
-                      <p className="chart-panel-sub">Arus transaksi harian produk stoneware kurasi dari berbagai mitra pengrajin</p>
+                      <p className="chart-panel-sub">Arus transaksi harian produk keramik kurasi CLAYÉ Studio di Kota Palembang</p>
                     </div>
                     <div className="chart-range-toggle">
                       <button
@@ -726,8 +726,8 @@ export default function AdminPage() {
                       <strong className="cmetric-val">Jumat (Rp2.4M)</strong>
                     </div>
                     <div className="cmetric-col">
-                      <span className="cmetric-label">KEBERHASILAN PEMBAKARAN</span>
-                      <strong className="cmetric-val">94.8% Sukses</strong>
+                      <span className="cmetric-label">PENGANTARAN TEPAT WAKTU</span>
+                      <strong className="cmetric-val">98.5% Sukses</strong>
                     </div>
                   </div>
 
@@ -776,21 +776,23 @@ export default function AdminPage() {
                 <div className="admin-kiln-focus-card">
                   <div className="focus-card-header">
                     <span className="focus-tag">PRODUK UNGGULAN TERKURASI</span>
-                    <span className="limited-series-pill">EDISI TERBATAS</span>
+                    <span className="limited-series-pill">TERLARIS</span>
                   </div>
 
-                  <div className="focus-image-frame">
+                  <div className="focus-image-frame" style={{ backgroundColor: '#FAF8F5', border: '1px solid #EAE6DF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <img
-                      src="/assets/images/product_bowl.jpg"
-                      alt="Wabi Matcha Chawan Vessel"
+                      src={products?.[0]?.image || '/assets/images/katalog_bowl.jpg'}
+                      alt={products?.[0]?.name || 'Produk Unggulan'}
                       className="focus-img"
+                      style={{ objectFit: 'contain', width: '100%', height: '100%', padding: '6px' }}
+                      onError={(e) => { e.target.src = '/assets/images/katalog_bowl.jpg'; }}
                     />
-                    <div className="focus-overlay-content">
-                      <span className="drop-edition-label">BATCH DROP #04</span>
-                      <h4 className="focus-vessel-title">Wabi Matcha Chawan</h4>
+                    <div className="focus-overlay-content" style={{ backgroundColor: 'rgba(26, 23, 21, 0.72)', padding: '6px 10px', borderRadius: '4px', left: '0.6rem', bottom: '0.6rem', right: 'auto' }}>
+                      <span className="drop-edition-label" style={{ color: '#D4C3B3' }}>{products?.[0]?.batchInfo || 'BATCH KURASI NO. 01 • EDISI SPESIAL'}</span>
+                      <h4 className="focus-vessel-title" style={{ color: '#FFFFFF', margin: 0, fontSize: '0.92rem' }}>{products?.[0]?.name || 'Artisan Ceramic Bowls Collection'}</h4>
                     </div>
                     <div className="focus-made-counter">
-                      <strong>08/25</strong> Tersedia
+                      <strong>{products?.[0]?.stock || 35}</strong> Tersedia
                     </div>
                   </div>
 
@@ -800,12 +802,12 @@ export default function AdminPage() {
                       <strong className="fspec-val" style={{ color: '#5E7958' }}>✓ Siap Dikirim Segera</strong>
                     </div>
                     <div className="fspec-row">
-                      <span className="fspec-key">Asal Tanah Liat</span>
-                      <strong className="fspec-val">Stoneware Sukabumi</strong>
+                      <span className="fspec-key">Kategori Produk</span>
+                      <strong className="fspec-val">{products?.[0]?.category || 'Mangkuk Keramik'}</strong>
                     </div>
                     <div className="fspec-row">
-                      <span className="fspec-key">Finishing Glasir</span>
-                      <strong className="fspec-val">Abu Kayu & Besi Matte</strong>
+                      <span className="fspec-key">Material & Kualitas</span>
+                      <strong className="fspec-val">Stoneware Food-Grade 100%</strong>
                     </div>
                   </div>
 
@@ -2095,10 +2097,10 @@ export default function AdminPage() {
               </div>
 
               <div className="form-group-claye">
-                <label>Keterangan Warna dan Tekstur Glasir *</label>
+                <label>Keterangan Singkat / Subtitle Produk *</label>
                 <input
                   type="text"
-                  placeholder="contoh: Stoneware pasir alami dengan glasir abu kayu sage"
+                  placeholder="contoh: Mangkuk keramik saji stoneware bermotif etnik nusantara"
                   value={newProdSubtitle}
                   onChange={(e) => setNewProdSubtitle(e.target.value)}
                 />

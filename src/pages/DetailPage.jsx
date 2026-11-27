@@ -91,9 +91,9 @@ export default function DetailPage() {
               />
               <button
                 className="image-inspect-zoom-btn"
-                title="Perbesar Tampilan Glasir"
+                title="Perbesar Tampilan Foto"
                 aria-label="Perbesar Foto"
-                onClick={() => openConcierge(`Jelaskan detail tekstur dan permukaan glasir ${product.name}`)}
+                onClick={() => openConcierge(`Jelaskan detail material dan motif ${product.name}`)}
               >
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="11" cy="11" r="8"></circle>
@@ -106,7 +106,7 @@ export default function DetailPage() {
 
             {/* BARIS THUMBNAIL */}
             <div className="thumbnail-gallery-row">
-              {(product.thumbnails || [product.image, '/assets/images/product_bowl.jpg', '/assets/images/products_collection.jpg']).map((thumb, idx) => (
+              {(product.thumbnails || [product.image]).map((thumb, idx) => (
                 <button
                   key={idx}
                   className={`thumb-btn ${activeImage === thumb ? 'active-thumb' : ''}`}
