@@ -152,7 +152,7 @@ export default function CatalogPage() {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          addToCart(item.id, 1, { glaze: item.glazeOptions?.[0]?.name });
+                          addToCart(item.id, 1, { productCode: item.productCodes?.[0] });
                         }}
                         className="quick-add-pill-btn"
                       >
@@ -169,16 +169,11 @@ export default function CatalogPage() {
                   </div>
                   <div className="card-subtitle-dots-row">
                     <span className="curated-item-subtitle">{item.subtitle}</span>
-                    <div className="color-swatch-dots">
-                      {item.glazeOptions?.map((glaze, idx) => (
-                        <span
-                          key={idx}
-                          className="swatch-dot"
-                          style={{ backgroundColor: glaze.hex }}
-                          title={glaze.name}
-                        />
-                      ))}
-                    </div>
+                    {item.productCodes && item.productCodes.length > 0 && (
+                      <span style={{ fontSize: '0.72rem', color: 'var(--color-terracotta)', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                        {item.productCodes.length} Pilihan Kode
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>

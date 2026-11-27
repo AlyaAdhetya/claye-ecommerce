@@ -122,7 +122,7 @@ export default function Chatbot() {
       viewProduct(1);
       setIsChatOpen(false);
     } else if (sug === 'Tambah ke Keranjang') {
-      addToCart(1, 1, { glaze: 'Hijau Sage' });
+      addToCart(1, 1, { productCode: 'CER-BWL-001' });
     } else if (sug === 'Koleksi Peralatan Makan Lain' || sug === 'Lihat Semua Katalog' || sug === 'Jelajahi Katalog') {
       navigate('/katalog');
       setIsChatOpen(false);

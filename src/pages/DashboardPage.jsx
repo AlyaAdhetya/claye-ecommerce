@@ -1158,7 +1158,9 @@ export default function DashboardPage() {
                 <h4>Daftar Produk Keramik</h4>
                 {selectedOrderModal.items?.map((it, idx) => (
                   <div key={idx} className="modal-item-row">
-                    <span>{it.name} ({it.glaze || 'Glasir Khusus'}) × {it.quantity}</span>
+                    <span>
+                      {it.name} {it.selectedCode || it.code ? `(${it.selectedCode || it.code})` : ''} × {it.quantity}
+                    </span>
                     <strong>Rp {(it.price * it.quantity).toLocaleString('id-ID')}</strong>
                   </div>
                 ))}

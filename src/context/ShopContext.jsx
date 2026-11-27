@@ -30,7 +30,7 @@ const INITIAL_ORDERS = [];
 export function ShopProvider({ children }) {
   const [products, setProducts] = useState(() => {
     try {
-      const saved = localStorage.getItem('claye_products_id_v5');
+      const saved = localStorage.getItem('claye_products_id_v6');
       if (saved) {
         const parsed = JSON.parse(saved);
         const existingIds = new Set(parsed.map(p => p.id));
@@ -360,7 +360,7 @@ export function ShopProvider({ children }) {
   }, [orders]);
 
   useEffect(() => {
-    localStorage.setItem('claye_products_id_v5', JSON.stringify(products));
+    localStorage.setItem('claye_products_id_v6', JSON.stringify(products));
   }, [products]);
 
   useEffect(() => {
@@ -442,14 +442,13 @@ export function ShopProvider({ children }) {
     const product = products.find(p => p.id === productId);
     if (!product) return;
 
-    const glaze = customOpts.glaze || (product.glazeOptions && product.glazeOptions[0]?.name) || 'Alami';
-    const stamp = customOpts.stamp || '';
-    const addCost = stamp ? 25000 : 0;
-    const finalPrice = product.price + addCost;
+    // Varian kode produk (misal: CER-BWL-001) atau default
+    const code = customOpts.productCode || (product.productCodes && product.productCodes.length > 0 ? product.productCodes[0] : null);
+    const finalPrice = product.price;
 
     setCart(prev => {
       const existingIndex = prev.findIndex(item =>
-        item.id === productId && item.selectedGlaze === glaze && item.stamp === stamp
+        item.id === productId && item.selectedCode === code
       );
       if (existingIndex > -1) {
         return prev.map((item, idx) =>
@@ -463,14 +462,14 @@ export function ShopProvider({ children }) {
           price: finalPrice,
           basePrice: product.price,
           quantity,
-          selectedGlaze: glaze,
-          stamp,
+          selectedCode: code,
           selected: true
         }
       ];
     });
 
-    showToast(`"${product.name}" (${glaze}) berhasil dimasukkan ke keranjang.`, 'success');
+    const codeLabel = code ? ` (${code})` : '';
+    showToast(`"${product.name}"${codeLabel} berhasil dimasukkan ke keranjang.`, 'success');
   };
 
   const updateCartQty = (index, qty) => {
@@ -493,13 +492,13 @@ export function ShopProvider({ children }) {
     setCart(prev => prev.map(item => ({ ...item, selected: selectAll })));
   };
 
-  const updateCartItemGlaze = (index, newGlaze) => {
+  const updateCartItemCode = (index, newCode) => {
     setCart(prev =>
       prev.map((item, idx) =>
-        idx === index ? { ...item, selectedGlaze: newGlaze } : item
+        idx === index ? { ...item, selectedCode: newCode } : item
       )
     );
-    showToast(`Varian tipe/glasir berhasil diubah menjadi "${newGlaze}".`, 'info');
+    showToast(`Pilihan kode produk berhasil diubah menjadi "${newCode}".`, 'info');
   };
 
   const removeFromCart = (index) => {
@@ -865,12 +864,12 @@ export function ShopProvider({ children }) {
       city: userCity,
       address: userAddress,
       date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
-      itemsSummary: itemsToOrder.map(i => i.name).join(' + '),
-      variantSummary: itemsToOrder.map(i => `${i.selectedGlaze || 'Gading'} • Jml: ${i.quantity}`).join(', '),
+      itemsSummary: itemsToOrder.map(i => i.selectedCode ? `${i.name} (${i.selectedCode})` : i.name).join(' + '),
+      variantSummary: itemsToOrder.map(i => `${i.selectedCode ? `Kode: ${i.selectedCode}` : 'Standar'} • Jml: ${i.quantity}`).join(', '),
       items: itemsToOrder.map(i => ({
         name: i.name,
-        glaze: i.selectedGlaze,
-        stamp: i.stamp,
+        code: i.selectedCode,
+        selectedCode: i.selectedCode,
         quantity: i.quantity,
         price: i.price
       })),
@@ -1092,7 +1091,8 @@ export function ShopProvider({ children }) {
       clearCart,
       toggleCartItemSelection,
       selectAllCartItems,
-      updateCartItemGlaze,
+      updateCartItemGlaze: updateCartItemCode,
+      updateCartItemCode,
       toggleWishlist,
       login,
       register,

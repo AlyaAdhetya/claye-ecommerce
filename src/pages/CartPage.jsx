@@ -9,7 +9,7 @@ export default function CartPage() {
     clearCart,
     toggleCartItemSelection,
     selectAllCartItems,
-    updateCartItemGlaze,
+    updateCartItemCode,
     products,
     navigate,
     showToast,
@@ -33,18 +33,12 @@ export default function CartPage() {
   const shippingCost = selectedCount > 0 ? selectedZone.price : 0;
   const finalTotal = subtotal + shippingCost;
 
-  const getAvailableGlazes = (item) => {
+  const getAvailableCodes = (item) => {
     const prod = products?.find(p => p.id === item.id || p.name === item.name);
-    if (prod && prod.glazeOptions && prod.glazeOptions.length > 0) {
-      return prod.glazeOptions.map(g => g.name);
+    if (prod && prod.productCodes && prod.productCodes.length > 0) {
+      return prod.productCodes;
     }
-    return [
-      'Glasir Gading Alami',
-      'Glasir Abu Kayu Sage',
-      'Glasir Batu Pasir',
-      'Glasir Biru Samudra (Neko)',
-      'Glasir Hitam Arang Tenmoku'
-    ];
+    return [];
   };
 
   if (cart.length === 0) {
@@ -154,21 +148,19 @@ export default function CartPage() {
                     </button>
                   </div>
 
-                  <div className="cart-item-glaze-tag" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', margin: '0.35rem 0' }}>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--color-muted)' }}>Tipe / Glasir:</span>
-                    <select
-                      value={item.selectedGlaze || 'Glasir Gading Alami'}
-                      onChange={(e) => updateCartItemGlaze(idx, e.target.value)}
-                      style={{ padding: '3px 8px', fontSize: '0.8rem', borderRadius: '4px', border: '1px solid #DED8CF', backgroundColor: '#FAF8F5', color: 'var(--color-charcoal)', cursor: 'pointer' }}
-                    >
-                      {getAvailableGlazes(item).map((glazeName) => (
-                        <option key={glazeName} value={glazeName}>{glazeName}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {item.stamp && (
-                    <div className="cart-item-stamp-tag">Grafir Khusus: "{item.stamp}" (+Rp25.000)</div>
+                  {getAvailableCodes(item).length > 0 && (
+                    <div className="cart-item-glaze-tag" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', margin: '0.35rem 0' }}>
+                      <span style={{ fontSize: '0.8rem', color: 'var(--color-muted)' }}>Kode Motif / Produk:</span>
+                      <select
+                        value={item.selectedCode || getAvailableCodes(item)[0]}
+                        onChange={(e) => updateCartItemCode(idx, e.target.value)}
+                        style={{ padding: '3px 8px', fontSize: '0.8rem', borderRadius: '4px', border: '1px solid #DED8CF', backgroundColor: '#FAF8F5', color: 'var(--color-charcoal)', cursor: 'pointer', fontWeight: 600 }}
+                      >
+                        {getAvailableCodes(item).map((code) => (
+                          <option key={code} value={code}>{code}</option>
+                        ))}
+                      </select>
+                    </div>
                   )}
 
                   <div className="cart-item-unit-price">Rp {item.price.toLocaleString('id-ID')}</div>

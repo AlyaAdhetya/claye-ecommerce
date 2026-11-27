@@ -6,24 +6,28 @@ export default function DetailPage() {
 
   const product = products.find(p => p.id === selectedProductId) || products[0];
 
-  const [selectedGlaze, setSelectedGlaze] = useState(
-    product.glazeOptions?.[0]?.name || 'Gading (Ivory)'
+  const hasCodes = product.productCodes && product.productCodes.length > 0;
+  const [selectedCode, setSelectedCode] = useState(
+    hasCodes ? product.productCodes[0] : null
   );
-  const [stampText, setStampText] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(product.image);
   const [activeAccordion, setActiveAccordion] = useState('dimensions');
 
-  const hasStamp = stampText.trim().length > 0;
-  const unitPrice = product.price + (hasStamp ? 25000 : 0);
+  // Sinkronkan activeImage & selectedCode saat produk berganti
+  React.useEffect(() => {
+    setActiveImage(product.image);
+    setSelectedCode(product.productCodes && product.productCodes.length > 0 ? product.productCodes[0] : null);
+  }, [product]);
+
+  const unitPrice = product.price;
   const totalPrice = unitPrice * quantity;
 
   const isSaved = wishlist.includes(product.id);
 
   const handleAddToCart = () => {
     addToCart(product.id, quantity, {
-      glaze: selectedGlaze,
-      stamp: stampText.trim()
+      productCode: selectedCode
     });
   };
 
@@ -135,51 +139,52 @@ export default function DetailPage() {
               {product.description}
             </p>
 
-            {/* PILIHAN WARNA GLASIR */}
-            <div className="glaze-finish-section">
-              <div className="glaze-section-header">
-                <span className="glaze-label">PILIHAN WARNA GLASIR /</span>
-                <span className="glaze-selected-name">{selectedGlaze.toUpperCase()} (DIPILIH)</span>
-              </div>
+            {/* PILIHAN KODE PRODUK (JIKA PRODUK MEMILIKI LEBIH DARI 1 VARIAN) */}
+            {hasCodes && (
+              <div className="glaze-finish-section" style={{ marginBottom: '1.5rem' }}>
+                <div className="glaze-section-header" style={{ marginBottom: '0.65rem' }}>
+                  <span className="glaze-label" style={{ fontWeight: 700, color: 'var(--color-charcoal)' }}>
+                    PILIH KODE MOTIF / PRODUK:
+                  </span>
+                  <span className="glaze-selected-name" style={{ color: 'var(--color-terracotta)', fontWeight: 800 }}>
+                    {selectedCode} (DIPILIH)
+                  </span>
+                </div>
 
-              <div className="glaze-swatches-row">
-                {product.glazeOptions?.map((glaze) => (
-                  <button
-                    key={glaze.id}
-                    className={`glaze-swatch-item ${selectedGlaze === glaze.name ? 'is-selected' : ''}`}
-                    onClick={() => setSelectedGlaze(glaze.name)}
-                    type="button"
-                  >
-                    <span
-                      className="swatch-color-circle"
-                      style={{ backgroundColor: glaze.hex }}
-                    />
-                    <span className="swatch-text-name">{glaze.name.toUpperCase()}</span>
-                  </button>
-                ))}
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  {product.productCodes.map((code) => {
+                    const isSelected = selectedCode === code;
+                    return (
+                      <button
+                        key={code}
+                        type="button"
+                        onClick={() => setSelectedCode(code)}
+                        style={{
+                          padding: '8px 14px',
+                          borderRadius: '6px',
+                          border: isSelected ? '2px solid var(--color-terracotta)' : '1px solid #D8D2C7',
+                          backgroundColor: isSelected ? '#FAF2EC' : '#FFFFFF',
+                          color: isSelected ? 'var(--color-terracotta)' : '#262422',
+                          fontWeight: isSelected ? 800 : 600,
+                          fontSize: '0.86rem',
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          transition: 'all 0.15s ease'
+                        }}
+                      >
+                        <span>{isSelected ? '✓' : '•'}</span>
+                        <span>{code}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <p style={{ fontSize: '0.78rem', color: '#8A857F', marginTop: '0.5rem', marginBottom: 0 }}>
+                  *Lihat kode yang tertera pada foto di samping untuk memilih varian motif yang Anda inginkan.
+                </p>
               </div>
-            </div>
-
-            {/* PERSONALISASI GRAFIR NAMA / INISIAL */}
-            <div className="personalization-box">
-              <div className="personalization-header">
-                <span className="pers-label">TAMBAH GRAFIR NAMA ATAU INISIAL (OPSIONAL)</span>
-                <span className="pers-cost">+Rp25.000</span>
-              </div>
-              <div className="pers-input-wrap">
-                <input
-                  type="text"
-                  maxLength={6}
-                  placeholder="contoh: AML (maksimal 6 huruf)"
-                  value={stampText}
-                  onChange={(e) => setStampText(e.target.value.toUpperCase())}
-                  className="pers-text-input"
-                />
-              </div>
-              <p className="pers-footnote">
-                Dikerjakan langsung oleh mitra pengrajin tembikar sebelum finishing akhir.
-              </p>
-            </div>
+            )}
 
             {/* KUANTITAS & TOMBOL BELI */}
             <div className="detail-cta-row">

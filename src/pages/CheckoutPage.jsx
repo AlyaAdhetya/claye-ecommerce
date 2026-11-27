@@ -790,9 +790,8 @@ export default function CheckoutPage() {
                     <img src={item.image} alt={item.name} className="summary-item-img" />
                     <div className="summary-item-info">
                       <strong className="summary-name">{item.name}</strong>
-                      <span className="summary-variant">Glasir: {item.selectedGlaze || 'Alami'}</span>
-                      {item.stamp && (
-                        <span className="summary-stamp">Grafir: "{item.stamp}"</span>
+                      {item.selectedCode && (
+                        <span className="summary-variant">Kode Motif: {item.selectedCode}</span>
                       )}
                       <div className="summary-qty-price">
                         <span>Jml: {item.quantity}</span>

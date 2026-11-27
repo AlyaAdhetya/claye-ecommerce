@@ -58,7 +58,9 @@ export default function AdminPage() {
   const [newProdStock, setNewProdStock] = useState('12');
   const [newProdSubtitle, setNewProdSubtitle] = useState('');
   const [newProdDesc, setNewProdDesc] = useState('');
-  const [newProdImage, setNewProdImage] = useState('/assets/images/product_neko_mug.jpg');
+  const [newProdImage, setNewProdImage] = useState('/assets/images/katalog_bowl.jpg');
+  const [newProdThumbnails, setNewProdThumbnails] = useState([]);
+  const [newProdCodes, setNewProdCodes] = useState('');
 
   // Form input for edit ceramic product
   const [editProdName, setEditProdName] = useState('');
@@ -68,10 +70,15 @@ export default function AdminPage() {
   const [editProdSubtitle, setEditProdSubtitle] = useState('');
   const [editProdDesc, setEditProdDesc] = useState('');
   const [editProdBadge, setEditProdBadge] = useState('Kurasi');
-  const [editProdImage, setEditProdImage] = useState('/assets/images/product_neko_mug.jpg');
+  const [editProdImage, setEditProdImage] = useState('/assets/images/katalog_bowl.jpg');
+  const [editProdThumbnails, setEditProdThumbnails] = useState([]);
+  const [editProdCodes, setEditProdCodes] = useState('');
 
   // Pilihan galeri foto keramik CLAYÉ yang siap pakai
   const AVAILABLE_IMAGES = [
+    { label: 'Katalog Mangkuk Keramik (Koleksi)', url: '/assets/images/katalog_bowl.jpg' },
+    { label: 'Katalog Cangkir Kucing Paw (Koleksi)', url: '/assets/images/katalog_cup.jpg' },
+    { label: 'Katalog Mug Plaid Biru', url: '/assets/images/katalog_mug.jpg' },
     { label: 'Cangkir Neko Wave', url: '/assets/images/product_neko_mug.jpg' },
     { label: 'Cangkir Dusk Horizon', url: '/assets/images/product_dusk_mug.jpg' },
     { label: 'Cangkir Bintik Batu', url: '/assets/images/product_mug.jpg' },
@@ -104,6 +111,27 @@ export default function AdminPage() {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleMultipleImageUpload = (e, setThumbnailsState, setPrimaryImageState) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    files.forEach(file => {
+      if (file.size > 5 * 1024 * 1024) {
+        showToast(`File ${file.name} melebihi 5MB.`, 'error');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const url = event.target.result;
+        setThumbnailsState(prev => [...prev, url]);
+        if (setPrimaryImageState) {
+          setPrimaryImageState(prev => prev || url);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+    showToast(`${files.length} foto berhasil ditambahkan ke katalog!`, 'success');
   };
 
   // Filter states
@@ -232,6 +260,14 @@ export default function AdminPage() {
       return;
     }
 
+    const parsedCodes = newProdCodes
+      ? newProdCodes.split(',').map(s => s.trim()).filter(Boolean)
+      : [];
+    const allThumbnails = [
+      newProdImage,
+      ...newProdThumbnails.filter(t => t && t !== newProdImage)
+    ];
+
     addProduct({
       name: newProdName,
       subtitle: newProdSubtitle || 'Produk keramik stoneware kurasi pilihan',
@@ -240,7 +276,9 @@ export default function AdminPage() {
       stock: parseInt(newProdStock) || 12,
       description: newProdDesc || 'Karya keramik kurasi pilihan dengan glasir mineral alami, diproduksi oleh pengrajin mitra dan lolos kurasi mutu ketat CLAYÉ.',
       badge: 'baru',
-      image: newProdImage || '/assets/images/product_neko_mug.jpg'
+      image: newProdImage || '/assets/images/katalog_bowl.jpg',
+      thumbnails: allThumbnails.length > 0 ? allThumbnails : [newProdImage || '/assets/images/katalog_bowl.jpg'],
+      productCodes: parsedCodes
     });
 
     setIsAddModalOpen(false);
@@ -249,7 +287,9 @@ export default function AdminPage() {
     setNewProdStock('12');
     setNewProdSubtitle('');
     setNewProdDesc('');
-    setNewProdImage('/assets/images/product_neko_mug.jpg');
+    setNewProdImage('/assets/images/katalog_bowl.jpg');
+    setNewProdThumbnails([]);
+    setNewProdCodes('');
     showToast(`Produk "${newProdName}" berhasil didaftarkan ke inventaris!`, 'success');
   };
 
@@ -262,7 +302,9 @@ export default function AdminPage() {
     setEditProdSubtitle(prod.subtitle || '');
     setEditProdDesc(prod.description || '');
     setEditProdBadge(prod.badge || 'Kurasi');
-    setEditProdImage(prod.image || '/assets/images/product_neko_mug.jpg');
+    setEditProdImage(prod.image || '/assets/images/katalog_bowl.jpg');
+    setEditProdThumbnails(prod.thumbnails || [prod.image]);
+    setEditProdCodes((prod.productCodes || []).join(', '));
     setIsEditModalOpen(true);
   };
 
@@ -274,6 +316,14 @@ export default function AdminPage() {
     }
     if (!editingProduct) return;
 
+    const parsedCodes = editProdCodes
+      ? editProdCodes.split(',').map(s => s.trim()).filter(Boolean)
+      : [];
+    const allThumbnails = [
+      editProdImage,
+      ...editProdThumbnails.filter(t => t && t !== editProdImage)
+    ];
+
     updateProduct(editingProduct.id, {
       name: editProdName,
       category: editProdCategory,
@@ -282,7 +332,9 @@ export default function AdminPage() {
       subtitle: editProdSubtitle,
       description: editProdDesc,
       badge: editProdBadge,
-      image: editProdImage || editingProduct.image || '/assets/images/product_neko_mug.jpg'
+      image: editProdImage || editingProduct.image || '/assets/images/katalog_bowl.jpg',
+      thumbnails: allThumbnails.length > 0 ? allThumbnails : [editProdImage || editingProduct.image],
+      productCodes: parsedCodes
     });
 
     setIsEditModalOpen(false);
@@ -2109,48 +2161,125 @@ export default function AdminPage() {
                 />
               </div>
 
-              {/* INPUT FOTO PRODUK */}
+              {/* KODE MOTIF / VARIAN PRODUK (OPSIONAL) */}
               <div className="form-group-claye">
-                <label>Foto Produk Keramik *</label>
+                <label>Kode Motif / Pilihan Varian (Opsional, pisahkan dengan koma)</label>
+                <input
+                  type="text"
+                  placeholder="contoh: CER-BWL-001, CER-BWL-002, CER-BWL-003 (Kosongkan jika hanya 1 model)"
+                  value={newProdCodes}
+                  onChange={(e) => setNewProdCodes(e.target.value)}
+                />
+                <span style={{ fontSize: '0.75rem', color: '#8A857F', marginTop: '0.25rem', display: 'block' }}>
+                  💡 Jika diisi, pembeli dapat memilih kode motif saat checkout. Jika dikosongkan, produk dijual tanpa pilihan kode (seperti Katalog 3).
+                </span>
+              </div>
+
+              {/* INPUT FOTO PRODUK (MULTI-IMAGE GALLERY) */}
+              <div className="form-group-claye">
+                <label>Foto Produk Keramik (Bisa Masukkan Banyak Gambar) *</label>
                 <div style={{
-                  display: 'flex',
-                  gap: '1rem',
-                  alignItems: 'center',
                   backgroundColor: '#FAF8F5',
                   padding: '0.85rem',
                   borderRadius: '8px',
                   border: '1px solid #EAE6DF',
-                  marginBottom: '0.5rem',
-                  flexWrap: 'wrap'
+                  marginBottom: '0.5rem'
                 }}>
-                  <img
-                    src={newProdImage}
-                    alt="Preview Karya"
-                    style={{
-                      width: '84px',
-                      height: '84px',
-                      objectFit: 'cover',
-                      borderRadius: '6px',
-                      border: '1px solid #D8D2C7',
-                      backgroundColor: '#FFFFFF',
-                      flexShrink: 0
-                    }}
-                    onError={(e) => { e.target.src = '/assets/images/product_neko_mug.jpg'; }}
-                  />
-                  <div style={{ flex: 1, minWidth: '200px' }}>
+                  {/* PREVIEW DAFTAR FOTO */}
+                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.75rem', alignItems: 'center' }}>
+                    <div style={{ position: 'relative' }}>
+                      <img
+                        src={newProdImage}
+                        alt="Foto Utama"
+                        style={{
+                          width: '84px',
+                          height: '84px',
+                          objectFit: 'cover',
+                          borderRadius: '6px',
+                          border: '2px solid var(--color-terracotta)',
+                          backgroundColor: '#FFFFFF'
+                        }}
+                        onError={(e) => { e.target.src = '/assets/images/katalog_bowl.jpg'; }}
+                      />
+                      <span style={{
+                        position: 'absolute',
+                        bottom: '4px',
+                        left: '4px',
+                        background: 'var(--color-terracotta)',
+                        color: '#FFFFFF',
+                        fontSize: '9px',
+                        fontWeight: '700',
+                        padding: '1px 5px',
+                        borderRadius: '3px'
+                      }}>
+                        Utama
+                      </span>
+                    </div>
+
+                    {newProdThumbnails.map((imgUrl, idx) => (
+                      <div key={idx} style={{ position: 'relative' }}>
+                        <img
+                          src={imgUrl}
+                          alt={`Galeri ${idx + 1}`}
+                          style={{
+                            width: '84px',
+                            height: '84px',
+                            objectFit: 'cover',
+                            borderRadius: '6px',
+                            border: '1px solid #D8D2C7',
+                            backgroundColor: '#FFFFFF',
+                            cursor: 'pointer'
+                          }}
+                          onClick={() => setNewProdImage(imgUrl)}
+                          title="Klik untuk jadikan foto utama"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setNewProdThumbnails(prev => prev.filter((_, i) => i !== idx))}
+                          style={{
+                            position: 'absolute',
+                            top: '-6px',
+                            right: '-6px',
+                            width: '20px',
+                            height: '20px',
+                            borderRadius: '50%',
+                            background: '#dc2626',
+                            color: '#fff',
+                            border: 'none',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '11px',
+                            lineHeight: 1
+                          }}
+                          title="Hapus foto ini"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* SELECT PRESET FOTO UTAMA */}
+                  <div style={{ marginBottom: '0.5rem' }}>
                     <div style={{ fontSize: '0.78rem', color: '#6E6962', marginBottom: '0.35rem', fontWeight: 500 }}>
-                      Pilih dari galeri foto keramik CLAYÉ atau unggah file foto:
+                      Pilih Foto dari Galeri Siap Pakai:
                     </div>
                     <select
                       value={newProdImage}
-                      onChange={(e) => setNewProdImage(e.target.value)}
+                      onChange={(e) => {
+                        setNewProdImage(e.target.value);
+                        if (!newProdThumbnails.includes(e.target.value)) {
+                          setNewProdThumbnails(prev => [...prev, e.target.value]);
+                        }
+                      }}
                       style={{
                         width: '100%',
                         padding: '0.55rem 0.8rem',
                         borderRadius: '6px',
                         border: '1px solid #D8D2C7',
                         fontSize: '0.82rem',
-                        marginBottom: '0.45rem',
                         backgroundColor: '#FFFFFF'
                       }}
                     >
@@ -2158,7 +2287,10 @@ export default function AdminPage() {
                         <option key={img.url} value={img.url}>{img.label}</option>
                       ))}
                     </select>
+                  </div>
 
+                  {/* TOMBOL UNGGAH MULTI-FOTO */}
+                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                     <label style={{
                       display: 'inline-flex',
                       alignItems: 'center',
@@ -2167,22 +2299,23 @@ export default function AdminPage() {
                       fontWeight: 600,
                       color: 'var(--color-terracotta)',
                       cursor: 'pointer',
-                      padding: '4px 8px',
+                      padding: '6px 12px',
                       backgroundColor: '#FFFFFF',
                       border: '1px solid #E4D0C5',
-                      borderRadius: '4px'
+                      borderRadius: '6px'
                     }}>
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                         <polyline points="17 8 12 3 7 8"></polyline>
                         <line x1="12" y1="3" x2="12" y2="15"></line>
                       </svg>
-                      <span>Unggah Foto dari Perangkat (Maks. 5MB)</span>
+                      <span>+ Tambah Banyak Foto Sekaligus (Multi-upload)</span>
                       <input
                         type="file"
                         accept="image/*"
+                        multiple
                         style={{ display: 'none' }}
-                        onChange={(e) => handleImageFileUpload(e, setNewProdImage)}
+                        onChange={(e) => handleMultipleImageUpload(e, setNewProdThumbnails, setNewProdImage)}
                       />
                     </label>
                   </div>
@@ -2226,7 +2359,7 @@ export default function AdminPage() {
                 <label>Nama Karya / Produk Keramik *</label>
                 <input
                   type="text"
-                  placeholder="contoh: Kyoto Pourer Vessel"
+                  placeholder="contoh: Artisan Ceramic Bowls Collection"
                   value={editProdName}
                   onChange={(e) => setEditProdName(e.target.value)}
                   required
@@ -2234,10 +2367,10 @@ export default function AdminPage() {
               </div>
 
               <div className="form-group-claye">
-                <label>Keterangan Warna dan Tekstur Glasir *</label>
+                <label>Keterangan Sub-judul / Karakter Karya *</label>
                 <input
                   type="text"
-                  placeholder="contoh: Stoneware pasir alami dengan glasir abu kayu sage"
+                  placeholder="contoh: Koleksi mangkuk keramik stoneware dengan 7 ragam motif Nusantara"
                   value={editProdSubtitle}
                   onChange={(e) => setEditProdSubtitle(e.target.value)}
                 />
@@ -2310,48 +2443,125 @@ export default function AdminPage() {
                 />
               </div>
 
-              {/* INPUT FOTO PRODUK */}
+              {/* KODE MOTIF / VARIAN PRODUK (OPSIONAL) */}
               <div className="form-group-claye">
-                <label>Foto Produk Keramik *</label>
+                <label>Kode Motif / Pilihan Varian (Opsional, pisahkan dengan koma)</label>
+                <input
+                  type="text"
+                  placeholder="contoh: CER-BWL-001, CER-BWL-002, CER-BWL-003 (Kosongkan jika hanya 1 model)"
+                  value={editProdCodes}
+                  onChange={(e) => setEditProdCodes(e.target.value)}
+                />
+                <span style={{ fontSize: '0.75rem', color: '#8A857F', marginTop: '0.25rem', display: 'block' }}>
+                  💡 Jika diisi, pembeli dapat memilih kode motif saat checkout. Jika dikosongkan, produk dijual tanpa pilihan kode (seperti Katalog 3).
+                </span>
+              </div>
+
+              {/* INPUT FOTO PRODUK (MULTI-IMAGE GALLERY) */}
+              <div className="form-group-claye">
+                <label>Foto Produk Keramik (Bisa Masukkan Banyak Gambar) *</label>
                 <div style={{
-                  display: 'flex',
-                  gap: '1rem',
-                  alignItems: 'center',
                   backgroundColor: '#FAF8F5',
                   padding: '0.85rem',
                   borderRadius: '8px',
                   border: '1px solid #EAE6DF',
-                  marginBottom: '0.5rem',
-                  flexWrap: 'wrap'
+                  marginBottom: '0.5rem'
                 }}>
-                  <img
-                    src={editProdImage}
-                    alt="Preview Karya"
-                    style={{
-                      width: '84px',
-                      height: '84px',
-                      objectFit: 'cover',
-                      borderRadius: '6px',
-                      border: '1px solid #D8D2C7',
-                      backgroundColor: '#FFFFFF',
-                      flexShrink: 0
-                    }}
-                    onError={(e) => { e.target.src = '/assets/images/product_neko_mug.jpg'; }}
-                  />
-                  <div style={{ flex: 1, minWidth: '200px' }}>
+                  {/* PREVIEW DAFTAR FOTO */}
+                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.75rem', alignItems: 'center' }}>
+                    <div style={{ position: 'relative' }}>
+                      <img
+                        src={editProdImage}
+                        alt="Foto Utama"
+                        style={{
+                          width: '84px',
+                          height: '84px',
+                          objectFit: 'cover',
+                          borderRadius: '6px',
+                          border: '2px solid var(--color-terracotta)',
+                          backgroundColor: '#FFFFFF'
+                        }}
+                        onError={(e) => { e.target.src = '/assets/images/katalog_bowl.jpg'; }}
+                      />
+                      <span style={{
+                        position: 'absolute',
+                        bottom: '4px',
+                        left: '4px',
+                        background: 'var(--color-terracotta)',
+                        color: '#FFFFFF',
+                        fontSize: '9px',
+                        fontWeight: '700',
+                        padding: '1px 5px',
+                        borderRadius: '3px'
+                      }}>
+                        Utama
+                      </span>
+                    </div>
+
+                    {editProdThumbnails.map((imgUrl, idx) => (
+                      <div key={idx} style={{ position: 'relative' }}>
+                        <img
+                          src={imgUrl}
+                          alt={`Galeri ${idx + 1}`}
+                          style={{
+                            width: '84px',
+                            height: '84px',
+                            objectFit: 'cover',
+                            borderRadius: '6px',
+                            border: '1px solid #D8D2C7',
+                            backgroundColor: '#FFFFFF',
+                            cursor: 'pointer'
+                          }}
+                          onClick={() => setEditProdImage(imgUrl)}
+                          title="Klik untuk jadikan foto utama"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setEditProdThumbnails(prev => prev.filter((_, i) => i !== idx))}
+                          style={{
+                            position: 'absolute',
+                            top: '-6px',
+                            right: '-6px',
+                            width: '20px',
+                            height: '20px',
+                            borderRadius: '50%',
+                            background: '#dc2626',
+                            color: '#fff',
+                            border: 'none',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '11px',
+                            lineHeight: 1
+                          }}
+                          title="Hapus foto ini"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* SELECT PRESET FOTO UTAMA */}
+                  <div style={{ marginBottom: '0.5rem' }}>
                     <div style={{ fontSize: '0.78rem', color: '#6E6962', marginBottom: '0.35rem', fontWeight: 500 }}>
-                      Pilih dari galeri foto keramik CLAYÉ atau unggah file foto:
+                      Pilih Foto dari Galeri Siap Pakai:
                     </div>
                     <select
                       value={editProdImage}
-                      onChange={(e) => setEditProdImage(e.target.value)}
+                      onChange={(e) => {
+                        setEditProdImage(e.target.value);
+                        if (!editProdThumbnails.includes(e.target.value)) {
+                          setEditProdThumbnails(prev => [...prev, e.target.value]);
+                        }
+                      }}
                       style={{
                         width: '100%',
                         padding: '0.55rem 0.8rem',
                         borderRadius: '6px',
                         border: '1px solid #D8D2C7',
                         fontSize: '0.82rem',
-                        marginBottom: '0.45rem',
                         backgroundColor: '#FFFFFF'
                       }}
                     >
@@ -2359,7 +2569,10 @@ export default function AdminPage() {
                         <option key={img.url} value={img.url}>{img.label}</option>
                       ))}
                     </select>
+                  </div>
 
+                  {/* TOMBOL UNGGAH MULTI-FOTO */}
+                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                     <label style={{
                       display: 'inline-flex',
                       alignItems: 'center',
@@ -2368,22 +2581,23 @@ export default function AdminPage() {
                       fontWeight: 600,
                       color: 'var(--color-terracotta)',
                       cursor: 'pointer',
-                      padding: '4px 8px',
+                      padding: '6px 12px',
                       backgroundColor: '#FFFFFF',
                       border: '1px solid #E4D0C5',
-                      borderRadius: '4px'
+                      borderRadius: '6px'
                     }}>
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                         <polyline points="17 8 12 3 7 8"></polyline>
                         <line x1="12" y1="3" x2="12" y2="15"></line>
                       </svg>
-                      <span>Unggah Foto dari Perangkat (Maks. 5MB)</span>
+                      <span>+ Tambah Banyak Foto Sekaligus (Multi-upload)</span>
                       <input
                         type="file"
                         accept="image/*"
+                        multiple
                         style={{ display: 'none' }}
-                        onChange={(e) => handleImageFileUpload(e, setEditProdImage)}
+                        onChange={(e) => handleMultipleImageUpload(e, setEditProdThumbnails, setEditProdImage)}
                       />
                     </label>
                   </div>
@@ -2506,8 +2720,7 @@ export default function AdminPage() {
                         <div>
                           <strong style={{ fontSize: '0.88rem', display: 'block', color: 'var(--color-charcoal)' }}>{it.name}</strong>
                           <span style={{ fontSize: '0.78rem', color: '#8A857F' }}>
-                            Tipe / Glasir: {it.glaze || 'Alami'} • Jml: {it.quantity || 1}
-                            {it.stamp ? ` • Grafir: "${it.stamp}"` : ''}
+                            {it.selectedCode || it.code ? `Kode: ${it.selectedCode || it.code} • ` : ''}Jml: {it.quantity || 1}
                           </span>
                         </div>
                         <strong>Rp {((it.price || 0) * (it.quantity || 1)).toLocaleString('id-ID')}</strong>
@@ -2564,7 +2777,7 @@ export default function AdminPage() {
                       ? inspectOrderData.items.map(it => `
                         <tr>
                           <td style="padding: 8px 10px; border-bottom: 1px solid #ddd; font-weight: bold;">${it.name}</td>
-                          <td style="padding: 8px 10px; border-bottom: 1px solid #ddd; color: #555;">${it.glaze || 'Alami'}</td>
+                          <td style="padding: 8px 10px; border-bottom: 1px solid #ddd; color: #555;">${it.selectedCode || it.code || '-'}</td>
                           <td style="padding: 8px 10px; border-bottom: 1px solid #ddd; text-align: center;">${it.quantity || 1}</td>
                           <td style="padding: 8px 10px; border-bottom: 1px solid #ddd; text-align: right;">Rp ${((it.price || 0) * (it.quantity || 1)).toLocaleString('id-ID')}</td>
                         </tr>
@@ -2653,7 +2866,7 @@ export default function AdminPage() {
                             <thead>
                               <tr>
                                 <th>Karya Keramik</th>
-                                <th>Varian Glasir</th>
+                                <th>Kode Motif / Varian</th>
                                 <th style="text-align: center;">Qty</th>
                                 <th style="text-align: right;">Total</th>
                               </tr>
