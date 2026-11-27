@@ -910,6 +910,13 @@ export default function AdminPage() {
                   </p>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                  <button
+                    onClick={() => showToast(`Data ${adminOrders.length} pesanan siap diekspor.`, 'info')}
+                    className="purpose-action-btn secondary"
+                    style={{ textTransform: 'capitalize' }}
+                  >
+                    Ekspor CSV
+                  </button>
                 </div>
               </div>
 
@@ -2260,7 +2267,12 @@ export default function AdminPage() {
                       border: '1px solid #E4D0C5',
                       borderRadius: '6px'
                     }}>
-                      <span>Tambah Banyak Foto Sekaligus</span>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                      </svg>
+                      <span>Upload Foto</span>
                       <input
                         type="file"
                         accept="image/*"
@@ -2549,7 +2561,12 @@ export default function AdminPage() {
                       border: '1px solid #E4D0C5',
                       borderRadius: '6px'
                     }}>
-                      <span>Tambah Banyak Foto Sekaligus</span>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                      </svg>
+                      <span>Upload Foto</span>
                       <input
                         type="file"
                         accept="image/*"
