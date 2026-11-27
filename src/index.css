@@ -665,16 +665,21 @@ input, select, textarea {
   position: relative;
   width: 100%;
   aspect-ratio: 1;
-  background-color: var(--bg-surface-subtle);
+  background-color: #FAF8F5;
+  border: 1px solid #EAE6DF;
   border-radius: var(--radius-xs);
   overflow: hidden;
   margin-bottom: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
 }
 
 .curated-img-wrapper img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   transition: transform 0.4s ease;
 }
 
@@ -909,17 +914,24 @@ input, select, textarea {
 .main-image-display {
   position: relative;
   width: 100%;
-  aspect-ratio: 1;
-  background-color: var(--bg-surface-subtle);
+  aspect-ratio: 4 / 3.3;
+  min-height: 380px;
+  background-color: #FAF8F5;
+  border: 1px solid #EAE6DF;
   border-radius: var(--radius-xs);
   overflow: hidden;
   margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
 }
 
 .main-image-display img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  transition: transform 0.3s ease;
 }
 
 .image-inspect-zoom-btn {
@@ -949,8 +961,12 @@ input, select, textarea {
   border-radius: var(--radius-xs);
   overflow: hidden;
   border: 1.5px solid transparent;
-  background-color: var(--bg-surface-subtle);
-  padding: 0;
+  background-color: #FAF8F5;
+  border: 1px solid #EAE6DF;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .thumb-btn.active-thumb {
@@ -960,7 +976,7 @@ input, select, textarea {
 .thumb-btn img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .hand-formed-callout {
@@ -6325,16 +6341,21 @@ input, select, textarea {
 
 .card-thumb-frame {
   position: relative;
-  aspect-ratio: 4 / 3.8;
+  aspect-ratio: 4 / 3.4;
   overflow: hidden;
-  background-color: #F5EFEB;
+  background-color: #FAF8F5;
+  border-bottom: 1px solid #EAE6DF;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
 }
 
 .card-thumb-frame img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   transition: transform 0.5s ease;
 }
 

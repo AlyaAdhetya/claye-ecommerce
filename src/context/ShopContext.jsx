@@ -30,7 +30,7 @@ const INITIAL_ORDERS = [];
 export function ShopProvider({ children }) {
   const [products, setProducts] = useState(() => {
     try {
-      const saved = localStorage.getItem('claye_products_id_v6');
+      const saved = localStorage.getItem('claye_products_id_v7');
       if (saved) {
         const parsed = JSON.parse(saved);
         const existingIds = new Set(parsed.map(p => p.id));
@@ -360,7 +360,7 @@ export function ShopProvider({ children }) {
   }, [orders]);
 
   useEffect(() => {
-    localStorage.setItem('claye_products_id_v6', JSON.stringify(products));
+    localStorage.setItem('claye_products_id_v7', JSON.stringify(products));
   }, [products]);
 
   useEffect(() => {

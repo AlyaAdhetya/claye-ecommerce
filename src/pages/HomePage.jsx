@@ -68,7 +68,14 @@ export default function HomePage() {
                 onClick={() => viewProduct(item.id)}
               >
                 <div className="curated-img-wrapper">
-                  <img src={item.image} alt={item.name} />
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    style={{
+                      objectFit: item.imageFit || 'contain',
+                      transform: `scale(${(item.imageScale || 100) / 100})`
+                    }}
+                  />
                   <div className="curated-card-overlay">
                     <button
                       onClick={(e) => {

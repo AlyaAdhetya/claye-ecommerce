@@ -61,6 +61,8 @@ export default function AdminPage() {
   const [newProdImage, setNewProdImage] = useState('/assets/images/katalog_bowl.jpg');
   const [newProdThumbnails, setNewProdThumbnails] = useState([]);
   const [newProdCodes, setNewProdCodes] = useState('');
+  const [newProdImageFit, setNewProdImageFit] = useState('contain');
+  const [newProdImageScale, setNewProdImageScale] = useState(100);
 
   // Form input for edit ceramic product
   const [editProdName, setEditProdName] = useState('');
@@ -73,6 +75,8 @@ export default function AdminPage() {
   const [editProdImage, setEditProdImage] = useState('/assets/images/katalog_bowl.jpg');
   const [editProdThumbnails, setEditProdThumbnails] = useState([]);
   const [editProdCodes, setEditProdCodes] = useState('');
+  const [editProdImageFit, setEditProdImageFit] = useState('contain');
+  const [editProdImageScale, setEditProdImageScale] = useState(100);
 
   // Pilihan galeri foto keramik CLAYÉ yang siap pakai
   const AVAILABLE_IMAGES = [
@@ -278,7 +282,9 @@ export default function AdminPage() {
       badge: 'baru',
       image: newProdImage || '/assets/images/katalog_bowl.jpg',
       thumbnails: allThumbnails.length > 0 ? allThumbnails : [newProdImage || '/assets/images/katalog_bowl.jpg'],
-      productCodes: parsedCodes
+      productCodes: parsedCodes,
+      imageFit: newProdImageFit || 'contain',
+      imageScale: Number(newProdImageScale) || 100
     });
 
     setIsAddModalOpen(false);
@@ -290,6 +296,8 @@ export default function AdminPage() {
     setNewProdImage('/assets/images/katalog_bowl.jpg');
     setNewProdThumbnails([]);
     setNewProdCodes('');
+    setNewProdImageFit('contain');
+    setNewProdImageScale(100);
     showToast(`Produk "${newProdName}" berhasil didaftarkan ke inventaris!`, 'success');
   };
 
@@ -305,6 +313,8 @@ export default function AdminPage() {
     setEditProdImage(prod.image || '/assets/images/katalog_bowl.jpg');
     setEditProdThumbnails(prod.thumbnails || [prod.image]);
     setEditProdCodes((prod.productCodes || []).join(', '));
+    setEditProdImageFit(prod.imageFit || 'contain');
+    setEditProdImageScale(prod.imageScale || 100);
     setIsEditModalOpen(true);
   };
 
@@ -334,7 +344,9 @@ export default function AdminPage() {
       badge: editProdBadge,
       image: editProdImage || editingProduct.image || '/assets/images/katalog_bowl.jpg',
       thumbnails: allThumbnails.length > 0 ? allThumbnails : [editProdImage || editingProduct.image],
-      productCodes: parsedCodes
+      productCodes: parsedCodes,
+      imageFit: editProdImageFit || 'contain',
+      imageScale: Number(editProdImageScale) || 100
     });
 
     setIsEditModalOpen(false);
@@ -1307,7 +1319,8 @@ export default function AdminPage() {
                               left: 0,
                               width: '100%',
                               height: '100%',
-                              objectFit: 'cover'
+                              objectFit: 'contain',
+                              backgroundColor: '#FAF8F5'
                             }}
                           />
                           <div style={{ position: 'absolute', top: '10px', left: '10px', display: 'flex', gap: '6px' }}>
@@ -1457,7 +1470,7 @@ export default function AdminPage() {
                             <tr key={p.id}>
                               <td className="cell-pieces">
                                 <div className="pieces-item-preview">
-                                  <img src={p.image} alt={p.name} style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '4px' }} />
+                                  <img src={p.image} alt={p.name} style={{ width: '48px', height: '48px', objectFit: 'contain', borderRadius: '4px', backgroundColor: '#FAF8F5', padding: '2px' }} />
                                   <div>
                                     <strong className="piece-title">{p.name}</strong>
                                     <span className="piece-variant">{p.subtitle}</span>
@@ -2322,6 +2335,45 @@ export default function AdminPage() {
                 </div>
               </div>
 
+
+              {/* PENGATURAN TAMPILAN FOTO - Tambah Produk */}
+              <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px dashed #EAE6DF' }}>
+                <div style={{ fontSize: '0.78rem', color: '#6E6962', fontWeight: 600, marginBottom: '0.5rem' }}>
+                  Pengaturan Tampilan Foto di Katalog:
+                </div>
+                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                  <div style={{ flex: 1, minWidth: '140px' }}>
+                    <label style={{ fontSize: '0.74rem', color: '#8A857F', display: 'block', marginBottom: '4px' }}>Mode Tampilan</label>
+                    <select
+                      value={newProdImageFit}
+                      onChange={(e) => setNewProdImageFit(e.target.value)}
+                      style={{ width: '100%', padding: '0.4rem 0.6rem', borderRadius: '6px', border: '1px solid #D8D2C7', fontSize: '0.8rem' }}
+                    >
+                      <option value="contain">Contain (Tampilkan Penuh, Tidak Terpotong)</option>
+                      <option value="cover">Cover (Isi Kotak, Bisa Terpotong)</option>
+                    </select>
+                  </div>
+                  <div style={{ flex: 1, minWidth: '140px' }}>
+                    <label style={{ fontSize: '0.74rem', color: '#8A857F', display: 'block', marginBottom: '4px' }}>Zoom Foto: {newProdImageScale}%</label>
+                    <input
+                      type="range"
+                      min="60"
+                      max="130"
+                      value={newProdImageScale}
+                      onChange={(e) => setNewProdImageScale(Number(e.target.value))}
+                      style={{ width: '100%' }}
+                    />
+                  </div>
+                </div>
+                <div style={{ marginTop: '0.5rem', width: '100%', aspectRatio: '4/3', border: '1px solid #EAE6DF', borderRadius: '6px', backgroundColor: '#FAF8F5', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', padding: '8px' }}>
+                  <img
+                    src={newProdImage}
+                    alt="Preview"
+                    style={{ width: '100%', height: '100%', objectFit: newProdImageFit, transform: `scale(${newProdImageScale / 100})` }}
+                    onError={(e) => { e.target.src = '/assets/images/katalog_bowl.jpg'; }}
+                  />
+                </div>
+              </div>
               <div className="modal-footer">
                 <button type="submit" className="btn-modal-action">
                   Publikasikan ke Katalog Toko
@@ -2604,6 +2656,45 @@ export default function AdminPage() {
                 </div>
               </div>
 
+
+              {/* PENGATURAN TAMPILAN FOTO - Edit Produk */}
+              <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px dashed #EAE6DF' }}>
+                <div style={{ fontSize: '0.78rem', color: '#6E6962', fontWeight: 600, marginBottom: '0.5rem' }}>
+                  Pengaturan Tampilan Foto di Katalog:
+                </div>
+                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                  <div style={{ flex: 1, minWidth: '140px' }}>
+                    <label style={{ fontSize: '0.74rem', color: '#8A857F', display: 'block', marginBottom: '4px' }}>Mode Tampilan</label>
+                    <select
+                      value={editProdImageFit}
+                      onChange={(e) => setEditProdImageFit(e.target.value)}
+                      style={{ width: '100%', padding: '0.4rem 0.6rem', borderRadius: '6px', border: '1px solid #D8D2C7', fontSize: '0.8rem' }}
+                    >
+                      <option value="contain">Contain (Tampilkan Penuh, Tidak Terpotong)</option>
+                      <option value="cover">Cover (Isi Kotak, Bisa Terpotong)</option>
+                    </select>
+                  </div>
+                  <div style={{ flex: 1, minWidth: '140px' }}>
+                    <label style={{ fontSize: '0.74rem', color: '#8A857F', display: 'block', marginBottom: '4px' }}>Zoom Foto: {editProdImageScale}%</label>
+                    <input
+                      type="range"
+                      min="60"
+                      max="130"
+                      value={editProdImageScale}
+                      onChange={(e) => setEditProdImageScale(Number(e.target.value))}
+                      style={{ width: '100%' }}
+                    />
+                  </div>
+                </div>
+                <div style={{ marginTop: '0.5rem', width: '100%', aspectRatio: '4/3', border: '1px solid #EAE6DF', borderRadius: '6px', backgroundColor: '#FAF8F5', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', padding: '8px' }}>
+                  <img
+                    src={editProdImage}
+                    alt="Preview"
+                    style={{ width: '100%', height: '100%', objectFit: editProdImageFit, transform: `scale(${editProdImageScale / 100})` }}
+                    onError={(e) => { e.target.src = '/assets/images/katalog_bowl.jpg'; }}
+                  />
+                </div>
+              </div>
               <div className="modal-footer">
                 <button type="submit" className="btn-modal-action">
                   Simpan Perubahan

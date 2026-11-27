@@ -126,7 +126,14 @@ export default function CatalogPage() {
                 onClick={() => viewProduct(item.id)}
               >
                 <div className="curated-img-wrapper">
-                  <img src={item.image} alt={item.name} />
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    style={{
+                      objectFit: item.imageFit || 'contain',
+                      transform: `scale(${(item.imageScale || 100) / 100})`
+                    }}
+                  />
                   {isAdmin ? (
                     <span className="card-top-badge" style={{ backgroundColor: '#24201D', color: '#FAF7F2' }}>
                       STOK: {item.stock !== undefined ? item.stock : 10}

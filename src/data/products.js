@@ -11,6 +11,8 @@ export const INITIAL_PRODUCTS = [
     thumbnails: [
       '/assets/images/katalog_bowl.jpg'
     ],
+    imageFit: 'contain',
+    imageScale: 100,
     badge: 'terlaris',
     batchInfo: 'BATCH KURASI NO. 01 • EDISI SPESIAL MANGKUK ETNIK',
     editionInfo: 'KURASI ARTISAN NUSANTARA • 7 PILIHAN MOTIF',
@@ -52,6 +54,8 @@ export const INITIAL_PRODUCTS = [
     thumbnails: [
       '/assets/images/katalog_cup.jpg'
     ],
+    imageFit: 'contain',
+    imageScale: 100,
     badge: 'pilihan',
     batchInfo: 'BATCH KURASI NO. 02 • KOLEKSI KUCING LUCU',
     editionInfo: 'KURASI ARTISAN MUG • 2 PILIHAN MOTIF',
@@ -88,6 +92,8 @@ export const INITIAL_PRODUCTS = [
     thumbnails: [
       '/assets/images/katalog_mug.jpg'
     ],
+    imageFit: 'contain',
+    imageScale: 100,
     badge: 'esensial',
     batchInfo: 'BATCH KURASI NO. 03 • EDISI KLASIK TARTAN',
     editionInfo: 'KOLEKSI ESENSIAL HARIAN • 1 MODEL',

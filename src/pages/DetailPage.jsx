@@ -81,7 +81,14 @@ export default function DetailPage() {
           {/* KOLOM KIRI: GALERI FOTO */}
           <div className="detail-visual-column">
             <div className="main-image-display">
-              <img src={activeImage} alt={product.name} />
+              <img
+                src={activeImage}
+                alt={product.name}
+                style={{
+                  objectFit: product.imageFit || 'contain',
+                  transform: `scale(${(product.imageScale || 100) / 100})`
+                }}
+              />
               <button
                 className="image-inspect-zoom-btn"
                 title="Perbesar Tampilan Glasir"
@@ -105,7 +112,13 @@ export default function DetailPage() {
                   className={`thumb-btn ${activeImage === thumb ? 'active-thumb' : ''}`}
                   onClick={() => setActiveImage(thumb)}
                 >
-                  <img src={thumb} alt={`${product.name} sudut ${idx + 1}`} />
+                  <img
+                    src={thumb}
+                    alt={`${product.name} sudut ${idx + 1}`}
+                    style={{
+                      objectFit: product.imageFit || 'contain'
+                    }}
+                  />
                 </button>
               ))}
             </div>
