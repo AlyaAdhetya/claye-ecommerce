@@ -114,6 +114,122 @@ export const INITIAL_PRODUCTS = [
     },
     materialsCare: 'Aman untuk minuman panas mendidih maupun dingin, food-grade 100%, microwave & dishwasher safe.',
     shippingInfo: 'Diantar langsung oleh kurir tim CLAYÉ di Kota Palembang dengan jaminan keamanan produk.'
+  },
+  {
+    id: 4,
+    name: 'Artisan Floral Ceramic Plates',
+    subtitle: 'Piring keramik saji motif batik floral dengan border anyaman terakota (4 varian motif)',
+    category: 'Peralatan Makan',
+    price: 48000,
+    usdPrice: 16,
+    oldPrice: 58000,
+    image: '/assets/images/katalog_plate_1.jpg',
+    thumbnails: [
+      '/assets/images/katalog_plate_1.jpg',
+      '/assets/images/katalog_plate_2.jpg'
+    ],
+    imageFit: 'contain',
+    imageScale: 100,
+    badge: 'baru',
+    batchInfo: 'BATCH KURASI NO. 04 • KOLEKSI PIRING FLORAL',
+    editionInfo: 'KURASI ARTISAN NUSANTARA • 4 PILIHAN MOTIF',
+    rating: 5.0,
+    reviews: 48,
+    stock: 30,
+    description: 'Piring keramik saji stoneware bermotif batik floral dan geometris yang dipadukan dengan aksen border terakota klasik. Dibuat presisi dengan tepian cekung ergonomis, sangat cocok untuk hidangan utama, pasta, salad, maupun sajian istimewa keluarga. Tersedia dalam 4 varian kode motif unik (CER-PLT-001 s/d CER-PLT-004).',
+    productCodes: [
+      'CER-PLT-001',
+      'CER-PLT-002',
+      'CER-PLT-003',
+      'CER-PLT-004'
+    ],
+    specs: {
+      height: '4.5 cm',
+      dryWeight: 'Sekitar 420 gram',
+      rimDiameter: '20.5 cm',
+      technique: 'Underglaze Ceramic Printing & Hand-finish Rim',
+      liquidCapacity: 'Sajian Porsi Utama (8.5 inch)',
+      origin: 'Studio Keramik Mitra CLAYÉ',
+      firing: 'Pembakaran Suhu Tinggi 1250°C',
+      clay: 'Keramik Stoneware Berkualitas'
+    },
+    materialsCare: '100% Food-Grade bebas timbal. Aman digunakan di microwave, oven ringan, dan mesin pencuci piring.',
+    shippingInfo: 'Dikemas dari studio CLAYÉ Palembang dengan bubble wrap tebal berlapis serta kardus proteksi bergaransi pengiriman COD.'
+  },
+  {
+    id: 5,
+    name: 'Modern Indigo Ceramic Plates',
+    subtitle: 'Piring saji keramik modern motif indigo kontemporer dengan list emas elegan (4 varian motif)',
+    category: 'Peralatan Makan',
+    price: 52000,
+    usdPrice: 17,
+    oldPrice: 62000,
+    image: '/assets/images/katalog_plate_3.jpg',
+    thumbnails: [
+      '/assets/images/katalog_plate_3.jpg'
+    ],
+    imageFit: 'contain',
+    imageScale: 100,
+    badge: 'pilihan',
+    batchInfo: 'BATCH KURASI NO. 05 • EDISI INDIGO KONTEMPORER',
+    editionInfo: 'KURASI ARTISAN NUSANTARA • 4 PILIHAN MOTIF',
+    rating: 4.9,
+    reviews: 36,
+    stock: 25,
+    description: 'Piring keramik bertema Modern Indigo dengan sentuhan gaya kontemporer dan rim beraksen emas halus. Pilihan sempurna untuk sajian estetis modern, cafe-style plating, maupun jamuan makan malam elegan. Tersedia dalam 4 varian kode motif memikat (CER-PLT-005 s/d CER-PLT-008).',
+    productCodes: [
+      'CER-PLT-005',
+      'CER-PLT-006',
+      'CER-PLT-007',
+      'CER-PLT-008'
+    ],
+    specs: {
+      height: '3.8 cm',
+      dryWeight: 'Sekitar 400 gram',
+      rimDiameter: '20.0 cm',
+      technique: 'Glaze Indigo & Rim Aksen Gold Trim',
+      liquidCapacity: 'Sajian Piring Datar / Semi-Cekung (8 inch)',
+      origin: 'Studio Keramik Mitra CLAYÉ',
+      firing: 'Pembakaran Suhu Tinggi 1240°C',
+      clay: 'Porcelain Stoneware Halus'
+    },
+    materialsCare: 'Food-safe 100%. Untuk mempertahankan keindahan aksen rim emas, disarankan mencuci manual dengan spons lembut.',
+    shippingInfo: 'Dikemas ekstra aman dengan segel pelindung anti-benturan dan proteksi kardus ganda kurir COD Palembang.'
+  },
+  {
+    id: 6,
+    name: 'Royal Heritage Ceramic Tableware Set',
+    subtitle: 'Satu set lengkap peralatan makan keramik vintage premium dengan box eksklusif',
+    category: 'Peralatan Makan',
+    price: 275000,
+    usdPrice: 85,
+    oldPrice: 320000,
+    image: '/assets/images/katalog_tableware_set.jpg',
+    thumbnails: [
+      '/assets/images/katalog_tableware_set.jpg'
+    ],
+    imageFit: 'contain',
+    imageScale: 100,
+    badge: 'eksklusif',
+    batchInfo: 'BATCH KURASI NO. 06 • FULL DINNERWARE SET',
+    editionInfo: 'SATU SET LENGKAP • PIRING, MANGKUK, MUG & BOX',
+    rating: 5.0,
+    reviews: 22,
+    stock: 10,
+    description: 'Satu set lengkap peralatan makan keramik bermotif ornamen floral vintage nusantara dengan kombinasi warna toska, kuning kunyit, dan hijau klasik. Terdiri dari piring saji, mangkuk sup, cangkir mug, mangkuk saus/tatakan, lengkap dengan kotak kemasan koleksi (gift box) eksklusif. Sangat cocok sebagai kado pernikahan, bingkisan istimewa, maupun koleksi jamuan makan keluarga mewah.',
+    productCodes: [], // Produk satu set lengkap utuh tanpa kode varian
+    specs: {
+      height: 'Set Lengkap (Multi-item)',
+      dryWeight: 'Sekitar 2.800 gram (Termasuk Gift Box)',
+      rimDiameter: 'Piring 21 cm, Mangkuk 14 cm, Mug 8 cm',
+      technique: 'Underglaze Fine Ceramic Porcelain with Gift Box',
+      liquidCapacity: 'Set Multi-Piece Tableware',
+      origin: 'Studio Keramik Mitra CLAYÉ',
+      firing: 'Pembakaran Suhu Tinggi 1280°C',
+      clay: 'Fine Bone Porcelain Stoneware'
+    },
+    materialsCare: 'Food-grade 100%, microwave & dishwasher safe. Kemasan gift box tebal cocok untuk hadiah langsung.',
+    shippingInfo: 'Dikemas berlapis-lapis dengan foam proteksi khusus, bubble wrap tebal, dan kardus pelindung khusus pengiriman aman COD di Kota Palembang.'
   }
 ];
 
