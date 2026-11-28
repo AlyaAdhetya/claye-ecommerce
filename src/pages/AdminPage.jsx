@@ -1259,6 +1259,27 @@ export default function AdminPage() {
                   </button>
                 </div>
 
+                {/* TOMBOL TAMBAH PRODUK BARU */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <button
+                    onClick={() => setIsAddModalOpen(true)}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      backgroundColor: 'var(--color-terracotta)',
+                      color: '#FFFFFF',
+                      border: 'none',
+                      padding: '8px 16px',
+                      borderRadius: '6px',
+                      fontWeight: 600,
+                      fontSize: '0.82rem',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    + Tambah Produk Baru
+                  </button>
+                </div>
 
               </div>
 
