@@ -643,9 +643,7 @@ export default function AdminPage() {
                   </p>
                 </div>
                 <div style={{ display: 'flex', gap: '8px' }}>
-                  <button onClick={() => setIsAddModalOpen(true)} className="purpose-action-btn primary" style={{ textTransform: 'capitalize' }}>
-                    + Tambah Produk
-                  </button>
+
                   <button onClick={() => setActivePage('orders')} className="purpose-action-btn secondary" style={{ textTransform: 'capitalize' }}>
                     Lihat Pesanan
                   </button>
@@ -1132,11 +1130,7 @@ export default function AdminPage() {
                     Kelola data produk keramik, harga jual, foto, dan ketersediaan stok fisik di gudang.
                   </p>
                 </div>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <button onClick={() => setIsAddModalOpen(true)} className="purpose-action-btn primary" style={{ textTransform: 'capitalize' }}>
-                    + Tambah Produk Baru
-                  </button>
-                </div>
+
               </div>
 
               {/* MINI STAT ROW INVENTORY */}
@@ -1265,26 +1259,7 @@ export default function AdminPage() {
                   </button>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <button
-                    onClick={() => setIsAddModalOpen(true)}
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                      backgroundColor: 'var(--color-terracotta)',
-                      color: '#FFFFFF',
-                      border: 'none',
-                      padding: '8px 16px',
-                      borderRadius: '6px',
-                      fontWeight: 600,
-                      fontSize: '0.82rem',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    + Tambah Produk Baru
-                  </button>
-                </div>
+
               </div>
 
               {/* TAMPILAN 1: TAMPILAN TOKO (ETALASE KATALOG VISUAL DENGAN KONTROL ADMIN) */}
