@@ -7239,7 +7239,7 @@ img {
   }
 }
 
-/* 7. Patron Dashboard Akun Mobile */
+/* 7. Patron & Admin Dashboard Akun Mobile */
 @media (max-width: 900px) {
   .patron-page-grid {
     grid-template-columns: 1fr !important;
@@ -7248,30 +7248,92 @@ img {
   .patron-sidebar-menu {
     border-right: none !important;
     border-bottom: 1px solid var(--color-border) !important;
-    padding: 1rem !important;
+    padding: 0.85rem 1rem !important;
+    background-color: #FAF8F5 !important;
+    position: sticky !important;
+    top: 58px !important;
+    z-index: 90 !important;
   }
 
-  .patron-nav-list {
+  .patron-profile-identity {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    margin-bottom: 0.65rem !important;
+    padding-bottom: 0.65rem !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+  }
+
+  .patron-avatar-circle {
+    width: 38px !important;
+    height: 38px !important;
+    font-size: 1rem !important;
+    flex-shrink: 0 !important;
+  }
+
+  .patron-display-name {
+    font-size: 0.95rem !important;
+    margin: 0 !important;
+  }
+
+  .patron-since-text,
+  .patron-email-sub {
+    font-size: 0.72rem !important;
+  }
+
+  .patron-nav-menu {
     display: flex !important;
     flex-direction: row !important;
     overflow-x: auto !important;
-    gap: 0.4rem !important;
+    gap: 0.45rem !important;
     white-space: nowrap !important;
     -webkit-overflow-scrolling: touch !important;
     scrollbar-width: none !important;
+    padding: 2px 0 !important;
   }
 
-  .patron-nav-btn {
+  .patron-nav-menu::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .patron-nav-group {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 0.45rem !important;
+    margin-bottom: 0 !important;
+  }
+
+  .patron-nav-group-title {
+    display: none !important;
+  }
+
+  .patron-nav-item {
     width: auto !important;
-    padding: 0.5rem 0.85rem !important;
+    white-space: nowrap !important;
+    padding: 0.45rem 0.85rem !important;
     border-radius: 999px !important;
     border: 1px solid #EAE4DC !important;
-    background-color: #FAF7F2 !important;
+    background-color: #FFFFFF !important;
+    font-size: 0.78rem !important;
+    gap: 0.4rem !important;
+    border-left: 1px solid #EAE4DC !important;
+    display: inline-flex !important;
+    align-items: center !important;
   }
 
-  .patron-nav-btn.active {
+  .patron-nav-item.is-active {
     background-color: var(--color-charcoal) !important;
     color: #FAF7F2 !important;
+    border-color: var(--color-charcoal) !important;
+  }
+
+  .patron-nav-item.is-active .pnav-icon {
+    color: #FAF7F2 !important;
+  }
+
+  .patron-nav-logout-group,
+  .patron-sidebar-help-widget {
+    display: none !important;
   }
 
   .patron-main-viewport {
@@ -7282,59 +7344,73 @@ img {
 /* 8. Modals Mobile Rapi & Tidak Terpotong */
 @media (max-width: 600px) {
   .claye-modal-overlay {
-    padding: 0.65rem !important;
+    padding: 0.5rem !important;
+    align-items: flex-end !important;
   }
 
   .claye-modal-content {
-    width: 96% !important;
-    max-width: 96% !important;
-    max-height: 90vh !important;
-    border-radius: 8px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 88vh !important;
+    border-radius: 14px 14px 0 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
   }
 
   .modal-header {
-    padding: 1rem 1.15rem !important;
+    padding: 0.9rem 1rem !important;
+    position: sticky !important;
+    top: 0 !important;
+    background: #FFFFFF !important;
+    z-index: 10 !important;
+    border-bottom: 1px solid #ECE7E0 !important;
   }
 
   .modal-title {
-    font-size: 1.25rem !important;
+    font-size: 1.15rem !important;
   }
 
   .modal-body {
-    padding: 1.15rem 1rem !important;
+    padding: 1rem 0.9rem !important;
   }
 
   .modal-footer {
-    padding: 0.85rem 1rem !important;
+    padding: 0.75rem 1rem !important;
     flex-direction: column-reverse !important;
     gap: 0.5rem !important;
+    position: sticky !important;
+    bottom: 0 !important;
+    background: #FFFFFF !important;
+    border-top: 1px solid #ECE7E0 !important;
   }
 
   .btn-modal-action,
   .btn-modal-cancel {
     width: 100% !important;
     text-align: center !important;
+    padding: 11px !important;
   }
 }
 
 /* 9. Hero Section & Typography Mobile */
 @media (max-width: 768px) {
   .claye-hero-section {
-    padding: 3rem 0 2rem !important;
+    padding: 2.5rem 0 2rem !important;
   }
 
   .hero-editorial-title {
-    font-size: 2.1rem !important;
+    font-size: clamp(1.85rem, 5.5vw, 2.5rem) !important;
     line-height: 1.2 !important;
   }
 
-  .hero-editorial-lead {
-    font-size: 0.95rem !important;
+  .hero-editorial-desc {
+    font-size: 0.92rem !important;
     line-height: 1.55 !important;
+    margin-bottom: 1.5rem !important;
   }
 
   .section-serif-heading {
-    font-size: 1.55rem !important;
+    font-size: clamp(1.4rem, 4vw, 1.85rem) !important;
     line-height: 1.3 !important;
   }
 
@@ -7343,19 +7419,129 @@ img {
   }
 
   .claye-footer {
-    padding: 3rem 1rem 2.5rem !important;
+    padding: 2.75rem 1rem 2rem !important;
   }
 
   .footer-wabi-sabi-quote {
-    font-size: 1.15rem !important;
-    margin-bottom: 1.75rem !important;
+    font-size: 1.1rem !important;
+    margin-bottom: 1.5rem !important;
   }
 
   .footer-horizontal-links {
-    gap: 1rem !important;
+    gap: 0.85rem !important;
     font-size: 0.72rem !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+  }
+
+  .nav-action-logout-text {
+    display: none !important;
   }
 }
+
+/* 10. Admin Inventory Toolbar & Action Buttons Mobile */
+@media (max-width: 640px) {
+  .admin-inventory-toolbar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.65rem !important;
+  }
+
+  .admin-view-switcher-group {
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .admin-view-toggle-btn {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 7px 10px !important;
+    font-size: 0.78rem !important;
+  }
+
+  .admin-add-product-btn-wrap {
+    width: 100% !important;
+  }
+
+  .admin-add-product-btn {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 9px 16px !important;
+  }
+
+  .acquisitions-table-wrap {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    border-radius: 6px !important;
+    box-shadow: inset -6px 0 6px -6px rgba(0, 0, 0, 0.15) !important;
+  }
+}
+
+/* 11. Chatbot Widget Mobile Floating Button & Window */
+@media (max-width: 600px) {
+  .claye-concierge-trigger {
+    bottom: 16px !important;
+    right: 16px !important;
+    padding: 0.55rem 0.95rem !important;
+    border-radius: 999px !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
+  }
+
+  .concierge-trigger-text {
+    font-size: 0.75rem !important;
+  }
+
+  .claye-chat-overlay {
+    padding: 0 !important;
+    background: rgba(0, 0, 0, 0.45) !important;
+  }
+
+  .claye-chat-window {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100% !important;
+    max-height: 100dvh !important;
+    border-radius: 0 !important;
+    bottom: 0 !important;
+    right: 0 !important;
+    left: 0 !important;
+    top: 0 !important;
+  }
+}
+
+/* 12. Global Responsive Safety Constraints */
+#root {
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+  width: 100% !important;
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 1rem !important;
+  }
+
+  .catalog-toolbar-panel {
+    padding: 0.85rem 0.75rem !important;
+  }
+
+  .catalog-search-sort-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.5rem !important;
+  }
+
+  .search-field-wrap {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  .catalog-sort-select {
+    width: 100% !important;
+  }
+}
+
 
 
 

@@ -1190,27 +1190,31 @@ export default function AdminPage() {
               </div>
 
               {/* SEGMENTED SWITCHER: TAMPILAN TOKO (KATALOG) vs TABEL STOK */}
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                flexWrap: 'wrap',
-                gap: '1rem',
-                backgroundColor: '#FAF8F5',
-                padding: '0.75rem 1rem',
-                borderRadius: '8px',
-                border: '1px solid #EAE6DF',
-                marginBottom: '1.25rem'
-              }}>
-                <div style={{ display: 'inline-flex', gap: '4px', backgroundColor: '#EDE8E1', padding: '4px', borderRadius: '6px' }}>
+              <div
+                className="admin-inventory-toolbar"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  gap: '0.75rem',
+                  backgroundColor: '#FAF8F5',
+                  padding: '0.75rem 1rem',
+                  borderRadius: '8px',
+                  border: '1px solid #EAE6DF',
+                  marginBottom: '1.25rem'
+                }}
+              >
+                <div className="admin-view-switcher-group" style={{ display: 'inline-flex', gap: '4px', backgroundColor: '#EDE8E1', padding: '4px', borderRadius: '6px' }}>
                   <button
                     type="button"
                     onClick={() => setInventoryViewMode('storefront')}
+                    className="admin-view-toggle-btn"
                     style={{
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: '6px',
-                      padding: '8px 16px',
+                      padding: '8px 14px',
                       borderRadius: '5px',
                       border: 'none',
                       backgroundColor: inventoryViewMode === 'storefront' ? '#24201D' : 'transparent',
@@ -1227,16 +1231,17 @@ export default function AdminPage() {
                       <rect x="14" y="14" width="7" height="7"></rect>
                       <rect x="3" y="14" width="7" height="7"></rect>
                     </svg>
-                    Tampilan Toko (Etalase Produk)
+                    <span>Etalase Produk</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => setInventoryViewMode('table')}
+                    className="admin-view-toggle-btn"
                     style={{
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: '6px',
-                      padding: '8px 16px',
+                      padding: '8px 14px',
                       borderRadius: '5px',
                       border: 'none',
                       backgroundColor: inventoryViewMode === 'table' ? '#24201D' : 'transparent',
@@ -1255,14 +1260,15 @@ export default function AdminPage() {
                       <line x1="3" y1="12" x2="3.01" y2="12"></line>
                       <line x1="3" y1="18" x2="3.01" y2="18"></line>
                     </svg>
-                    Tabel Data Stok
+                    <span>Tabel Data Stok</span>
                   </button>
                 </div>
 
                 {/* TOMBOL TAMBAH PRODUK BARU */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <div className="admin-add-product-btn-wrap" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   <button
                     onClick={() => setIsAddModalOpen(true)}
+                    className="admin-add-product-btn"
                     style={{
                       display: 'inline-flex',
                       alignItems: 'center',

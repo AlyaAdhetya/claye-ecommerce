@@ -245,13 +245,19 @@ export default function Navbar() {
                   DASHBOARD ADMIN
                 </button>
               )}
-              {user && (
+              {user ? (
                 <div style={{ borderTop: '1px solid #EAE4DC', margin: '0.75rem 0', paddingTop: '0.75rem' }}>
                   <button onClick={() => handleNav('/dashboard')} className="mobile-link" style={{ fontSize: '0.85rem' }}>
                     AKUN SAYA ({user.name})
                   </button>
                   <button onClick={logout} className="mobile-link" style={{ fontSize: '0.85rem', color: '#B87355' }}>
                     KELUAR DARI AKUN
+                  </button>
+                </div>
+              ) : (
+                <div style={{ borderTop: '1px solid #EAE4DC', margin: '0.75rem 0', paddingTop: '0.75rem' }}>
+                  <button onClick={() => handleNav('/login')} className="mobile-link" style={{ fontSize: '0.88rem', color: 'var(--color-terracotta)', fontWeight: 600 }}>
+                    MASUK / DAFTAR AKUN →
                   </button>
                 </div>
               )}
