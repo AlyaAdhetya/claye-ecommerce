@@ -240,7 +240,44 @@ export const CATEGORIES = [
   'Peralatan Makan',
   'Vas',
   'Kopi & Teh',
-  'Edisi Terbatas'
+  'Edisi Terbatas',
+  {
+    id: 7,
+    name: 'Moroccan Mandala Ceramic Bowls',
+    subtitle: 'Mangkuk keramik bermotif mandala mediterania biru toska bertekstur halus',
+    category: 'Mangkuk',
+    price: 48000,
+    usdPrice: 16,
+    oldPrice: 58000,
+    image: '/assets/images/katalog_moroccan_bowl.jpg',
+    thumbnails: [
+      '/assets/images/katalog_moroccan_bowl.jpg'
+    ],
+    imageFit: 'contain',
+    imageScale: 100,
+    badge: 'pilihan',
+    batchInfo: 'BATCH KURASI NO. 07 • EDISI MANDALA ETNIK',
+    editionInfo: 'KURASI ARTISAN NUSANTARA • MOTIF MAROKO VINTAGE',
+    rating: 5.0,
+    reviews: 18,
+    stock: 24,
+    description: 'Mangkuk keramik artisan dengan sentuhan pola ornamen mandala maroko bernuansa biru kobalt dan toska elegan pada permukaan putih bersih. Desain melingkar yang simetris dan detail yang presisi memberikan tampilan mewah saat menyajikan sup hangat, ramen, salad segar, atau hidangan pencuci mulut. Sangat kokoh, tebal, dan tahan suhu tinggi.',
+    productCodes: [
+      'CER-BWL-008'
+    ],
+    specs: {
+      height: '7.5 cm',
+      dryWeight: 'Sekitar 340 gram',
+      rimDiameter: '15.5 cm',
+      technique: 'Fine Underglaze Ceramic Transfer & Glossy Finish',
+      liquidCapacity: '600 ml',
+      origin: 'Studio Keramik Mitra CLAYÉ',
+      firing: 'Pembakaran Suhu Tinggi 1260°C',
+      clay: 'Porcelain Stoneware Food-Grade'
+    },
+    materialsCare: '100% Food-Safe, bebas timbal dan kadmium. Aman digunakan di dalam microwave, oven, maupun mesin pencuci piring (dishwasher).',
+    shippingInfo: 'Dikemas khusus dengan pelindung bubble wrap ekstra tebal dan lapisan karton ganda untuk pengiriman COD aman langsung di wilayah Kota Palembang.'
+  }
 ];
 
 export const products = INITIAL_PRODUCTS;
