@@ -120,22 +120,19 @@ export default function Navbar() {
           <nav className="claye-navbar-links">
             <button
               onClick={() => handleNav('/')}
-              className={
-av-text-link }
+              className={`nav-text-link ${currentRoute === '/' || currentRoute === '' ? 'active' : ''}`}
             >
               BERANDA
             </button>
             <button
               onClick={() => handleNav('/katalog')}
-              className={
-av-text-link }
+              className={`nav-text-link ${currentRoute === '/katalog' ? 'active' : ''}`}
             >
               KATALOG
             </button>
             <button
               onClick={() => handleNav('/tentang')}
-              className={
-av-text-link }
+              className={`nav-text-link ${currentRoute === '/tentang' ? 'active' : ''}`}
             >
               TENTANG KAMI
             </button>
