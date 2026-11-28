@@ -629,21 +629,20 @@ export default function AdminPage() {
           {activePage === 'overview' && (
             <div className="admin-page-view">
               {/* HEADER RINGKASAN TOKO */}
-              <div style={{
+              <div className="admin-view-header-row" style={{
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem',
                 borderBottom: '1px solid var(--color-border)', paddingBottom: '1.25rem'
               }}>
-                <div>
+                <div style={{ minWidth: 0, flex: 1 }}>
                   <h2 style={{ fontSize: '1.6rem', fontFamily: 'var(--font-serif)', margin: 0, color: 'var(--color-charcoal)' }}>
                     Ringkasan Toko CLAYÉ
                   </h2>
-                  <p style={{ margin: '4px 0 0', fontSize: '0.88rem', color: '#6E6962' }}>
+                  <p style={{ margin: '4px 0 0', fontSize: '0.88rem', color: '#6E6962', wordBreak: 'break-word' }}>
                     Pantau pesanan masuk, pengantaran mandiri Kota Palembang, dan ketersediaan stok produk keramik.
                   </p>
                 </div>
-                <div style={{ display: 'flex', gap: '8px' }}>
-
+                <div className="admin-header-actions-group" style={{ display: 'flex', gap: '8px' }}>
                   <button onClick={() => setActivePage('orders')} className="purpose-action-btn secondary" style={{ textTransform: 'capitalize' }}>
                     Lihat Pesanan
                   </button>

@@ -2,7 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useShop } from '../context/ShopContext';
 
 export default function Chatbot() {
-  const { isChatOpen, setIsChatOpen, chatInitialPrompt, products, viewProduct, addToCart, navigate } = useShop();
+  const { currentRoute, isChatOpen, setIsChatOpen, chatInitialPrompt, products, viewProduct, addToCart, navigate } = useShop();
+
+  // Jangan tampilkan chatbot bantuan pelanggan di halaman admin
+  if (currentRoute === '/admin' || (currentRoute && currentRoute.startsWith('/admin'))) {
+    return null;
+  }
 
   const [messages, setMessages] = useState([
     {
