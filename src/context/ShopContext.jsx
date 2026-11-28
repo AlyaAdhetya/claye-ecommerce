@@ -224,8 +224,9 @@ export function ShopProvider({ children }) {
   // Status user aktif
   const [user, setUser] = useState(() => {
     try {
-      const isClean = localStorage.getItem('claye_clean_reset_v3');
+      const isClean = localStorage.getItem('claye_clean_reset_v4');
       if (!isClean) {
+        localStorage.setItem('claye_clean_reset_v4', 'true');
         localStorage.removeItem('claye_user_active_v8');
         return INITIAL_USER;
       }

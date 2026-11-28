@@ -118,36 +118,27 @@ export default function Navbar() {
 
           {/* MENU NAVIGASI: HANYA BERANDA, KATALOG, TENTANG KAMI */}
           <nav className="claye-navbar-links">
-            {isAdminUser ? (
-              <button
-                onClick={openAdminStorefront}
-                className="nav-text-link active"
-                style={{ fontWeight: 700, letterSpacing: '0.06em' }}
-              >
-                KELOLA INVENTARIS & KATALOG
-              </button>
-            ) : (
-              <>
-                <button
-                  onClick={() => handleNav('/')}
-                  className={`nav-text-link ${currentRoute === '/' || currentRoute === '' ? 'active' : ''}`}
-                >
-                  BERANDA
-                </button>
-                <button
-                  onClick={() => handleNav('/katalog')}
-                  className={`nav-text-link ${currentRoute === '/katalog' ? 'active' : ''}`}
-                >
-                  KATALOG
-                </button>
-                <button
-                  onClick={() => handleNav('/tentang')}
-                  className={`nav-text-link ${currentRoute === '/tentang' ? 'active' : ''}`}
-                >
-                  TENTANG KAMI
-                </button>
-              </>
-            )}
+            <button
+              onClick={() => handleNav('/')}
+              className={
+av-text-link }
+            >
+              BERANDA
+            </button>
+            <button
+              onClick={() => handleNav('/katalog')}
+              className={
+av-text-link }
+            >
+              KATALOG
+            </button>
+            <button
+              onClick={() => handleNav('/tentang')}
+              className={
+av-text-link }
+            >
+              TENTANG KAMI
+            </button>
           </nav>
 
           {/* AKSI KANAN */}
