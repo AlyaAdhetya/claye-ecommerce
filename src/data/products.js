@@ -230,17 +230,7 @@ export const INITIAL_PRODUCTS = [
     },
     materialsCare: 'Food-grade 100%, microwave & dishwasher safe. Kemasan gift box tebal cocok untuk hadiah langsung.',
     shippingInfo: 'Dikemas berlapis-lapis dengan foam proteksi khusus, bubble wrap tebal, dan kardus pelindung khusus pengiriman aman COD di Kota Palembang.'
-  }
-];
-
-export const CATEGORIES = [
-  'Semua',
-  'Cangkir & Mug',
-  'Mangkuk',
-  'Peralatan Makan',
-  'Vas',
-  'Kopi & Teh',
-  'Edisi Terbatas',
+  },
   {
     id: 7,
     name: 'Moroccan Mandala Ceramic Bowls',
@@ -278,6 +268,16 @@ export const CATEGORIES = [
     materialsCare: '100% Food-Safe, bebas timbal dan kadmium. Aman digunakan di dalam microwave, oven, maupun mesin pencuci piring (dishwasher).',
     shippingInfo: 'Dikemas khusus dengan pelindung bubble wrap ekstra tebal dan lapisan karton ganda untuk pengiriman COD aman langsung di wilayah Kota Palembang.'
   }
+];
+
+export const CATEGORIES = [
+  'Semua',
+  'Cangkir & Mug',
+  'Mangkuk',
+  'Peralatan Makan',
+  'Vas',
+  'Kopi & Teh',
+  'Edisi Terbatas'
 ];
 
 export const products = INITIAL_PRODUCTS;
