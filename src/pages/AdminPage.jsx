@@ -148,6 +148,7 @@ export default function AdminPage() {
   const [orderSearchQuery, setOrderSearchQuery] = useState('');
   const [inventoryCategoryFilter, setInventoryCategoryFilter] = useState('Semua');
   const [inventorySearchQuery, setInventorySearchQuery] = useState('');
+  const [reportFilter, setReportFilter] = useState('Semua');
 
   // Settings form state
   const [studioSettings, setStudioSettings] = useState({
@@ -569,6 +570,189 @@ export default function AdminPage() {
       ]
     }
   ];
+
+  // =========================================================================
+  // METRIK & KALKULASI LAPORAN PENJUALAN DINAMIS (SINKRON DENGAN DATA TOKO)
+  // =========================================================================
+  const validReportOrders = adminOrders.filter(o => o.status !== 'Dibatalkan' && o.fulfillment !== 'Dibatalkan');
+  const cancelledReportOrders = adminOrders.filter(o => o.status === 'Dibatalkan' || o.fulfillment === 'Dibatalkan');
+
+  const totalReportRevenue = validReportOrders.reduce((sum, o) => {
+    const val = o.grandTotal !== undefined ? o.grandTotal : (o.total + (o.shippingFee || 0));
+    return sum + (val || 0);
+  }, 0);
+
+  const averageOrderValue = validReportOrders.length > 0
+    ? Math.round(totalReportRevenue / validReportOrders.length)
+    : 0;
+
+  const logisticIntegrity = adminOrders.length > 0
+    ? (((adminOrders.length - cancelledReportOrders.length) / adminOrders.length) * 100).toFixed(1)
+    : '99.8';
+
+  const avgProductRating = products.length > 0
+    ? (products.reduce((acc, p) => acc + (p.rating || 4.9), 0) / products.length)
+    : 4.93;
+  const csatPercentage = ((avgProductRating / 5) * 100).toFixed(1) + '%';
+
+  // Distribusi kategori berdasarkan pesanan riil & katalog
+  const categorySalesMap = {
+    'Cangkir & Mug': { category: 'Cangkir dan Mug', count: 0, amount: 0, color: '#B87355' },
+    'Mangkuk': { category: 'Mangkuk Stoneware', count: 0, amount: 0, color: '#385E3E' },
+    'Piring': { category: 'Peralatan Makan dan Piring', count: 0, amount: 0, color: '#24201D' },
+    'Peralatan Makan Set': { category: 'Tableware & Vas Set', count: 0, amount: 0, color: '#6E6962' }
+  };
+
+  validReportOrders.forEach(ord => {
+    if (ord.items && Array.isArray(ord.items) && ord.items.length > 0) {
+      ord.items.forEach(it => {
+        const nameLower = (it.name || '').toLowerCase();
+        const codeLower = (it.selectedCode || it.code || '').toLowerCase();
+        let catKey = 'Peralatan Makan Set';
+        if (nameLower.includes('mug') || nameLower.includes('cup') || nameLower.includes('cangkir') || codeLower.includes('cup')) {
+          catKey = 'Cangkir & Mug';
+        } else if (nameLower.includes('bowl') || nameLower.includes('mangkuk') || codeLower.includes('bwl')) {
+          catKey = 'Mangkuk';
+        } else if (nameLower.includes('plate') || nameLower.includes('piring') || codeLower.includes('plt')) {
+          catKey = 'Piring';
+        }
+        const qty = it.quantity || 1;
+        const price = it.price || 0;
+        categorySalesMap[catKey].count += qty;
+        categorySalesMap[catKey].amount += (price * qty);
+      });
+    } else {
+      const summary = (ord.itemsSummary || '').toLowerCase();
+      let catKey = 'Peralatan Makan Set';
+      if (summary.includes('mug') || summary.includes('cup') || summary.includes('cangkir') || summary.includes('cup')) {
+        catKey = 'Cangkir & Mug';
+      } else if (summary.includes('bowl') || summary.includes('mangkuk') || summary.includes('bwl')) {
+        catKey = 'Mangkuk';
+      } else if (summary.includes('plate') || summary.includes('piring') || summary.includes('plt')) {
+        catKey = 'Piring';
+      }
+      categorySalesMap[catKey].count += 1;
+      categorySalesMap[catKey].amount += (ord.total || 0);
+    }
+  });
+
+  const totalCatAmount = Object.values(categorySalesMap).reduce((s, c) => s + c.amount, 0) || 1;
+  const categoryDistribution = Object.values(categorySalesMap).map(c => {
+    const pct = totalCatAmount > 0 ? Math.round((c.amount / totalCatAmount) * 100) : 0;
+    return {
+      ...c,
+      pct: pct + '%',
+      pctNum: pct
+    };
+  }).sort((a, b) => b.amount - a.amount);
+
+  const topCategory = categoryDistribution.find(c => c.count > 0) || categoryDistribution[0];
+
+  const filteredReportOrders = adminOrders.filter(ord => {
+    if (reportFilter === 'Semua') return true;
+    if (reportFilter === 'Selesai') return ord.fulfillment === 'Selesai' || ord.status === 'Selesai';
+    if (reportFilter === 'Diproses') return ord.fulfillment === 'Diproses' || ord.status === 'Diproses';
+    if (reportFilter === 'Dibatalkan') return ord.fulfillment === 'Dibatalkan' || ord.status === 'Dibatalkan';
+    return true;
+  });
+
+  const handleDownloadSalesReportCSV = () => {
+    const headers = [
+      'ID Pesanan',
+      'Tanggal Transaksi',
+      'Nama Pemesan',
+      'Nomor WhatsApp',
+      'Kota & Wilayah',
+      'Alamat Lengkap Pengiriman',
+      'Karya Keramik & Varian',
+      'Jumlah Item (pcs)',
+      'Subtotal Produk (Rp)',
+      'Ongkos Kirim COD (Rp)',
+      'Total Pembayaran (Rp)',
+      'Metode Pembayaran',
+      'Status Pembayaran',
+      'Status Pengiriman'
+    ];
+
+    const rows = adminOrders.map(ord => {
+      const itemsCount = ord.items ? ord.items.reduce((s, it) => s + (it.quantity || 1), 0) : 1;
+      const cleanAddress = (ord.address || ord.shippingAddress || '').replace(/[\r\n,]+/g, ' ');
+      const itemsText = (ord.itemsSummary || (ord.items ? ord.items.map(it => `${it.name} (${it.selectedCode || it.code || '-'}) x${it.quantity || 1}`).join('; ') : '-')).replace(/[\r\n,]+/g, ' ');
+      const grandTotal = ord.grandTotal !== undefined ? ord.grandTotal : (ord.total + (ord.shippingFee || 0));
+
+      return [
+        `"${ord.id}"`,
+        `"${ord.date || '-'}"`,
+        `"${(ord.patron || 'Pelanggan').replace(/"/g, '""')}"`,
+        `"${ord.phone || '-'}"`,
+        `"${ord.city || 'Kota Palembang'}"`,
+        `"${cleanAddress.replace(/"/g, '""')}"`,
+        `"${itemsText.replace(/"/g, '""')}"`,
+        itemsCount,
+        ord.total || 0,
+        ord.shippingFee || 0,
+        grandTotal || 0,
+        `"${ord.paymentMethod || 'COD'}"`,
+        `"${ord.paymentStatus || 'Menunggu Pembayaran'}"`,
+        `"${ord.fulfillment || 'Diproses'}"`
+      ].join(',');
+    });
+
+    const csvContent = '\uFEFF' + [headers.join(','), ...rows].join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `Laporan_Penjualan_CLAYE_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    showToast('Laporan Keuangan Penjualan (.CSV) berhasil diunduh.', 'success');
+  };
+
+  const handleDownloadProductsCSV = () => {
+    const headers = [
+      'ID Produk',
+      'Kode Varian Utama',
+      'Nama Karya Keramik',
+      'Kategori',
+      'Harga (Rp)',
+      'Stok Tersedia (pcs)',
+      'Rating Kepuasan',
+      'Jumlah Ulasan',
+      'Label Kurasi',
+      'Daftar Kode Varian'
+    ];
+
+    const rows = products.map(p => {
+      const variantCodes = (p.variants || []).map(v => v.code).join('; ') || (p.variants?.[0]?.code || p.id);
+      return [
+        `"${p.id}"`,
+        `"${p.variants?.[0]?.code || p.id}"`,
+        `"${(p.name || '').replace(/"/g, '""')}"`,
+        `"${p.category || 'Keramik'}"`,
+        p.price || 0,
+        p.stock || 0,
+        p.rating || 4.9,
+        p.reviewCount || (p.reviews ? p.reviews.length : 0),
+        `"${p.badge || 'Koleksi Aktif'}"`,
+        `"${variantCodes.replace(/"/g, '""')}"`
+      ].join(',');
+    });
+
+    const csvContent = '\uFEFF' + [headers.join(','), ...rows].join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `Data_Katalog_Produk_CLAYE_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    showToast('Data Penjualan Produk (.CSV) berhasil diunduh.', 'info');
+  };
 
   return (
     <div className="claye-admin-app-container">
@@ -1744,36 +1928,58 @@ export default function AdminPage() {
                     Rekapitulasi keuangan toko kurasi, performa transaksi COD, dan efisiensi pengantaran.
                   </p>
                 </div>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <button onClick={() => showToast('Laporan Keuangan Penjualan (.CSV) berhasil diunduh.', 'success')} className="purpose-action-btn primary" style={{ textTransform: 'capitalize' }}>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  <button 
+                    onClick={handleDownloadSalesReportCSV} 
+                    className="purpose-action-btn primary" 
+                    style={{ textTransform: 'capitalize', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                    title="Unduh seluruh rekapitulasi data pesanan dan keuangan dalam format CSV"
+                  >
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="7 10 12 15 17 10"></polyline>
+                      <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
                     Unduh Laporan CSV
                   </button>
-                  <button onClick={() => showToast('Data Penjualan Produk (.CSV) berhasil diunduh.', 'info')} className="purpose-action-btn secondary" style={{ textTransform: 'capitalize' }}>
+                  <button 
+                    onClick={handleDownloadProductsCSV} 
+                    className="purpose-action-btn secondary" 
+                    style={{ textTransform: 'capitalize', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                    title="Unduh data katalog seluruh produk dan stok dalam format CSV"
+                  >
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="7 10 12 15 17 10"></polyline>
+                      <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
                     Unduh Data Produk
                   </button>
                 </div>
               </div>
 
-              {/* 4 INDIKATOR EFISIENSI */}
+              {/* 4 INDIKATOR EFISIENSI (REAL-TIME TERINTEGRASI) */}
               <div className="admin-metrics-row">
                 <div className="admin-metric-card">
                   <span className="metric-title">KEPUASAN PELANGGAN (CSAT)</span>
-                  <div className="metric-primary-val">98.6%</div>
+                  <div className="metric-primary-val">{csatPercentage}</div>
                   <div className="metric-trend-positive">Berdasarkan ulasan pembeli terverifikasi</div>
                 </div>
                 <div className="admin-metric-card">
                   <span className="metric-title">RATA-RATA NILAI PESANAN (AOV)</span>
-                  <div className="metric-primary-val">Rp 285.000</div>
-                  <div className="metric-trend-positive">+8.5% peningkatan keranjang belanja</div>
+                  <div className="metric-primary-val">Rp {averageOrderValue.toLocaleString('id-ID')}</div>
+                  <div className="metric-trend-positive">Dari {validReportOrders.length} transaksi pesanan sah</div>
                 </div>
                 <div className="admin-metric-card">
                   <span className="metric-title">KATEGORI PALING LARIS</span>
-                  <div className="metric-primary-val">Cangkir dan Mug</div>
-                  <div className="metric-alert-pill">45% dari seluruh volume pesanan</div>
+                  <div className="metric-primary-val" style={{ fontSize: '1.35rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {topCategory.category}
+                  </div>
+                  <div className="metric-alert-pill">{topCategory.pct} dari volume omzet ({topCategory.count} pcs)</div>
                 </div>
                 <div className="admin-metric-card">
                   <span className="metric-title">KEUTUHAN PENGIRIMAN LOGISTIK</span>
-                  <div className="metric-primary-val">99.8%</div>
+                  <div className="metric-primary-val">{logisticIntegrity}%</div>
                   <div className="metric-trend-positive">Kemasan bubble wrap ramah lingkungan sukses</div>
                 </div>
               </div>
@@ -1788,12 +1994,7 @@ export default function AdminPage() {
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem', marginTop: '1rem' }}>
-                  {[
-                    { category: 'Cangkir dan Mug', pct: '45%', amount: 'Rp 5.625.000', count: '45 pcs', color: '#B87355' },
-                    { category: 'Peralatan Makan dan Piring', pct: '25%', amount: 'Rp 3.125.000', count: '21 pcs', color: '#24201D' },
-                    { category: 'Mangkuk Stoneware', pct: '18%', amount: 'Rp 2.250.000', count: '15 pcs', color: '#385E3E' },
-                    { category: 'Vas dan Wadah Kopi', pct: '12%', amount: 'Rp 1.500.000', count: '8 pcs', color: '#8A857F' }
-                  ].map((cat, idx) => (
+                  {categoryDistribution.map((cat, idx) => (
                     <div key={idx} style={{
                       backgroundColor: '#FFFFFF',
                       border: '1px solid var(--color-border)',
@@ -1801,18 +2002,117 @@ export default function AdminPage() {
                       padding: '1.25rem'
                     }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                        <span style={{ fontSize: '0.8rem', fontWeight: '600' }}>{cat.category}</span>
+                        <span style={{ fontSize: '0.85rem', fontWeight: '600' }}>{cat.category}</span>
                         <strong style={{ color: cat.color }}>{cat.pct}</strong>
                       </div>
                       <div style={{ height: '6px', backgroundColor: '#F0ECE4', borderRadius: '3px', overflow: 'hidden', marginBottom: '0.75rem' }}>
                         <div style={{ width: cat.pct, height: '100%', backgroundColor: cat.color }} />
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: '#8A857F' }}>
-                        <span>Total: {cat.amount}</span>
-                        <span>{cat.count}</span>
+                        <span>Total: Rp {cat.amount.toLocaleString('id-ID')}</span>
+                        <span>{cat.count} pcs</span>
                       </div>
                     </div>
                   ))}
+                </div>
+              </div>
+
+              {/* REKAPITULASI TRANSAKSI PENJUALAN MASUK */}
+              <div className="admin-section-container" style={{ marginTop: '1.5rem' }}>
+                <div className="admin-section-top" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
+                  <div>
+                    <h3 className="section-serif-heading">Rekapitulasi Transaksi Penjualan Masuk</h3>
+                    <p className="section-subtext">Rincian seluruh pesanan transaksi COD yang masuk ke toko kurasi CLAYÉ.</p>
+                  </div>
+                  <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                    {['Semua', 'Selesai', 'Diproses', 'Dibatalkan'].map(st => (
+                      <button
+                        key={st}
+                        onClick={() => setReportFilter(st)}
+                        className={`filter-tab-pill ${reportFilter === st ? 'active' : ''}`}
+                        style={{
+                          padding: '5px 12px',
+                          fontSize: '0.78rem',
+                          borderRadius: '20px',
+                          border: '1px solid var(--color-border)',
+                          background: reportFilter === st ? 'var(--color-charcoal)' : '#FFFFFF',
+                          color: reportFilter === st ? '#FFFFFF' : 'var(--color-charcoal)',
+                          cursor: 'pointer',
+                          fontWeight: reportFilter === st ? '600' : '400'
+                        }}
+                      >
+                        {st}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="table-responsive-wrapper" style={{ overflowX: 'auto', marginTop: '1rem', width: '100%' }}>
+                  <table className="admin-data-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem', minWidth: '600px' }}>
+                    <thead>
+                      <tr style={{ background: '#FAF7F2', borderBottom: '1px solid var(--color-border)', textAlign: 'left' }}>
+                        <th style={{ padding: '10px 12px', fontWeight: '600' }}>ID PESANAN</th>
+                        <th style={{ padding: '10px 12px', fontWeight: '600' }}>PELANGGAN</th>
+                        <th style={{ padding: '10px 12px', fontWeight: '600' }}>TANGGAL</th>
+                        <th style={{ padding: '10px 12px', fontWeight: '600' }}>KARYA KERAMIK</th>
+                        <th style={{ padding: '10px 12px', fontWeight: '600' }}>TOTAL OMZET</th>
+                        <th style={{ padding: '10px 12px', fontWeight: '600' }}>STATUS BAYAR</th>
+                        <th style={{ padding: '10px 12px', fontWeight: '600' }}>STATUS PENGIRIMAN</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredReportOrders.length === 0 ? (
+                        <tr>
+                          <td colSpan="7" style={{ textAlign: 'center', padding: '2rem', color: '#8A857F' }}>
+                            Tidak ada data transaksi untuk filter "{reportFilter}".
+                          </td>
+                        </tr>
+                      ) : (
+                        filteredReportOrders.map((ord, idx) => (
+                          <tr key={ord.id || idx} style={{ borderBottom: '1px solid #F0ECE4' }}>
+                            <td style={{ padding: '10px 12px', fontWeight: '600', color: 'var(--color-charcoal)' }}>{ord.id}</td>
+                            <td style={{ padding: '10px 12px' }}>
+                              <div style={{ fontWeight: '500' }}>{ord.patron || 'Pelanggan'}</div>
+                              <div style={{ fontSize: '0.74rem', color: '#8A857F' }}>{ord.phone || ord.email}</div>
+                            </td>
+                            <td style={{ padding: '10px 12px', color: '#6E6962' }}>{ord.date || '-'}</td>
+                            <td style={{ padding: '10px 12px', maxWidth: '240px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {ord.itemsSummary || (ord.items ? ord.items.map(it => `${it.name} (${it.selectedCode || it.code})`).join(', ') : '-')}
+                            </td>
+                            <td style={{ padding: '10px 12px', fontWeight: '600' }}>
+                              Rp {((ord.grandTotal !== undefined ? ord.grandTotal : (ord.total + (ord.shippingFee || 0))) || 0).toLocaleString('id-ID')}
+                            </td>
+                            <td style={{ padding: '10px 12px' }}>
+                              <span style={{
+                                display: 'inline-block',
+                                padding: '3px 8px',
+                                borderRadius: '12px',
+                                fontSize: '0.72rem',
+                                fontWeight: '600',
+                                background: ord.paymentStatus === 'Lunas' ? '#EBF5EE' : (ord.status === 'Dibatalkan' || ord.fulfillment === 'Dibatalkan') ? '#FEECEB' : '#FFF6E5',
+                                color: ord.paymentStatus === 'Lunas' ? '#22633C' : (ord.status === 'Dibatalkan' || ord.fulfillment === 'Dibatalkan') ? '#C23934' : '#996300'
+                              }}>
+                                {ord.paymentStatus || 'Menunggu Bayar'}
+                              </span>
+                            </td>
+                            <td style={{ padding: '10px 12px' }}>
+                              <span style={{
+                                display: 'inline-block',
+                                padding: '3px 8px',
+                                borderRadius: '12px',
+                                fontSize: '0.72rem',
+                                fontWeight: '600',
+                                background: ord.fulfillment === 'Selesai' ? '#EBF5EE' : (ord.fulfillment === 'Dibatalkan' || ord.status === 'Dibatalkan') ? '#FEECEB' : '#EDF4FC',
+                                color: ord.fulfillment === 'Selesai' ? '#22633C' : (ord.fulfillment === 'Dibatalkan' || ord.status === 'Dibatalkan') ? '#C23934' : '#1C5B96'
+                              }}>
+                                {ord.fulfillment || 'Diproses'}
+                              </span>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
