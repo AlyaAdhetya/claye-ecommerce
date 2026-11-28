@@ -7,6 +7,7 @@ export default function AdminPage() {
     products,
     orders,
     updateOrderFulfillment,
+    cancelOrder,
     syncOrders,
     addProduct,
     updateProduct,
@@ -362,7 +363,11 @@ export default function AdminPage() {
       updateOrderFulfillment(orderId, newStatus);
     }
     if (inspectOrderData && inspectOrderData.id === orderId) {
-      const updatedPayment = newStatus.startsWith('Selesai') ? 'Lunas' : (inspectOrderData.paymentMethod?.includes('COD') ? 'Menunggu Pembayaran' : inspectOrderData.paymentStatus);
+      const updatedPayment = newStatus.startsWith('Selesai')
+        ? 'Lunas'
+        : newStatus === 'Dibatalkan'
+          ? 'Dibatalkan'
+          : (inspectOrderData.paymentMethod?.includes('COD') ? 'Menunggu Pembayaran' : inspectOrderData.paymentStatus);
       setInspectOrderData(prev => ({
         ...prev,
         fulfillment: newStatus,
@@ -375,7 +380,8 @@ export default function AdminPage() {
   const filteredOrders = adminOrders.filter(ord => {
     const fulfillmentStr = (ord.fulfillment || 'Diproses').toLowerCase();
     const matchStatus = orderStatusFilter === 'Semua' ||
-      fulfillmentStr.includes(orderStatusFilter.toLowerCase()) ||
+      (orderStatusFilter === 'Dibatalkan' && fulfillmentStr.includes('batal')) ||
+      (orderStatusFilter !== 'Dibatalkan' && fulfillmentStr.includes(orderStatusFilter.toLowerCase())) ||
       (orderStatusFilter === 'Menunggu' && (fulfillmentStr.includes('menunggu') || (ord.paymentStatus || '').toLowerCase().includes('menunggu')));
     const matchSearch = (ord.id || '').toLowerCase().includes(orderSearchQuery.toLowerCase()) ||
       (ord.patron || '').toLowerCase().includes(orderSearchQuery.toLowerCase()) ||
@@ -391,8 +397,10 @@ export default function AdminPage() {
     return matchCat && matchSearch;
   });
 
-  // Calculate quick stats
-  const totalRevenue = adminOrders.reduce((sum, ord) => sum + (ord.grandTotal || ord.total || 0), 0);
+  // Calculate quick stats (hanya pesanan yang tidak dibatalkan yang dihitung ke pendapatan aktif)
+  const totalRevenue = adminOrders
+    .filter(ord => ord.fulfillment !== 'Dibatalkan')
+    .reduce((sum, ord) => sum + (ord.grandTotal || ord.total || 0), 0);
   const totalPhysicalStock = products.reduce((sum, p) => sum + (p.stock || 0), 0);
   const lowStockCount = products.filter(p => (p.stock || 0) < 5).length;
 
@@ -927,7 +935,7 @@ export default function AdminPage() {
               {/* FILTER & PENCARIAN PESANAN */}
               <div className="admin-filter-bar">
                 <div className="filter-tabs-row">
-                  {['Semua', 'Diproses', 'Selesai', 'Menunggu'].map(status => (
+                  {['Semua', 'Diproses', 'Selesai', 'Menunggu', 'Dibatalkan'].map(status => (
                     <button
                       key={status}
                       className={`filter-tab-btn ${orderStatusFilter === status ? 'active' : ''}`}
@@ -937,7 +945,9 @@ export default function AdminPage() {
                       <span className="filter-counter-badge">
                         {status === 'Semua'
                           ? adminOrders.length
-                          : adminOrders.filter(o => (o.fulfillment || '').toLowerCase().includes(status.toLowerCase())).length}
+                          : status === 'Dibatalkan'
+                            ? adminOrders.filter(o => (o.fulfillment || '').toLowerCase().includes('batal')).length
+                            : adminOrders.filter(o => (o.fulfillment || '').toLowerCase().includes(status.toLowerCase())).length}
                       </span>
                     </button>
                   ))}
@@ -1053,14 +1063,27 @@ export default function AdminPage() {
                                   fontSize: '0.78rem',
                                   borderRadius: '4px',
                                   border: '1px solid #EAE6DF',
-                                  backgroundColor: ord.fulfillment === 'Selesai' ? '#E8ECE6' : ord.fulfillment === 'Diproses' ? '#FBEBE4' : '#F5F2EB',
-                                  color: ord.fulfillment === 'Selesai' ? '#385E3E' : ord.fulfillment === 'Diproses' ? '#B87355' : '#8A857F',
+                                  backgroundColor: ord.fulfillment?.startsWith('Selesai')
+                                    ? '#E8ECE6'
+                                    : ord.fulfillment === 'Dibatalkan'
+                                      ? '#FCE8E6'
+                                      : ord.fulfillment === 'Diproses'
+                                        ? '#FBEBE4'
+                                        : '#F5F2EB',
+                                  color: ord.fulfillment?.startsWith('Selesai')
+                                    ? '#385E3E'
+                                    : ord.fulfillment === 'Dibatalkan'
+                                      ? '#C5221F'
+                                      : ord.fulfillment === 'Diproses'
+                                        ? '#B87355'
+                                        : '#8A857F',
                                   fontWeight: '600'
                                 }}
                               >
                                 <option value="Sedang Dikemas">Sedang Dikemas</option>
                                 <option value="Sedang Diantar">Sedang Diantar (COD)</option>
                                 <option value="Selesai (Terkirim & Lunas)">Selesai (Terkirim & Lunas)</option>
+                                <option value="Dibatalkan">Dibatalkan</option>
                               </select>
                             </td>
                             <td style={{ textAlign: 'right' }}>
@@ -2779,6 +2802,7 @@ export default function AdminPage() {
                   <option value="Sedang Dikemas">Sedang Dikemas</option>
                   <option value="Sedang Diantar">Sedang Diantar (COD)</option>
                   <option value="Selesai (Terkirim & Lunas)">Selesai (Terkirim & Lunas)</option>
+                  <option value="Dibatalkan">Dibatalkan</option>
                 </select>
               </div>
 

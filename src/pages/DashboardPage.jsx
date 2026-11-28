@@ -11,6 +11,7 @@ export default function DashboardPage() {
     registeredUsers,
     logout,
     updateProfile,
+    cancelOrder,
     navigate,
     openConcierge,
     showToast,
@@ -759,7 +760,10 @@ export default function DashboardPage() {
                               </td>
                               <td className="cell-total">Rp {((ord.grandTotal !== undefined ? ord.grandTotal : (ord.total + (ord.shippingFee || 0))) || 0).toLocaleString('id-ID')}</td>
                               <td className="cell-fulfillment">
-                                <span className={`status-pill ${ord.fulfillment === 'SELESAI' ? 'pill-completed' : 'pill-processing'}`}>• {ord.fulfillment}</span>
+                                <span className={`status-pill ${ord.fulfillment?.startsWith('Selesai') || ord.fulfillment === 'SELESAI' ? 'pill-completed' : ord.fulfillment === 'Dibatalkan' ? 'pill-cancelled' : 'pill-processing'}`}
+                                  style={ord.fulfillment === 'Dibatalkan' ? { backgroundColor: '#FCE8E6', color: '#C5221F', border: '1px solid #F5C2C7' } : {}}>
+                                  • {ord.fulfillment}
+                                </span>
                               </td>
                               <td className="cell-details" style={{ textAlign: 'right' }}>
                                 <button onClick={() => setSelectedOrderModal(ord)} className="order-view-btn">LIHAT ›</button>
@@ -844,10 +848,41 @@ export default function DashboardPage() {
                             </td>
                             <td className="cell-total">Rp {((ord.grandTotal !== undefined ? ord.grandTotal : (ord.total + (ord.shippingFee || 0))) || 0).toLocaleString('id-ID')}</td>
                             <td className="cell-fulfillment">
-                              <span className={`status-pill ${ord.fulfillment === 'SELESAI' ? 'pill-completed' : 'pill-processing'}`}>• {ord.fulfillment}</span>
+                              <span
+                                className={`status-pill ${
+                                  ord.fulfillment?.startsWith('Selesai') || ord.fulfillment === 'SELESAI'
+                                    ? 'pill-completed'
+                                    : ord.fulfillment === 'Dibatalkan'
+                                      ? 'pill-cancelled'
+                                      : 'pill-processing'
+                                }`}
+                                style={ord.fulfillment === 'Dibatalkan' ? { backgroundColor: '#FCE8E6', color: '#C5221F', border: '1px solid #F5C2C7' } : {}}
+                              >
+                                • {ord.fulfillment}
+                              </span>
                             </td>
-                            <td className="cell-details" style={{ textAlign: 'right' }}>
-                              <button onClick={() => setSelectedOrderModal(ord)} className="order-view-btn">LIHAT ›</button>
+                            <td className="cell-details" style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+                              <button onClick={() => setSelectedOrderModal(ord)} className="order-view-btn" style={{ marginRight: '6px' }}>LIHAT ›</button>
+                              {(!ord.fulfillment || ord.fulfillment === 'Diproses' || ord.fulfillment === 'Sedang Dikemas' || ord.fulfillment === 'Menunggu') && (
+                                <button
+                                  onClick={() => {
+                                    if (window.confirm(`Apakah Anda yakin ingin membatalkan pesanan ${ord.id}?`)) {
+                                      cancelOrder(ord.id);
+                                    }
+                                  }}
+                                  className="order-view-btn"
+                                  style={{
+                                    backgroundColor: '#fff',
+                                    color: '#C5221F',
+                                    borderColor: '#F5C2C7',
+                                    fontSize: '0.72rem',
+                                    padding: '4px 8px'
+                                  }}
+                                  title="Batalkan pesanan ini"
+                                >
+                                  BATALKAN
+                                </button>
+                              )}
                             </td>
                           </tr>
                         ))}
@@ -1142,7 +1177,23 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <span className="detail-tag">Status Pengiriman</span>
-                  <p><span className="status-pill pill-completed">• {selectedOrderModal.fulfillment}</span></p>
+                  <p>
+                    <span
+                      className={`status-pill ${
+                        selectedOrderModal.fulfillment?.startsWith('Selesai') ? 'pill-completed'
+                        : selectedOrderModal.fulfillment === 'Dibatalkan' ? 'pill-cancelled'
+                        : 'pill-processing'
+                      }`}
+                      style={selectedOrderModal.fulfillment === 'Dibatalkan' ? { backgroundColor: '#FCE8E6', color: '#C5221F', border: '1px solid #F5C2C7' } : {}}
+                    >
+                      • {selectedOrderModal.fulfillment}
+                    </span>
+                  </p>
+                  {selectedOrderModal.fulfillment === 'Dibatalkan' && selectedOrderModal.cancelReason && (
+                    <p style={{ fontSize: '0.78rem', color: '#8A857F', marginTop: '4px' }}>
+                      Alasan: {selectedOrderModal.cancelReason}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <span className="detail-tag">Nomor Resi</span>
@@ -1178,15 +1229,20 @@ export default function DashboardPage() {
             </div>
 
             <div className="modal-footer">
-              <button
-                onClick={() => {
-                  setSelectedOrderModal(null);
-                  openConcierge(`Bantu saya melacak resi pengiriman ${selectedOrderModal.trackingNumber}`);
-                }}
-                className="btn-modal-action"
-              >
-                Lacak Status Ekspedisi →
-              </button>
+              {selectedOrderModal.fulfillment !== 'Dibatalkan' && !selectedOrderModal.fulfillment?.startsWith('Selesai') && (
+                <button
+                  onClick={() => {
+                    if (window.confirm(`Apakah Anda yakin ingin membatalkan pesanan ${selectedOrderModal.id}?`)) {
+                      cancelOrder(selectedOrderModal.id);
+                      setSelectedOrderModal(null);
+                    }
+                  }}
+                  className="btn-modal-cancel"
+                  style={{ backgroundColor: '#FFF5F5', color: '#C5221F', borderColor: '#F5C2C7' }}
+                >
+                  Batalkan Pesanan
+                </button>
+              )}
               <button onClick={() => setSelectedOrderModal(null)} className="btn-modal-cancel">
                 Tutup
               </button>

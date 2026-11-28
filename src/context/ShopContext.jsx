@@ -1061,6 +1061,8 @@ export function ShopProvider({ children }) {
           // Jika status fulfillment diubah menjadi "Selesai (Terkirim & Lunas)", otomatis tandai pembayaran Lunas
           if (newStatus.startsWith('Selesai')) {
             updated.paymentStatus = 'Lunas';
+          } else if (newStatus === 'Dibatalkan') {
+            updated.paymentStatus = 'Dibatalkan';
           } else {
             // Jika masih Sedang Dikemas atau Sedang Diantar, COD menunggu pembayaran saat serah terima
             if (ord.paymentMethod && ord.paymentMethod.includes('COD')) {
@@ -1073,6 +1075,23 @@ export function ShopProvider({ children }) {
       })
     );
     showToast(`Status pengiriman ${orderId} diubah menjadi "${newStatus}".`, 'success');
+  };
+
+  const cancelOrder = (orderId, reason = 'Dibatalkan oleh pelanggan') => {
+    setOrders(prev =>
+      prev.map(ord => {
+        if (ord.id === orderId) {
+          return {
+            ...ord,
+            fulfillment: 'Dibatalkan',
+            paymentStatus: 'Dibatalkan',
+            cancelReason: reason
+          };
+        }
+        return ord;
+      })
+    );
+    showToast(`Pesanan ${orderId} berhasil dibatalkan.`, 'info');
   };
 
   const updateOrderPayment = (orderId, newPaymentStatus, newPaymentMethod = null) => {
@@ -1242,6 +1261,7 @@ export function ShopProvider({ children }) {
       createOrder,
       updateOrderFulfillment,
       updateOrderPayment,
+      cancelOrder,
       syncOrders,
       addProduct,
       updateProduct,
