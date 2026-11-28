@@ -183,9 +183,21 @@ export function ShopProvider({ children }) {
       const saved = localStorage.getItem('claye_products_id_v9');
       if (saved) {
         const parsed = JSON.parse(saved);
-        const existingIds = new Set(parsed.map(p => p.id));
-        const missingProducts = INITIAL_PRODUCTS.filter(p => !existingIds.has(p.id));
-        return [...parsed, ...missingProducts];
+        const savedMap = new Map(parsed.map(p => [p.id, p]));
+        // Ambil setiap produk dari INITIAL_PRODUCTS dan merge dengan data saved (jika ada edit admin)
+        const merged = INITIAL_PRODUCTS.map(initP => {
+          if (savedMap.has(initP.id)) {
+            return { ...initP, ...savedMap.get(initP.id) };
+          }
+          return initP;
+        });
+        // Tambahkan juga produk custom baru yang mungkin ditambah admin secara manual
+        parsed.forEach(p => {
+          if (!merged.some(m => m.id === p.id)) {
+            merged.push(p);
+          }
+        });
+        return merged;
       }
       return INITIAL_PRODUCTS;
     } catch {
@@ -509,23 +521,11 @@ export function ShopProvider({ children }) {
     localStorage.setItem('claye_wishlist_id_v3', JSON.stringify(wishlist));
   }, [wishlist]);
 
-  // Sinkronisasi data awal dari PostgreSQL / Supabase jika kredensial sudah aktif
+  // Sinkronisasi data awal dari PostgreSQL / Supabase jika kredensial sudah aktif (hanya sinkron order)
   useEffect(() => {
     async function initSupabaseData() {
       if (!isSupabaseConfigured()) return;
       try {
-        const dbProducts = await supabaseService.getProducts();
-        if (dbProducts && dbProducts.length > 0) {
-          setProducts(dbProducts.map(p => ({
-            ...p,
-            image: p.image_url || '/assets/images/product_mug.jpg',
-            category: p.categories?.name || p.category || 'Kurasi Pilihan',
-            artisanOrigin: p.artisan_partners?.region_origin || 'Sentra Lokal',
-            glazeOptions: p.product_glazes && p.product_glazes.length > 0
-              ? p.product_glazes.map(g => ({ id: g.id, name: g.glaze_name, hex: g.hex_preview || '#EBE5D8' }))
-              : [{ id: 'default', name: 'Alami', hex: '#EBE5D8' }]
-          })));
-        }
 
         const dbOrders = await supabaseService.getOrders();
         if (dbOrders && dbOrders.length > 0) {
