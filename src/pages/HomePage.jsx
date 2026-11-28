@@ -72,8 +72,9 @@ export default function HomePage() {
                     src={item.image}
                     alt={item.name}
                     style={{
-                      objectFit: item.imageFit || 'contain',
-                      transform: `scale(${(item.imageScale || 100) / 100})`
+                      objectFit: 'cover',
+                      width: '100%',
+                      height: '100%'
                     }}
                   />
                   <div className="curated-card-overlay">

@@ -7215,41 +7215,125 @@ img {
   .claye-curated-grid,
   .store-products-grid,
   .catalog-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 0.75rem !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.65rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   .curated-product-card {
-    border-radius: 6px !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    box-sizing: border-box !important;
+  }
+
+  .curated-img-wrapper {
+    width: 100% !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 8px !important;
+    margin-bottom: 0.45rem !important;
+    background-color: #F8F5F0 !important;
+    overflow: hidden !important;
+    position: relative !important;
+    padding: 0 !important;
+    border: 1px solid #ECE7E0 !important;
+  }
+
+  .curated-img-wrapper img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block !important;
+  }
+
+  .card-top-badge {
+    top: 6px !important;
+    left: 6px !important;
+    font-size: 0.58rem !important;
+    padding: 2px 6px !important;
+    border-radius: 4px !important;
+    letter-spacing: 0.05em !important;
+    z-index: 2 !important;
   }
 
   .curated-card-info {
-    padding: 0.65rem 0.75rem 0.75rem !important;
+    padding: 0.15rem 0.1rem !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
   }
 
   .card-title-price-row {
+    display: flex !important;
     flex-direction: column !important;
     align-items: flex-start !important;
-    gap: 0.2rem !important;
+    gap: 0.15rem !important;
+    margin-bottom: 0.2rem !important;
+    width: 100% !important;
+    min-width: 0 !important;
   }
 
   .curated-item-name {
-    font-size: 0.88rem !important;
-    line-height: 1.3 !important;
+    font-size: 0.82rem !important;
+    line-height: 1.25 !important;
+    font-weight: 600 !important;
+    color: var(--color-charcoal) !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    word-break: break-word !important;
   }
 
   .curated-item-price {
-    font-size: 0.85rem !important;
+    font-size: 0.84rem !important;
     color: var(--color-terracotta) !important;
     font-weight: 700 !important;
+    margin-top: 0.1rem !important;
+  }
+
+  .card-subtitle-dots-row {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.15rem !important;
+    width: 100% !important;
+    min-width: 0 !important;
   }
 
   .curated-item-subtitle {
-    font-size: 0.7rem !important;
+    font-size: 0.68rem !important;
+    color: #8A857F !important;
+    line-height: 1.3 !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 1 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  .item-variant-count {
+    font-size: 0.65rem !important;
+    color: var(--color-terracotta) !important;
+    font-weight: 600 !important;
+    white-space: nowrap !important;
   }
 
   .quick-add-pill-btn {
-    font-size: 0.7rem !important;
+    font-size: 0.68rem !important;
     padding: 0.4rem 0.75rem !important;
   }
 }
@@ -7258,11 +7342,15 @@ img {
   .claye-curated-grid,
   .store-products-grid,
   .catalog-grid {
-    gap: 0.5rem !important;
+    gap: 0.45rem !important;
   }
 
-  .curated-card-info {
-    padding: 0.5rem 0.6rem 0.65rem !important;
+  .curated-item-name {
+    font-size: 0.78rem !important;
+  }
+
+  .curated-item-price {
+    font-size: 0.8rem !important;
   }
 }
 
@@ -7575,18 +7663,42 @@ img {
   }
 }
 
-/* 11. Chatbot Widget Mobile Floating Button & Window */
+/* 11. Chatbot Widget Mobile Floating FAB & Window */
 @media (max-width: 600px) {
   .claye-concierge-trigger {
-    bottom: 16px !important;
+    width: 48px !important;
+    height: 48px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    bottom: 18px !important;
     right: 16px !important;
-    padding: 0.55rem 0.95rem !important;
-    border-radius: 999px !important;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35) !important;
+    background-color: var(--color-charcoal) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.3) !important;
+    z-index: 999 !important;
+    cursor: pointer !important;
+  }
+
+  .claye-concierge-trigger svg {
+    width: 20px !important;
+    height: 20px !important;
+    color: #FFFFFF !important;
   }
 
   .concierge-trigger-text {
-    font-size: 0.75rem !important;
+    display: none !important;
+  }
+
+  .concierge-trigger-dot {
+    position: absolute !important;
+    top: 9px !important;
+    right: 9px !important;
+    width: 8px !important;
+    height: 8px !important;
+    border: 2px solid var(--color-charcoal) !important;
   }
 
   .claye-chat-overlay {
@@ -7607,26 +7719,68 @@ img {
   }
 }
 
-/* 12. Global Responsive Safety Constraints */
-#root {
+/* 12. Global Responsive Safety Constraints & Catalog Toolbar Mobile */
+#root, .app-layout {
   overflow-x: hidden !important;
   max-width: 100vw !important;
   width: 100% !important;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .container {
-    padding: 0 1rem !important;
+    padding: 0 0.85rem !important;
+  }
+
+  .claye-catalog-page {
+    padding: 1.5rem 0 4rem !important;
+  }
+
+  .catalog-page-header {
+    margin: 0 auto 1.5rem !important;
+  }
+
+  .catalog-main-title {
+    font-size: clamp(1.6rem, 5vw, 2.2rem) !important;
+  }
+
+  .catalog-lead-text {
+    font-size: 0.85rem !important;
   }
 
   .catalog-toolbar-panel {
-    padding: 0.85rem 0.75rem !important;
+    padding: 0.85rem 0.85rem !important;
+    margin-bottom: 1rem !important;
+    border-radius: 8px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .catalog-category-pills {
+    display: flex !important;
+    gap: 0.35rem !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    padding-bottom: 0.65rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+
+  .catalog-category-pills::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .cat-pill-btn {
+    padding: 0.4rem 0.85rem !important;
+    font-size: 0.72rem !important;
+    flex-shrink: 0 !important;
   }
 
   .catalog-search-sort-row {
+    display: flex !important;
     flex-direction: column !important;
     align-items: stretch !important;
-    gap: 0.5rem !important;
+    gap: 0.65rem !important;
+    width: 100% !important;
   }
 
   .search-field-wrap {
@@ -7634,8 +7788,39 @@ img {
     width: 100% !important;
   }
 
-  .catalog-sort-select {
+  .catalog-search-input {
     width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 0.55rem 2rem 0.55rem 2.2rem !important;
+    font-size: 0.82rem !important;
+  }
+
+  .sort-dropdown-wrap {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.5rem !important;
+  }
+
+  .sort-label {
+    font-size: 0.72rem !important;
+    font-weight: 700 !important;
+    color: var(--color-muted) !important;
+    flex-shrink: 0 !important;
+  }
+
+  .catalog-sort-select {
+    flex: 1 !important;
+    padding: 0.45rem 0.75rem !important;
+    font-size: 0.8rem !important;
+    border-radius: 6px !important;
+    box-sizing: border-box !important;
+  }
+
+  .catalog-results-meta {
+    font-size: 0.78rem !important;
+    margin-bottom: 0.85rem !important;
   }
 }
 
