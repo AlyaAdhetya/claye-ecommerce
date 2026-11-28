@@ -7357,30 +7357,85 @@ img {
 /* 5. Detail Page (Halaman Rincian Karya Keramik) Mobile */
 @media (max-width: 900px) {
   .detail-main-layout {
-    grid-template-columns: 1fr !important;
-    gap: 1.5rem !important;
-  }
-
-  .detail-visual-column {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 1.25rem !important;
     width: 100% !important;
   }
 
-  .detail-main-img-box {
+  .detail-visual-column,
+  .detail-info-column {
+    width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .main-image-display {
+    min-height: auto !important;
+    aspect-ratio: 1 / 1 !important;
     border-radius: 8px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background-color: #F8F5F0 !important;
+    border: 1px solid #ECE7E0 !important;
+  }
+
+  .main-image-display img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block !important;
   }
 
   .detail-thumbs-strip {
-    gap: 0.5rem !important;
+    gap: 0.4rem !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    padding-bottom: 4px !important;
+  }
+
+  .detail-thumbs-strip::-webkit-scrollbar {
+    display: none !important;
   }
 
   .detail-thumb-box {
-    width: 60px !important;
-    height: 60px !important;
+    width: 54px !important;
+    height: 54px !important;
+    border-radius: 6px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .detail-thumb-box img {
+    object-fit: cover !important;
   }
 
   .detail-hero-title {
-    font-size: 1.85rem !important;
+    font-size: clamp(1.6rem, 5vw, 2.1rem) !important;
     line-height: 1.25 !important;
+  }
+
+  .detail-top-nav-bar {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.45rem !important;
+    padding-bottom: 0.85rem !important;
+    margin-bottom: 1.25rem !important;
+    width: 100% !important;
+    border-bottom: 1px solid var(--color-border) !important;
+  }
+
+  .detail-breadcrumb {
+    font-size: 0.72rem !important;
+    flex-wrap: wrap !important;
+    gap: 0.35rem !important;
+  }
+
+  .bc-product-name {
+    display: none !important;
+  }
+
+  .studio-batch-header-badge {
+    font-size: 0.68rem !important;
   }
 
   .detail-cta-bar {
@@ -7395,6 +7450,7 @@ img {
 
   .dimensions-spec-grid {
     grid-template-columns: 1fr 1fr !important;
+    gap: 0.5rem !important;
   }
 }
 
@@ -7402,8 +7458,18 @@ img {
 @media (max-width: 900px) {
   .cart-grid-layout,
   .checkout-split-layout {
-    grid-template-columns: 1fr !important;
-    gap: 1.5rem !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 1.25rem !important;
+    width: 100% !important;
+  }
+
+  .cart-items-column,
+  .cart-summary-column,
+  .checkout-steps-column,
+  .checkout-summary-column {
+    width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
   }
 
   .checkout-steps-column {
@@ -7412,6 +7478,128 @@ img {
 
   .checkout-summary-column {
     order: 2;
+  }
+
+  .cart-page-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.5rem !important;
+    padding-bottom: 1rem !important;
+    margin-bottom: 1.25rem !important;
+    width: 100% !important;
+  }
+
+  .cart-main-title {
+    font-size: 1.75rem !important;
+  }
+
+  .clear-cart-link-btn {
+    align-self: flex-end !important;
+    font-size: 0.72rem !important;
+  }
+
+  .cart-item-row-card {
+    padding: 0.85rem !important;
+    gap: 0.65rem !important;
+    border-radius: 8px !important;
+    align-items: flex-start !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .cart-item-photo {
+    width: 68px !important;
+    height: 68px !important;
+    border-radius: 6px !important;
+    flex-shrink: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .cart-item-photo img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+  }
+
+  .cart-item-details {
+    min-width: 0 !important;
+    flex: 1 !important;
+    width: 100% !important;
+  }
+
+  .cart-item-title {
+    font-size: 0.95rem !important;
+    line-height: 1.25 !important;
+    word-break: break-word !important;
+  }
+
+  .cart-item-glaze-tag {
+    font-size: 0.75rem !important;
+    margin: 0.25rem 0 !important;
+  }
+
+  .cart-item-glaze-tag select {
+    font-size: 0.75rem !important;
+    padding: 2px 6px !important;
+    max-width: 140px !important;
+  }
+
+  .cart-item-unit-price {
+    font-size: 0.78rem !important;
+    margin-bottom: 0.35rem !important;
+  }
+
+  .cart-qty-subtotal-row {
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    width: 100% !important;
+  }
+
+  .stepper-quantity-control.sm {
+    height: 28px !important;
+  }
+
+  .stepper-quantity-control.sm .stepper-btn {
+    width: 26px !important;
+    font-size: 0.9rem !important;
+  }
+
+  .stepper-quantity-control.sm .stepper-value {
+    width: 28px !important;
+    font-size: 0.8rem !important;
+  }
+
+  .cart-item-line-total {
+    font-size: 0.95rem !important;
+    font-weight: 700 !important;
+    color: var(--color-terracotta) !important;
+    white-space: nowrap !important;
+  }
+
+  .cart-select-all-bar {
+    padding: 0.65rem 0.85rem !important;
+    font-size: 0.82rem !important;
+    border-radius: 6px !important;
+  }
+
+  .cart-packaging-assurance {
+    padding: 0.85rem !important;
+    font-size: 0.78rem !important;
+    border-radius: 6px !important;
+  }
+
+  .order-summary-card {
+    padding: 1.15rem 1rem !important;
+    border-radius: 8px !important;
+  }
+
+  .place-order-cta-btn {
+    padding: 12px 16px !important;
+    font-size: 0.92rem !important;
+    border-radius: 6px !important;
   }
 
   .checkout-form-row {
@@ -7427,17 +7615,22 @@ img {
 /* 7. Patron & Admin Dashboard Akun Mobile */
 @media (max-width: 900px) {
   .patron-page-grid {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
   }
 
   .patron-sidebar-menu {
     border-right: none !important;
     border-bottom: 1px solid var(--color-border) !important;
-    padding: 0.85rem 1rem !important;
+    padding: 0.75rem 0.85rem !important;
     background-color: #FAF8F5 !important;
     position: sticky !important;
     top: 58px !important;
     z-index: 90 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   .patron-profile-identity {
@@ -7470,11 +7663,12 @@ img {
     display: flex !important;
     flex-direction: row !important;
     overflow-x: auto !important;
-    gap: 0.45rem !important;
+    gap: 0.4rem !important;
     white-space: nowrap !important;
     -webkit-overflow-scrolling: touch !important;
     scrollbar-width: none !important;
     padding: 2px 0 !important;
+    width: 100% !important;
   }
 
   .patron-nav-menu::-webkit-scrollbar {
@@ -7484,8 +7678,9 @@ img {
   .patron-nav-group {
     display: flex !important;
     flex-direction: row !important;
-    gap: 0.45rem !important;
+    gap: 0.4rem !important;
     margin-bottom: 0 !important;
+    flex-shrink: 0 !important;
   }
 
   .patron-nav-group-title {
@@ -7495,7 +7690,7 @@ img {
   .patron-nav-item {
     width: auto !important;
     white-space: nowrap !important;
-    padding: 0.45rem 0.85rem !important;
+    padding: 0.45rem 0.8rem !important;
     border-radius: 999px !important;
     border: 1px solid #EAE4DC !important;
     background-color: #FFFFFF !important;
@@ -7504,6 +7699,7 @@ img {
     border-left: 1px solid #EAE4DC !important;
     display: inline-flex !important;
     align-items: center !important;
+    flex-shrink: 0 !important;
   }
 
   .patron-nav-item.is-active {
@@ -7522,7 +7718,73 @@ img {
   }
 
   .patron-main-viewport {
-    padding: 1.25rem 1rem !important;
+    padding: 1.25rem 0.85rem !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .dashboard-account-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.75rem !important;
+    margin-bottom: 1.25rem !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .account-main-title {
+    font-size: 1.85rem !important;
+  }
+
+  .account-welcome-sub {
+    font-size: 0.85rem !important;
+    line-height: 1.45 !important;
+    word-break: break-word !important;
+  }
+
+  .archived-cohort-badge {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 0.6rem 0.85rem !important;
+    border-radius: 6px !important;
+  }
+
+  .patron-metrics-row {
+    grid-template-columns: 1fr !important;
+    gap: 0.65rem !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .patron-stat-card {
+    padding: 0.85rem 1rem !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    border-radius: 8px !important;
+  }
+
+  .pstat-big-num {
+    font-size: 1.65rem !important;
+    margin: 0.2rem 0 !important;
+  }
+
+  .pstat-subtext {
+    font-size: 0.75rem !important;
+  }
+}
+
+/* Universal Page Bottom Spacing for Floating Controls */
+@media (max-width: 768px) {
+  .claye-cart-page,
+  .claye-detail-page,
+  .claye-patron-dashboard-page,
+  .claye-catalog-page,
+  .claye-checkout-page,
+  .claye-login-page,
+  .admin-main-viewport {
+    padding-bottom: 85px !important;
   }
 }
 
@@ -7821,6 +8083,70 @@ img {
   .catalog-results-meta {
     font-size: 0.78rem !important;
     margin-bottom: 0.85rem !important;
+  }
+
+  /* Home Promise Banner Mobile */
+  .promise-inner-card {
+    padding: 1.75rem 1.15rem !important;
+    border-radius: 8px !important;
+  }
+
+  .promise-serif-title {
+    font-size: 1.45rem !important;
+    line-height: 1.3 !important;
+    margin-bottom: 0.85rem !important;
+  }
+
+  .promise-body-text {
+    font-size: 0.85rem !important;
+    line-height: 1.55 !important;
+    margin-bottom: 1.25rem !important;
+  }
+
+  .promise-action-link {
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 0.65rem !important;
+  }
+
+  .promise-action-link button {
+    width: 100% !important;
+    text-align: center !important;
+    padding: 12px !important;
+    font-size: 0.84rem !important;
+  }
+
+  /* Checkout Steps & Inputs Mobile */
+  .checkout-step-card {
+    padding: 1.15rem 1rem !important;
+    border-radius: 8px !important;
+  }
+
+  .step-title-text {
+    font-size: 1.15rem !important;
+    line-height: 1.3 !important;
+  }
+
+  .checkout-form-group {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* About Page Grids Mobile */
+  .about-story-grid,
+  .visit-inner-banner,
+  .about-stats-grid,
+  .artisans-grid,
+  .values-grid,
+  .process-timeline-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 1.25rem !important;
+  }
+
+  .about-story-photo-frame,
+  .artisan-card-photo {
+    aspect-ratio: 4 / 3 !important;
+    max-height: 240px !important;
   }
 }
 

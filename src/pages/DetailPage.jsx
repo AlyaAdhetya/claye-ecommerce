@@ -67,8 +67,8 @@ export default function DetailPage() {
             <button onClick={() => navigate('/katalog')}>KATALOG</button>
             <span className="bc-sep">/</span>
             <button onClick={() => navigate('/katalog')}>{product.category.toUpperCase()}</button>
-            <span className="bc-sep">/</span>
-            <span className="bc-current">{product.name.toUpperCase()}</span>
+            <span className="bc-sep bc-product-name">/</span>
+            <span className="bc-current bc-product-name">{product.name.toUpperCase()}</span>
           </div>
 
           <div className="studio-batch-header-badge">
@@ -85,8 +85,9 @@ export default function DetailPage() {
                 src={activeImage}
                 alt={product.name}
                 style={{
-                  objectFit: product.imageFit || 'contain',
-                  transform: `scale(${(product.imageScale || 100) / 100})`
+                  objectFit: 'cover',
+                  width: '100%',
+                  height: '100%'
                 }}
               />
               <button
