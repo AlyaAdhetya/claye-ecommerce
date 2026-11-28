@@ -180,7 +180,7 @@ export const INITIAL_REGISTERED_USERS = [
 export function ShopProvider({ children }) {
   const [products, setProducts] = useState(() => {
     try {
-      const saved = localStorage.getItem('claye_products_id_v8');
+      const saved = localStorage.getItem('claye_products_id_v9');
       if (saved) {
         const parsed = JSON.parse(saved);
         const existingIds = new Set(parsed.map(p => p.id));
@@ -227,10 +227,10 @@ export function ShopProvider({ children }) {
       const isClean = localStorage.getItem('claye_clean_reset_v4');
       if (!isClean) {
         localStorage.setItem('claye_clean_reset_v4', 'true');
-        localStorage.removeItem('claye_user_active_v8');
+        localStorage.removeItem('claye_user_active_v9');
         return INITIAL_USER;
       }
-      const saved = localStorage.getItem('claye_user_active_v8');
+      const saved = localStorage.getItem('claye_user_active_v9');
       return saved ? JSON.parse(saved) : INITIAL_USER;
     } catch {
       return INITIAL_USER;
@@ -240,7 +240,7 @@ export function ShopProvider({ children }) {
   // Keranjang terisolasi per akun pengguna (akun baru = kosong)
   const [cart, setCart] = useState(() => {
     try {
-      const savedUser = localStorage.getItem('claye_user_active_v8');
+      const savedUser = localStorage.getItem('claye_user_active_v9');
       if (savedUser) {
         const u = JSON.parse(savedUser);
         const userCart = localStorage.getItem(`claye_cart_${u.email?.toLowerCase()}`);
@@ -255,7 +255,7 @@ export function ShopProvider({ children }) {
   // Wishlist terisolasi per akun pengguna (akun baru = kosong)
   const [wishlist, setWishlist] = useState(() => {
     try {
-      const savedUser = localStorage.getItem('claye_user_active_v8');
+      const savedUser = localStorage.getItem('claye_user_active_v9');
       if (savedUser) {
         const u = JSON.parse(savedUser);
         const userWish = localStorage.getItem(`claye_wishlist_${u.email?.toLowerCase()}`);
@@ -432,7 +432,7 @@ export function ShopProvider({ children }) {
 
   // Jika belum login, rute awal wajib /login
   const [currentRoute, setCurrentRoute] = useState(() => {
-    const savedUser = localStorage.getItem('claye_user_active_v8');
+    const savedUser = localStorage.getItem('claye_user_active_v9');
     if (!savedUser) {
       if (window.location.hash !== '#/login' && window.location.hash !== '#/register') {
         window.location.hash = '/login';
@@ -502,7 +502,7 @@ export function ShopProvider({ children }) {
   }, [orders]);
 
   useEffect(() => {
-    localStorage.setItem('claye_products_id_v8', JSON.stringify(products));
+    localStorage.setItem('claye_products_id_v9', JSON.stringify(products));
   }, [products]);
 
   useEffect(() => {
@@ -684,7 +684,7 @@ export function ShopProvider({ children }) {
       if (cleanPass === 'admin123' || cleanPass === 'claye2026' || cleanPass === 'admin' || cleanPass === 'atelier2026') {
         const adminUser = { ...ADMIN_CREDENTIALS };
         setUser(adminUser);
-        localStorage.setItem('claye_user_active_v8', JSON.stringify(adminUser));
+        localStorage.setItem('claye_user_active_v9', JSON.stringify(adminUser));
         showToast('Masuk berhasil sebagai Administrator CLAYÉ Studio.', 'success');
         navigate('/admin');
         return { success: true };
@@ -714,7 +714,7 @@ export function ShopProvider({ children }) {
 
     // Berhasil Login
     setUser(foundUser);
-    localStorage.setItem('claye_user_active_v8', JSON.stringify(foundUser));
+    localStorage.setItem('claye_user_active_v9', JSON.stringify(foundUser));
     showToast(`Masuk berhasil. Selamat datang di CLAYÉ, ${foundUser.name}!`, 'success');
     navigate('/');
     return { success: true };
@@ -788,7 +788,7 @@ export function ShopProvider({ children }) {
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('claye_user_active_v8');
+    localStorage.removeItem('claye_user_active_v9');
     setCart([]);
     setWishlist([]);
     showToast('Anda telah keluar dari akun.', 'info');
@@ -798,7 +798,7 @@ export function ShopProvider({ children }) {
   const updateProfile = (updatedFields) => {
     setUser(prev => {
       const updated = { ...prev, ...updatedFields };
-      localStorage.setItem('claye_user_active_v8', JSON.stringify(updated));
+      localStorage.setItem('claye_user_active_v9', JSON.stringify(updated));
       return updated;
     });
     // Update juga di registeredUsers jika itu pelanggan
@@ -811,7 +811,7 @@ export function ShopProvider({ children }) {
   // ── MANAJEMEN BUKU ALAMAT PENGGUNA (TERHUBUNG KE CHECKOUT COD) ──
   const [addresses, setAddresses] = useState(() => {
     try {
-      const savedUser = localStorage.getItem('claye_user_active_v8');
+      const savedUser = localStorage.getItem('claye_user_active_v9');
       if (savedUser) {
         const u = JSON.parse(savedUser);
         if (u && u.email) {
